@@ -66,6 +66,7 @@ message DownloadRequest {
     map<string, string> segment_sources = 3;
     int64 arrival_time = 4;
     double contact_time = 5;
+    repeated Coordinate contact_points = 6;    
 }
 
 message DownloadReply {
