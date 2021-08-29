@@ -64,6 +64,8 @@ message DownloadRequest {
     int64 token_id = 1;
     repeated Segment segments = 2;
     map<string, string> segment_sources = 3;
+    int64 arrival_time = 4;
+    double contact_time = 5;
 }
 
 message DownloadReply {
