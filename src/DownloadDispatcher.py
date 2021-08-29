@@ -23,7 +23,7 @@ class DownloadDispatcher:
                 s.CopyFrom(segment)
             for s in segment_sources:
                 request.segment_sources[s] = segment_sources[s]
-            logging.info('request has' + str(len(request.segment_sources)) + ' and ' + str(len(request.segments)) + ' segments')
+            print('request has' , request.segment_sources , ' sources and ' + str(len(request.segments)) + ' segments')
             response = await stub.HandleDownloadRequest(request)
             if self.callback is not None:
                 self.callback(response)
@@ -32,8 +32,8 @@ class DownloadDispatcher:
 
 if __name__ == '__main__':
     logging.basicConfig()
-    segment_sources = {'0':'0.0.0.0:8000'}
-    downloadDispatcher = DownloadDispatcher({'0':'0.0.0.0:50054'}, None)
+    segment_sources = {'1':'0.0.0.0:8000'}
+    downloadDispatcher = DownloadDispatcher({'0':'0.0.0.0:50056'}, None)
     for i  in range(2):
         segment = clairvoyant_pb2.Segment()
         segment.segment_id = '1'
