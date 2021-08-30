@@ -61,6 +61,11 @@ class EdgeMetadataManager:
         self.redis.hmset(segmentInfo['segment'].segment_id, values)
         #self.redis.sadd(video_id, set(segmentInfo['segment'].segment_id))
 
+    def hasSegment(self, segment_id):
+        if self.redis.exists(segment_id):
+            return True
+        return False
+    
     def getSegment(self, segment_id):
         segmentInfo = {'segment':None, 'source':None, 'source_ip':None}
         values = self.redis.hgetall(segment_id)

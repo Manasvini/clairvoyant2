@@ -3,6 +3,7 @@ import os
 import asyncio
 import grpc
 import logging
+import threading
 
 import clairvoyant_pb2
 import clairvoyant_pb2_grpc
@@ -11,6 +12,8 @@ from EdgeMetadataManager import EdgeMetadataManager
 from ModelReader import Model
 import json
 from argparse import ArgumentParser
+from EdgeDownloadQueue import EdgeDownloadQueue
+from EdgeDownloadMonitor import EdgeDownloadMonitor
 
 class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
     def __init__(self, filename):
@@ -23,6 +26,11 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         print('started subs')
         self.model = Model(self.configDict["modelFile"])
 
+        self.queueManager = EdgeDownloadQueue(self.configDict['timeScale'], self.metadataManager)
+        self.downloadMonitor = EdgeDownloadMonitor(self.configDict['timeScale'], self.queueManager, self.configDict['serverAddress'], self.configDict['nodeId'], self.configDict['intervalSeconds'])
+        self.queueTracker = threading.Thread(target=self.downloadMonitor.run)
+        self.queueTracker.start()
+        
     def checkDownloadSchedule(self, segments, contact_points):
         return {segment.segment_id: segment for segment in segments}        
 
@@ -39,9 +47,11 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
             if segment.segment_id not in committed_segments:
                 continue
             segmentInfo = {}
-            segmentInfo['segment']  =segment
-            segmentInfo['source_ip'] = request.segment_sources[segment.segment_id]
-            self.metadataManager.addSegment(segmentInfo)
+            #segmentInfo['segment']  =segment
+            #segmentInfo['source_ip'] = request.segment_sources[segment.segment_id]
+            #self.metadataManager.addSegment(segmentInfo)
+            sourceSpeed = self.configDict['downloadSources'][request.segment_sources[segment.segment_id]]
+            self.queueManager.enqueue(segment, sourceSpeed, request.segment_sources[segment.segment_id])
             #segment_id = reply.segment_ids.add(sefmen)
             #segment_id = segment.segment_id
         reply.segment_ids.extend(committed_segments.keys())
@@ -51,6 +61,7 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
 
     def shutdown(self):
         self.metadataManager.shutdown()
+        self.queueTracker.join()
 
 def create_dl_server(filename):
     dlServer = EdgeDownloadServer(filename)

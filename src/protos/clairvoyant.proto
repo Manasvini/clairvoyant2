@@ -76,6 +76,7 @@ message DownloadReply {
 
 message DownloadCompleteRequest {
   repeated string segment_ids = 1;
+  string node_id = 2;
 }
 
 message CVRequest{

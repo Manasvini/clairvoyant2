@@ -51,13 +51,20 @@ class CVCloudServer(clairvoyant_pb2_grpc.EdgeServerServicer):
     async def HandleCVRequest(
                 self, request: clairvoyant_pb2.CVRequest, 
                 context: grpc.aio.ServicerContext) -> clairvoyant_pb2.CVReply:
+        reply = clairvoyant_pb2.CVReply()
         if request.HasField('videorequest'):
             urls, token = self.handleVideoRequest(request.videorequest)
-        reply = clairvoyant_pb2.CVReply()
-        videoReply = clairvoyant_pb2.VideoReply()
-        videoReply.token_id = token
-        videoReply.urls.extend(urls)
-        reply.videoreply.CopyFrom(videoReply)
+            videoReply = clairvoyant_pb2.VideoReply()
+            videoReply.token_id = token
+            videoReply.urls.extend(urls)
+            reply.videoreply.CopyFrom(videoReply)
+        elif request.HasField('downloadcompleterequest'):
+            logging.info('got dl update request from '+ request.downloadcompleterequest.node_id +  ' for' + str(len(request.downloadcompleterequest.segment_ids)) + ' segments')
+            self.dlManager.updateDownloads(request.downloadcompleterequest.node_id, request.downloadcompleterequest.segment_ids)
+            statusReply = clairvoyant_pb2.StatusReply()
+            statusReply.status = 'Updated'
+            reply.status.CopyFrom(statusReply)
+
         return reply
 
     def shutdown(self):
@@ -89,7 +96,7 @@ def main():
     args = parse_args()
     print("it's alive")
     logging.basicConfig(level=logging.INFO)
-    cvServer = create_server(args.config) 
+    cvServer = create_cv_server(args.config) 
     asyncio.run(serve(args.address, cvServer))
 
 if __name__=='__main__':

@@ -23,12 +23,12 @@ class EdgeDownloadAssignment:
         bytesInProgress = 0 
         now = time.time_ns() / 1e9
         totalTime = 0
-        segmentTime = (candidate.segment.segment_size * 8.0) / self.downloadSourceSpeeds[candidate.source] 
+        segmentTime = ((candidate.segment.segment_size/self.timeScale) * 8.0) / (self.downloadSourceSpeeds[candidate.source] )
         try:
             for ip_segment in self.assignments.values():
                 if ip_segment.source in self.downloadSourceSpeeds:
                     speed = self.downloadSourceSpeeds[ip_segment.source]
-                    segmentTime = (ip_segment.segment.segment_size * 8.0) / speed
+                    segmentTime = ((ip_segment.segment.segment_size/self.timeScale) * 8.0) / speed
                     totalTime += segmentTime
                 else:
                     raise ValueError('source ' + ip_segment.source + ' not found')

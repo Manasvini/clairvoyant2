@@ -13,7 +13,8 @@ class DownloadManager:
         self.edgeNodeAssignments = {node_id: EdgeDownloadAssignment(node_id, downloadSources[node_id], timeScale) for node_id in node_ids}
         self.timeScale = timeScale
         self.dispatcher = dispatcher    
-
+        logging.basicConfig(level=logging.INFO)
+        
     def findOptimalSource(self, node_id):
         return 'http://ftp.itec.aau.at/DASHDataset2014'
 
@@ -66,6 +67,7 @@ class DownloadManager:
                     availableContactTime -= (segments[segmentIdx].segment_size * 8 )/ (dlSpeed  * self.timeScale)
                     #print('seg', segmentIdx, ' contact left', availableContactTime, 'seg id ', segments[segmentIdx].segment_id)
                 else:
+                    logging.info('assigned ' + str(len(assignments[node.node_id])) + ' segments to ' + node.node_id)
                     break
             return assignments
 
