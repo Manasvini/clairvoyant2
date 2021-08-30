@@ -101,10 +101,13 @@ class MonitoringServer:
 
     def run(self): # TODO:potentially run this within the constructor 
         
-        httpd = self.server_class((self.address, self.port), MonitoringHandler)
-        httpd.edge_model_dict = self.edge_model_dict
+        self.httpd = self.server_class((self.address, self.port), MonitoringHandler)
+        self.httpd.edge_model_dict = self.edge_model_dict
         print("Starting Moniroring httpd server on {}:{}".format(self.address, self.port))
-        httpd.serve_forever()
+        self.httpd.serve_forever()
+
+    def shutdown(self):
+        self.httpd.shutdown()
 
 
 if __name__ == "__main__":

@@ -15,6 +15,8 @@ from argparse import ArgumentParser
 from EdgeDownloadQueue import EdgeDownloadQueue
 from EdgeDownloadMonitor import EdgeDownloadMonitor
 
+from monitoring.client import MonitoringClient
+
 class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
     def __init__(self, filename):
         self.configDict = {}
@@ -25,6 +27,9 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         self.metadataManager.startRedisSubscription()
         print('started subs')
         self.model = Model(self.configDict["modelFile"])
+        self.monClient = MonitoringClient(self.model, self.configDict['monInterval'], \
+                self.configDict['monServerAddress'])
+        monClient.start()
 
         self.queueManager = EdgeDownloadQueue(self.configDict['timeScale'], self.metadataManager)
         self.downloadMonitor = EdgeDownloadMonitor(self.configDict['timeScale'], self.queueManager, self.configDict['serverAddress'], self.configDict['nodeId'], self.configDict['intervalSeconds'])
@@ -62,6 +67,8 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
     def shutdown(self):
         self.metadataManager.shutdown()
         self.queueTracker.join()
+        self.monClient.stop()
+        monClient.join()
 
 def create_dl_server(filename):
     dlServer = EdgeDownloadServer(filename)

@@ -10,5 +10,6 @@
     "downloadSources":{
         "http://ftp.itec.aau.at/DASHDataset2014": 100000000
 
-    }
+    },
+    "monServerAddress": "localhost:8192"
 }

@@ -11,7 +11,8 @@ import requests
 if __name__ == "__main__":
     from os import path
     sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
-    from EdgeNetworkModel import EdgeNetworkModel
+
+from EdgeNetworkModel import EdgeNetworkModel
 
 logging.basicConfig()
 logger = logging.getLogger("monitoring")

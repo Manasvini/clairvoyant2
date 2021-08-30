@@ -12,5 +12,7 @@
     "nodeIps":{
         "node_0": "0.0.0.0:50056"
     },
-    "defaultSource":"http://ftp.itec.aau.at/DASHDataset2014"
+    "defaultSource":"http://ftp.itec.aau.at/DASHDataset2014",
+    "monServerAddress": "localhost",
+    "monServerPort": 8192
 }
