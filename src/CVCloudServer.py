@@ -31,7 +31,7 @@ class CVCloudServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         monServer = MonitoringServer(address=self.configDict['monServerAddress'], port=self.configDict['monServerPort'],\
                 edge_model_dict=mmWaveModels)
         self.monServerThread = Thread(target=monServer.run)
-        #self.monServerThread.start()
+        self.monServerThread.start()
         
         
     def checkDownloadSchedule(self, segments, contact_points):

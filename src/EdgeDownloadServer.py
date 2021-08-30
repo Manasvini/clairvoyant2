@@ -28,10 +28,10 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         self.metadataManager = EdgeMetadataManager(self.configDict['redisHost'], self.configDict['redisPort'], self.configDict['missedDeliveryThreshold'], self.configDict['timeScale'])
         self.metadataManager.startRedisSubscription()
         print('started subs')
-        #self.model = Model(self.configDict['modelFile'])
-        #self.monClient = MonitoringClient(self.configDict['modelFile'], self.configDict['monInterval'], \
-        #        self.configDict['monServerAddress'], self.configDict['nodeId'])
-        #self.monClient.start()
+        self.model = Model(self.configDict['modelFile'])
+        self.monClient = MonitoringClient(self.configDict['modelFile'], self.configDict['monInterval'], \
+                self.configDict['monServerAddress'], self.configDict['nodeId'])
+        self.monClient.start()
 
         self.queueManager = EdgeDownloadQueue(self.configDict['timeScale'], self.metadataManager)
         self.downloadMonitor = EdgeDownloadMonitor(self.configDict['timeScale'], self.queueManager, self.configDict['serverAddress'], self.configDict['nodeId'], self.configDict['intervalSeconds'])
