@@ -38,11 +38,11 @@ class EdgeDownloadQueue:
                     if not self.metadataManager.hasSegment(qData.segment.segment_id):
                         self.metadataManager.addSegment({'segment':qData.segment, 'source_ip':source})
                     completed.append(copy.deepcopy(self.pending[i]))
-                    print('compltedt:', i, 'dl deadline', dlTime + qData.timestamp/self.timeScale, 'now', now)
+                    #print('compltedt:', i, 'dl deadline', dlTime + qData.timestamp/self.timeScale, 'now', now)
                 
                 else:
                     newPending.append(copy.deepcopy(self.pending[i]))
-                    print('pending:', i, 'dl deadline', dlTime + qData.timestamp/self.timeScale, 'now', now)
+                    #print('pending:', i, 'dl deadline', dlTime + qData.timestamp/self.timeScale, 'now', now)
             self.pending = newPending
             logging.info('now have ' + str(len(self.pending)) + ' in pending list') 
         finally:

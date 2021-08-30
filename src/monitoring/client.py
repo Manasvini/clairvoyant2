@@ -26,12 +26,14 @@ class MonitoringClient(Thread):
     Currently sends model updates.
 
     """
-    def __init__(self, model_file, interval, address):
+    def __init__(self, model_file, interval, address, node_id):
         self.model_dict = self.parse_model_file(model_file)
         self.interval = interval
         self.url = 'http://{}'.format(address)
         self.stopped = Event()
+        self.node_id = node_id
         Thread.__init__(self)
+        
 
     def parse_model_file(self, model_file):
         model_dict = {} # dist -> throughput, std dev
@@ -51,7 +53,7 @@ class MonitoringClient(Thread):
                 dict_to_send[key] = value['mean'] + random.uniform(-value['sdev'], value['sdev'])
 
             payload = {}
-            payload['nodeid'] = 'node_1'
+            payload['nodeid'] = self.node_id
             payload['model'] = dict_to_send
 
             r = requests.post(self.url, json=payload)

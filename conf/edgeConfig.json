@@ -11,5 +11,6 @@
         "http://ftp.itec.aau.at/DASHDataset2014": 100000000
 
     },
-    "monServerAddress": "localhost:8192"
+    "monServerAddress": "localhost:8192",
+    "monInterval": 5
 }

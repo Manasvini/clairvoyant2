@@ -56,7 +56,6 @@ message StatusReply{
 message MissedDeliveryRequest {
     int64 token_id = 1;
     repeated Segment segments = 2;
-    string video_id = 3;
     string node_id = 4;
 }
 

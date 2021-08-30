@@ -28,10 +28,10 @@ class CVCloudServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         print('got config', self.configDict)
         self.metaClient = CloudMetadataClient(self.configDict['metaServerAddress'])
         self.dlManager = DownloadManager(self.configDict['nodeIds'], self.configDict['downloadSources'], self.configDict['timeScale'], mmWaveModels, DownloadDispatcher(self.configDict['nodeIps'], None))
-        monServer = MonitoringServer(address=configDict['monServerAddress'], port=configDict['monServerPort'],\
+        monServer = MonitoringServer(address=self.configDict['monServerAddress'], port=self.configDict['monServerPort'],\
                 edge_model_dict=mmWaveModels)
         self.monServerThread = Thread(target=monServer.run)
-
+        #self.monServerThread.start()
         
         
     def checkDownloadSchedule(self, segments, contact_points):
@@ -47,9 +47,10 @@ class CVCloudServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         urls = []
         assigned_segments = set()
         for node in assignments:
-            node_ip = self.configDict['nodeIps'][node]
+            http_node_ip = self.configDict['httpAddress'][node]
+
             for segment in assignments[node]:
-                urls.append('http://' + node_ip + '/' + segment.segment.segment_id)
+                urls.append('http://' + http_node_ip + '/' + segment.segment.segment_id)
                 assigned_segments.add(segment.segment.segment_id)
         for s in segments:
             if s.segment_id not in assigned_segments:
@@ -67,13 +68,20 @@ class CVCloudServer(clairvoyant_pb2_grpc.EdgeServerServicer):
             videoReply.token_id = token
             videoReply.urls.extend(urls)
             reply.videoreply.CopyFrom(videoReply)
+            return reply 
         elif request.HasField('downloadcompleterequest'):
             logging.info('got dl update request from '+ request.downloadcompleterequest.node_id +  ' for' + str(len(request.downloadcompleterequest.segment_ids)) + ' segments')
             self.dlManager.updateDownloads(request.downloadcompleterequest.node_id, request.downloadcompleterequest.segment_ids)
             statusReply = clairvoyant_pb2.StatusReply()
             statusReply.status = 'Updated'
             reply.status.CopyFrom(statusReply)
-
+        
+        elif request.HasField('misseddeliveryrequest'):
+            logging.info('got missed delivery for token', request.misseddeliveryrequest.token_id)
+            newAssignment = self.dlManager.handleMissedDelivery(request.misseddeliveryrequest.token_id, request.misseddeliveryrequest.node_id, request.misseddeliveryrequest.segments)
+            statusReply = clairvoyant_pb2.StatusReply()
+            statusReply.status = 'Updated'
+            reply.status.CopyFrom(statusReply)
         return reply
 
     def shutdown(self): #TODO: this is probably not called when CloudServer is destroyed. Make sure we clean up server

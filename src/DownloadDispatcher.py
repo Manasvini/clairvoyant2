@@ -10,7 +10,7 @@ class DownloadDispatcher:
         self.edge_ip_map = edge_ip_map
         self.callback = callback
 
-    def makeRequest(self, token_id, edge_node_id, segments, segment_sources) -> None:
+    def makeRequest(self, token_id, edge_node_id, segments,  segment_sources, arrival_time) -> None:
         if edge_node_id not in self.edge_ip_map:
             return None
         ip = self.edge_ip_map[edge_node_id]    
@@ -18,6 +18,8 @@ class DownloadDispatcher:
             stub = clairvoyant_pb2_grpc.EdgeServerStub(channel)
             request = clairvoyant_pb2.DownloadRequest()
             request.token_id = token_id
+            request.arrival_time = int(arrival_time)
+            #request.contact_time = contact_time
             for segment in segments:
                 s = request.segments.add()
                 s.CopyFrom(segment)

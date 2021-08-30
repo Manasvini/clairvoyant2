@@ -14,6 +14,7 @@ class DownloadManager:
         self.timeScale = timeScale
         self.dispatcher = dispatcher    
         logging.basicConfig(level=logging.INFO)
+        self.routeInfos = {}
         
     def findOptimalSource(self, node_id):
         return 'http://ftp.itec.aau.at/DASHDataset2014'
@@ -45,15 +46,18 @@ class DownloadManager:
         return False
 
 
-    def getDownloadAssignment(self, segments, nodeInfos):
+    def getDownloadAssignment(self, segments, nodeInfos, token_id):
         segmentIdx = 0
         assignments = {}
+        self.routeInfos[token_id] = nodeInfos
+        print('got token ', token_id)
         for node in nodeInfos:
             if segmentIdx == len(segments):
                 break
             dlSpeed = self.getMeanDownloadSpeed(node.node_id, node.contact_points, node.contact_time)
             availableContactTime = node.contact_time
             assignments[node.node_id] = []
+            print(node.node_id, availableContactTime)
             for i in range(segmentIdx, len(segments)):
                 segmentIdx = i
                 if availableContactTime <= 0:
@@ -63,6 +67,7 @@ class DownloadManager:
                     candidate = SegmentInfo()
                     candidate.segment = segments[segmentIdx]
                     candidate.source = source
+                    candidate.arrival_time = node.arrival_time
                     assignments[node.node_id].append(candidate)
                     availableContactTime -= (segments[segmentIdx].segment_size * 8 )/ (dlSpeed  * self.timeScale)
                     #print('seg', segmentIdx, ' contact left', availableContactTime, 'seg id ', segments[segmentIdx].segment_id)
@@ -71,21 +76,46 @@ class DownloadManager:
                     break
             return assignments
 
-    def handleVideoRequest(self, token_id, segments, nodeInfos):
-        assignments = self.getDownloadAssignment(segments, nodeInfos)
+    def sendAssignments(self, assignments, token_id):
         for node_id in assignments:
             segments = [candidate.segment for candidate in assignments[node_id]]
             sources = {candidate.segment.segment_id: candidate.source for candidate in assignments[node_id]}
                 
             if len(segments) == 0:
                 continue
-            response = self.dispatcher.makeRequest(token_id, node_id, segments, sources) 
+            response = self.dispatcher.makeRequest(token_id, node_id, segments, sources, assignments[node_id][0].arrival_time) 
+          
+    def handleMissedDelivery(self, token_id, node_id, segments):
+        nodeInfos = self.routeInfos[token_id]
+        idx = 0
+        for node in nodeInfos:
+            if node.node_id == node_id:
+                break
+            idx += 1
+        if len(nodeInfos) > idx + 1:
+            nodeInfo = nodeInfos[idx+1]
+            assignments = self.getDownloadAssignment(segments, [nodeInfo], token_id)
+            self.sendAssignments(assignments, token_id)
+
+    def handleVideoRequest(self, token_id, segments, nodeInfos):
+        assignments = self.getDownloadAssignment(segments, nodeInfos, token_id)
+        self.sendAssignments(assignments, token_id)
         return assignments
-   
+        #for node_id in assignments:
+        #    segments = [candidate.segment for candidate in assignments[node_id]]
+        #    sources = {candidate.segment.segment_id: candidate.source for candidate in assignments[node_id]}
+        #        
+        #    if len(segments) == 0:
+        #        continue
+        #    response = self.dispatcher.makeRequest(token_id, node_id, segments, sources) 
+        #return assignments
+  
+     
     def updateDownloads(self, node_id, segment_ids):
         for segment in segment_ids:
             self.edgeNodeAssignments[node_id].removeCompletedSegment(segment)
-       
+
+           
 #if __name__ == '__main__':
 #    logging.basicConfig()
 #    #segment_sources = {'1':'0.0.0.0:8000'}

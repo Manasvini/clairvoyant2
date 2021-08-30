@@ -1,11 +1,12 @@
 import threading
 import time
 import copy
-
+import logging
 class SegmentInfo:
     def __init__(self):
         self.segment = None
         self.source = None
+        self.contact_time = None
 
 class EdgeDownloadAssignment:
     def __init__(self, node_id, downloadSources, timeScale):
@@ -24,6 +25,7 @@ class EdgeDownloadAssignment:
         now = time.time_ns() / 1e9
         totalTime = 0
         segmentTime = ((candidate.segment.segment_size/self.timeScale) * 8.0) / (self.downloadSourceSpeeds[candidate.source] )
+        print(candidate.segment.segment_id, segmentTime)
         try:
             for ip_segment in self.assignments.values():
                 if ip_segment.source in self.downloadSourceSpeeds:
@@ -35,7 +37,7 @@ class EdgeDownloadAssignment:
         finally:
             self.mutex.release()
 
-        if (segmentTime + totalTime + now)  < deadline:
+        if (segmentTime + totalTime + now/self.timeScale)  < deadline:
             return True
         return False
 
@@ -44,15 +46,17 @@ class EdgeDownloadAssignment:
         try:
             if candidate.segment.segment_id not in self.assignments:
                 self.assignments[candidate.segment.segment_id] = candidate
-            #print('edge node ' , self.node_id, ' has', len(self.assignments), ' in progress')
+                #print('added to dl', candidate.segment.segment_id)
+                logging.info('edge node ' + self.node_id+ ' has' + str(len(self.assignments))+ ' in progress')
         finally:
             self.mutex.release()
     
     def removeCompletedSegment(self, segment_id):
         self.mutex.acquire()
         try:
-            self.downloadedSegments[segment_id] = copy.deepcopy(self.assignments[segment_id])
-            self.assignments.pop(segment_id)
+            if segment_id in self.assignments:
+                self.downloadedSegments[segment_id] = copy.deepcopy(self.assignments[segment_id])
+                self.assignments.pop(segment_id)
         finally:
             self.mutex.release()
 

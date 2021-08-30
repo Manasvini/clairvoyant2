@@ -14,6 +14,8 @@ import json
 from argparse import ArgumentParser
 from EdgeDownloadQueue import EdgeDownloadQueue
 from EdgeDownloadMonitor import EdgeDownloadMonitor
+from EdgeDeliveryMonitor import EdgeDeliveryMonitor
+
 
 from monitoring.client import MonitoringClient
 
@@ -26,16 +28,20 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         self.metadataManager = EdgeMetadataManager(self.configDict['redisHost'], self.configDict['redisPort'], self.configDict['missedDeliveryThreshold'], self.configDict['timeScale'])
         self.metadataManager.startRedisSubscription()
         print('started subs')
-        self.model = Model(self.configDict["modelFile"])
-        self.monClient = MonitoringClient(self.model, self.configDict['monInterval'], \
-                self.configDict['monServerAddress'])
-        monClient.start()
+        #self.model = Model(self.configDict['modelFile'])
+        #self.monClient = MonitoringClient(self.configDict['modelFile'], self.configDict['monInterval'], \
+        #        self.configDict['monServerAddress'], self.configDict['nodeId'])
+        #self.monClient.start()
 
         self.queueManager = EdgeDownloadQueue(self.configDict['timeScale'], self.metadataManager)
         self.downloadMonitor = EdgeDownloadMonitor(self.configDict['timeScale'], self.queueManager, self.configDict['serverAddress'], self.configDict['nodeId'], self.configDict['intervalSeconds'])
         self.queueTracker = threading.Thread(target=self.downloadMonitor.run)
         self.queueTracker.start()
-        
+       
+        self.deliveryMon = EdgeDeliveryMonitor(self.configDict['timeScale'], self.configDict['serverAddress'], self.configDict['nodeId'], self.configDict['intervalSeconds'], self.metadataManager)
+        self.deliveryThread = threading.Thread(target=self.deliveryMon.run)
+        self.deliveryThread.start()
+
     def checkDownloadSchedule(self, segments, contact_points):
         return {segment.segment_id: segment for segment in segments}        
 
@@ -60,6 +66,7 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
             #segment_id = reply.segment_ids.add(sefmen)
             #segment_id = segment.segment_id
         reply.segment_ids.extend(committed_segments.keys())
+        print('req ', request.token_id, ' has arrival', request.arrival_time)
         self.metadataManager.addRoute(request.token_id, request.arrival_time, request.contact_time, list(committed_segments.values()))
         print('responding to server with ' + str(len(reply.segment_ids)) + ' segments')        
         return reply

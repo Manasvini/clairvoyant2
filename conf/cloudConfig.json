@@ -14,5 +14,8 @@
     },
     "defaultSource":"http://ftp.itec.aau.at/DASHDataset2014",
     "monServerAddress": "localhost",
-    "monServerPort": 8192
+    "monServerPort": 8192,
+    "httpAddress":{
+        "node_0": "0.0.0.0:8000"
+    }
 }

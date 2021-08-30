@@ -4,6 +4,7 @@ from redis import Redis
 import threading
 import time
 from collections import OrderedDict
+import copy
 
 class RouteInfo:
     def __init__(self):
@@ -29,6 +30,7 @@ class EdgeMetadataManager:
     def updateDeliveryForRoute(self, token_id, segment_id):
         self.mutex.acquire()
         try:
+            print('delivered', segment_id, ' for ', token_id)
             if token_id in self.routes: 
                 routeInfo = self.routes[token_id]
                 routeInfo.segments.pop(segment_id)
@@ -40,12 +42,15 @@ class EdgeMetadataManager:
         while True:
             message = self.pubsub.get_message()
             if message:
-                print ("Subscriber got", message['data'])
+                #print ("Subscriber got", message['data'])
                 vals  = str(message['data']).split('|')
                 if len(vals) >= 2:
                     token_id = int(vals[0])
                     segment_id = vals[1]
                     self.updateDeliveryForRoute(token_id, segment_id)
+                    self.cleanUpRoute(token_id)
+
+
             time.sleep(0.001)
 
     def startRedisSubscription(self):
@@ -81,6 +86,7 @@ class EdgeMetadataManager:
         self.mutex.acquire()
         try:
             #print(token_id, arrival_time, contact_time, segments)
+            print('added route', token_id)
             routeInfo = RouteInfo()
             routeInfo.token_id = token_id
             routeInfo.arrival_time = arrival_time
@@ -97,11 +103,14 @@ class EdgeMetadataManager:
             now = time.time_ns() / 1e9
             deadline = now + self.missedDeliveryThreshold
             deadline /= self.timeScale
+            if len(self.routes) == 0:
+                print('no routes')
             for token_id in self.routes:
+                print('route is ', token_id)
                 routeInfo =  self.routes[token_id]
-        
-                if len(routeInfo.segments) > 0 and routeInfo.arrivalTime + routeInfo.contactTime > deadline:
-                    undelivered_segments[token_id] = route.segments
+                print('deadline = ', deadline, ' latest',  routeInfo.arrival_time + routeInfo.contact_time/self.timeScale, ' arrival = ', routeInfo.arrival_time)
+                if len(routeInfo.segments) > 0 and routeInfo.arrival_time + routeInfo.contact_time/self.timeScale > deadline:
+                    undelivered_segments[token_id] = copy.deepcopy(routeInfo)
         finally:
             self.mutex.release()
         return undelivered_segments
@@ -118,10 +127,11 @@ class EdgeMetadataManager:
             self.mutex.release()
         return route_ids
 
-    def removeRoute(self, token_id):
+    def cleanUpRoute(self, token_id):
         self.mutex.acquire()
         try:
             if token_id in self.routes and len(self.routes[token_id].segments) == 0:
+                print('removed route', token_id)
                 self.routes.pop(token_id)
         finally:
             self.mutex.release()
