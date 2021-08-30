@@ -63,18 +63,15 @@ class CVCloudServer(clairvoyant_pb2_grpc.EdgeServerServicer):
     def shutdown(self):
         pass
 
-async def serve(filename, listen_addr) -> None:
+async def serve(address, cvServer) -> None:
     server = grpc.aio.server()
-    cvServer = CVCloudServer(filename, {'node_0':EdgeNetworkModel('node_0')})
     clairvoyant_pb2_grpc.add_CVServerServicer_to_server(cvServer, server)
     #listen_addr = '[::]:50056'
-    server.add_insecure_port(listen_addr)
-    logging.info('starting server on %s', listen_addr)
-    await server.start()
+    server.add_insecure_port(address)
     try:
+        await server.start()
         await server.wait_for_termination()
     except KeyboardInterrupt:
-        await cvServer.shutdown()
         await server.stop(0)
         
 def parse_args():
@@ -84,11 +81,16 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+def create_cv_server(filename):
+    cvServer = CVCloudServer(filename, {'node_0':EdgeNetworkModel('node_0')})
+    return cvServer
+
 def main():
     args = parse_args()
     print("it's alive")
     logging.basicConfig(level=logging.INFO)
-    asyncio.run(serve(args.config, args.address))
+    cvServer = create_server(args.config) 
+    asyncio.run(serve(args.address, cvServer))
 
 if __name__=='__main__':
     main()

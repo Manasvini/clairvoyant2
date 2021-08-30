@@ -52,9 +52,12 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
     def shutdown(self):
         self.metadataManager.shutdown()
 
-async def serve(filename, listen_addr) -> None:
-    server = grpc.aio.server()
+def create_dl_server(filename):
     dlServer = EdgeDownloadServer(filename)
+    return dlServer
+
+async def serve(dlServer, listen_addr) -> None:
+    server = grpc.aio.server()
     clairvoyant_pb2_grpc.add_EdgeServerServicer_to_server(dlServer, server)
     #listen_addr = '[::]:50056'
     server.add_insecure_port(listen_addr)
@@ -73,11 +76,13 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+
 def main():
     args = parse_args()
     print("it's alive")
     logging.basicConfig(level=logging.INFO)
-    asyncio.run(serve(args.config, args.address))
+    dlServer = create_dl_server(args.config)
+    asyncio.run(serve(dlServer, args.address))
 
 if __name__=='__main__':
     main()

@@ -8,6 +8,7 @@ class CVCloudClient:
     def __init__(self, address):
         self.address = address
     def make_request(self):
+        
         request = clairvoyant_pb2.CVRequest()
         videoReq = clairvoyant_pb2.VideoRequest()
         videoReq.video_id = 'v1'
@@ -22,6 +23,7 @@ class CVCloudClient:
             ctr += 1
         videoReq.route.CopyFrom(route)
         request.videorequest.CopyFrom(videoReq)
+        start = time.time()
         with grpc.insecure_channel(self.address) as channel:
             stub = clairvoyant_pb2_grpc.CVServerStub(channel)
             response = stub.HandleCVRequest(request)
@@ -30,7 +32,8 @@ class CVCloudClient:
 #            self.urls = response.videoreply.urls
             print('have ' , len(response.videoreply.urls) , ' token is ', response.videoreply.token_id)
             #print(self.urls)
-   
+        end = time.time()
+        print('request took', (end-start), 'seconds')
 if __name__=='__main__':
     client = CVCloudClient('localhost:50058')
     client.make_request() 
