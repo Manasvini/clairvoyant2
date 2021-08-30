@@ -25,19 +25,20 @@ class DownloadDispatcher:
                 request.segment_sources[s] = segment_sources[s]
             print('request has' , request.segment_sources , ' sources and ' + str(len(request.segments)) + ' segments')
             response = await stub.HandleDownloadRequest(request)
+            print(response)
             if self.callback is not None:
                 self.callback(response)
             logging.info("Dl client received response for token %s: ", response.token_id)
 
 
-if __name__ == '__main__':
-    logging.basicConfig()
-    segment_sources = {'1':'0.0.0.0:8000'}
-    downloadDispatcher = DownloadDispatcher({'0':'0.0.0.0:50056'}, None)
-    for i  in range(2):
-        segment = clairvoyant_pb2.Segment()
-        segment.segment_id = '1'
-        segment.segment_size = 10
-        segment.segment_name = '1'
-        segments = [segment]
-        asyncio.run(downloadDispatcher.makeRequest(1, '0', segments, segment_sources))
+#if __name__ == '__main__':
+#    logging.basicConfig()
+#    segment_sources = {'1':'0.0.0.0:8000'}
+#    downloadDispatcher = DownloadDispatcher({'0':'0.0.0.0:50056'}, None)
+#    for i  in range(2):
+#        segment = clairvoyant_pb2.Segment()
+#        segment.segment_id = '1'
+#        segment.segment_size = 10
+#        segment.segment_name = '1'
+#        segments = [segment]
+#        asyncio.run(downloadDispatcher.makeRequest(1, '0', segments, segment_sources))

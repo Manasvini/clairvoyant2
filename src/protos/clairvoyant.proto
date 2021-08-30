@@ -74,10 +74,15 @@ message DownloadReply {
   repeated string segment_ids = 2;  
 }
 
+message DownloadCompleteRequest {
+  repeated string segment_ids = 1;
+}
+
 message CVRequest{
   oneof request {
     VideoRequest videorequest = 1;
     MissedDeliveryRequest misseddeliveryrequest = 2;
+    DownloadCompleteRequest downloadcompleterequest = 3;
   }
 }
 

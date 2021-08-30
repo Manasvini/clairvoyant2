@@ -1,0 +1,108 @@
+import asyncio
+from EdgeDownloadAssignment import EdgeDownloadAssignment, SegmentInfo
+import bisect
+from EdgeNetworkModel import EdgeNetworkModel
+import logging
+import clairvoyant_pb2
+from DownloadDispatcher import DownloadDispatcher
+import time
+class DownloadManager:
+    def __init__(self, node_ids, downloadSources, timeScale, mmWaveModels, dispatcher):
+        self.downloadSources = downloadSources
+        self.mmWaveModels = mmWaveModels
+        self.edgeNodeAssignments = {node_id: EdgeDownloadAssignment(node_id, downloadSources[node_id], timeScale) for node_id in node_ids}
+        self.timeScale = timeScale
+        self.dispatcher = dispatcher    
+
+    def findOptimalSource(self, node_id):
+        return 'http://ftp.itec.aau.at/DASHDataset2014'
+
+    def getMeanDownloadSpeed(self, node_id, contact_points, contact_time):
+        model = self.mmWaveModels.get(node_id)
+        print(node_id, model, self.mmWaveModels.keys() )
+        if model is None:
+            print('boom', self.mmWaveModels)
+        distances = sorted(list(model.get().keys()))
+        totalBytes = 0
+
+        for point in contact_points:
+            distance_idx = bisect.bisect_left(distances, point.distance)
+            distance = distances[min(distance_idx, len(distances)-1)]
+            dlSpeed = model.get()[distance]
+            totalBytes += (point.time * dlSpeed) / (self.timeScale * 8)
+
+        return totalBytes / (contact_time/self.timeScale)
+
+    def assignDownload(self, node_id, deadline, segment, source):
+        source = self.findOptimalSource(node_id)
+        candidate = SegmentInfo()
+        candidate.segment = segment
+        candidate.source = source
+        if self.edgeNodeAssignments[node_id].isDownloadPossible(deadline, candidate):
+            self.edgeNodeAssignments[node_id].addSegmentForDownload(candidate)
+            return True
+        return False
+
+
+    def getDownloadAssignment(self, segments, nodeInfos):
+        segmentIdx = 0
+        assignments = {}
+        for node in nodeInfos:
+            if segmentIdx == len(segments):
+                break
+            dlSpeed = self.getMeanDownloadSpeed(node.node_id, node.contact_points, node.contact_time)
+            availableContactTime = node.contact_time
+            assignments[node.node_id] = []
+            for i in range(segmentIdx, len(segments)):
+                segmentIdx = i
+                if availableContactTime <= 0:
+                    break
+                source = self.findOptimalSource(node.node_id)
+                if self.edgeNodeAssignments[node.node_id].hasSegment(segments[segmentIdx].segment_id) or self.assignDownload(node.node_id, node.arrival_time + node.contact_time, segments[segmentIdx], source):
+                    candidate = SegmentInfo()
+                    candidate.segment = segments[segmentIdx]
+                    candidate.source = source
+                    assignments[node.node_id].append(candidate)
+                    availableContactTime -= (segments[segmentIdx].segment_size * 8 )/ (dlSpeed  * self.timeScale)
+                    print('seg', segmentIdx, ' contact left', availableContactTime, 'seg id ', segments[segmentIdx].segment_id)
+                else:
+                    break
+            return assignments
+
+    def handleVideoRequest(self, token_id, segments, nodeInfos):
+        assignments = self.getDownloadAssignment(segments, nodeInfos)
+        for node_id in assignments:
+            segments = [candidate.segment for candidate in assignments[node_id]]
+            sources = {candidate.segment.segment_id: candidate.source for candidate in assignments[node_id]}
+                
+            if len(segments) == 0:
+                continue
+            asyncio.run(self.dispatcher.makeRequest(token_id, node_id, segments, sources))
+    
+    def updateDownloads(self, node_id, segment_ids):
+        for segment in segment_ids:
+            self.edgeNodeAssignments[node_id].removeCompletedSegment(segment)
+       
+if __name__ == '__main__':
+    logging.basicConfig()
+    #segment_sources = {'1':'0.0.0.0:8000'}
+    dispatcher = DownloadDispatcher({'0':'0.0.0.0:50056'}, None)
+    segments = []
+    nodeInfo = clairvoyant_pb2.NodeInfo()
+    nodeInfo.node_id = '0'
+    nodeInfo.node_ip = '0.0.0.0:50056'
+    nodeInfo.arrival_time = time.time_ns() / 1e9 + 100
+    nodeInfo.contact_time = 3
+    for i in range(3):
+        point = nodeInfo.contact_points.add()
+        point.distance = 10
+        point.time = 1
+    nodeInfos = [nodeInfo]
+    for i  in range(2):
+        segment = clairvoyant_pb2.Segment()
+        segment.segment_id = str(i)
+        segment.segment_size = int(1e9)
+        segment.segment_name = '1'
+        segments.append(segment)
+    dlManager = DownloadManager(['0'], { '0':{'http://ftp.itec.aau.at/DASHDataset2014':100000000}}, 10,  {'0':EdgeNetworkModel()}, dispatcher) 
+    dlManager.handleVideoRequest(1, segments, nodeInfos)

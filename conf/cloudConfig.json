@@ -1,0 +1,5 @@
+{
+    "modelMap":"models/model_map.csv",
+    "modelDir":"models/",
+    "timeScale":10    
+}

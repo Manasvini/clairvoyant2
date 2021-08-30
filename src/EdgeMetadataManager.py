@@ -3,20 +3,38 @@ import clairvoyant_pb2
 from redis import Redis
 import threading
 import time
+from collections import OrderedDict
+
+class RouteInfo:
+    def __init__(self):
+        self.token_id = None
+        self.arrival_time = None
+        self.contact_time = None
+        self.segments = None
 
 class EdgeMetadataManager:
     
-    def __init__(self, redis_address, redis_port):
+    def __init__(self, redis_address, redis_port, missedDeliveryThreshold, timeScale):
         self.redis = Redis(host=redis_address, port=redis_port, decode_responses=True)
         self.routes_queue = []
-        self.routes_info = {}
+        self.routes = OrderedDict()
 
         self.pubsub = self.redis.pubsub()
         self.pubsub.subscribe('user_download_notify')
         self.updateListener = None
+        self.mutex = threading.Lock()
+        self.missedDeliveryThreshold = missedDeliveryThreshold
+        self.timeScale = timeScale
 
-    def updateRoute(self, token_id, segment_id):
-        pass
+    def updateDeliveryForRoute(self, token_id, segment_id):
+        self.mutex.acquire()
+        try:
+            if token_id in self.routes: 
+                routeInfo = self.routes[token_id]
+                routeInfo.segments.pop(segment_id)
+                self.routes[token_id] = routeInfo 
+        finally:
+            self.mutex.release()
 
     def listen(self):
         while True:
@@ -28,7 +46,7 @@ class EdgeMetadataManager:
                 if len(vals) >= 2:
                     token_id = int(vals[0])
                     segment_id = vals[1]
-                    self.updateRoute(token_id, segment_id)
+                    self.updateDeliveryForRoute(token_id, segment_id)
             time.sleep(0.001)
 
     def startRedisSubscription(self):
@@ -57,17 +75,53 @@ class EdgeMetadataManager:
         return segmentInfo
 
     def addRoute(self, token_id, arrival_time, contact_time, segments):
-        pass
-
-    def getOverdueSegments(self, token_id):
-        pass        
-
+        self.mutex.acquire()
+        try:
+            print(token_id, arrival_time, contact_time, segments)
+            routeInfo = RouteInfo()
+            routeInfo.token_id = token_id
+            routeInfo.arrival_time = arrival_time
+            routeInfo.contact_time = contact_time
+            routeInfo.segments = {segment.segment_id: segment for segment in segments}
+            self.routes[token_id] = routeInfo        
+        finally:
+            self.mutex.release()
+ 
+    def getOverdueSegments(self):
+        self.mutex.acquire()
+        undelivered_segments = {}
+        try:
+            now = time.time_ns() / 1e9
+            deadline = now + self.missedDeliveryThreshold
+            deadline /= self.timeScale
+            for token_id in self.routes:
+                routeInfo =  self.routes[token_id]
+        
+                if len(routeInfo.segments) > 0 and routeInfo.arrivalTime + routeInfo.contactTime > deadline:
+                    undelivered_segments[token_id] = route.segments
+        finally:
+            self.mutex.release()
+        return undelivered_segments
 
     def getRoutesAt(self, arrival_time, contact_time):
-        pass
+        self.mutex.acquire()
+        route_ids = []
+        try:
+            for token_id, routeInfo in route.items():
+                if (routeInfo.arrival_time + routeInfo.contact_time < arrival_time) or (routeInfo.arrivalTime > arrival_time + contact_time):
+                    continue
+                route_ids.append(token_id)
+        finally:
+            self.mutex.release()
+        return route_ids
 
-    def removeRoute(self, route_id):
-        pass
+    def removeRoute(self, token_id):
+        self.mutex.acquire()
+        try:
+            if token_id in self.routes and len(self.routes[token_id].segments) == 0:
+                self.routes.pop(token_id)
+        finally:
+            self.mutex.release()
     
     def shutdown(self):
         self.updateListener.join()
