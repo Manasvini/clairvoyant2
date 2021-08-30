@@ -30,7 +30,7 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
                 self, request: clairvoyant_pb2.DownloadRequest, 
                 context: grpc.aio.ServicerContext) -> clairvoyant_pb2.DownloadReply:
         
-        print(request.token_id, request.segment_sources, len(request.segments))
+        print('token = ', request.token_id,'num segments',  len(request.segments))
         committed_segments = self.checkDownloadSchedule(request.segments, request.contact_points)
         reply = clairvoyant_pb2.DownloadReply()
         reply.token_id = request.token_id

@@ -64,7 +64,7 @@ class DownloadManager:
                     candidate.source = source
                     assignments[node.node_id].append(candidate)
                     availableContactTime -= (segments[segmentIdx].segment_size * 8 )/ (dlSpeed  * self.timeScale)
-                    print('seg', segmentIdx, ' contact left', availableContactTime, 'seg id ', segments[segmentIdx].segment_id)
+                    #print('seg', segmentIdx, ' contact left', availableContactTime, 'seg id ', segments[segmentIdx].segment_id)
                 else:
                     break
             return assignments
@@ -77,32 +77,33 @@ class DownloadManager:
                 
             if len(segments) == 0:
                 continue
-            asyncio.run(self.dispatcher.makeRequest(token_id, node_id, segments, sources))
-    
+            response = self.dispatcher.makeRequest(token_id, node_id, segments, sources) 
+        return assignments
+   
     def updateDownloads(self, node_id, segment_ids):
         for segment in segment_ids:
             self.edgeNodeAssignments[node_id].removeCompletedSegment(segment)
        
-if __name__ == '__main__':
-    logging.basicConfig()
-    #segment_sources = {'1':'0.0.0.0:8000'}
-    dispatcher = DownloadDispatcher({'0':'0.0.0.0:50056'}, None)
-    segments = []
-    nodeInfo = clairvoyant_pb2.NodeInfo()
-    nodeInfo.node_id = '0'
-    nodeInfo.node_ip = '0.0.0.0:50056'
-    nodeInfo.arrival_time = time.time_ns() / 1e9 + 100
-    nodeInfo.contact_time = 3
-    for i in range(3):
-        point = nodeInfo.contact_points.add()
-        point.distance = 10
-        point.time = 1
-    nodeInfos = [nodeInfo]
-    for i  in range(2):
-        segment = clairvoyant_pb2.Segment()
-        segment.segment_id = str(i)
-        segment.segment_size = int(1e9)
-        segment.segment_name = '1'
-        segments.append(segment)
-    dlManager = DownloadManager(['0'], { '0':{'http://ftp.itec.aau.at/DASHDataset2014':100000000}}, 10,  {'0':EdgeNetworkModel()}, dispatcher) 
-    dlManager.handleVideoRequest(1, segments, nodeInfos)
+#if __name__ == '__main__':
+#    logging.basicConfig()
+#    #segment_sources = {'1':'0.0.0.0:8000'}
+#    dispatcher = DownloadDispatcher({'0':'0.0.0.0:50056'}, None)
+#    segments = []
+#    nodeInfo = clairvoyant_pb2.NodeInfo()
+#    nodeInfo.node_id = '0'
+#    nodeInfo.node_ip = '0.0.0.0:50056'
+#    nodeInfo.arrival_time = time.time_ns() / 1e9 + 100
+#    nodeInfo.contact_time = 3
+#    for i in range(3):
+#        point = nodeInfo.contact_points.add()
+#        point.distance = 10
+#        point.time = 1
+#    nodeInfos = [nodeInfo]
+#    for i  in range(2):
+#        segment = clairvoyant_pb2.Segment()
+#        segment.segment_id = str(i)
+#        segment.segment_size = int(1e9)
+#        segment.segment_name = '1'
+#        segments.append(segment)
+#    dlManager = DownloadManager(['0'], { '0':{'http://ftp.itec.aau.at/DASHDataset2014':100000000}}, 10,  {'0':EdgeNetworkModel()}, dispatcher) 
+#    dlManager.handleVideoRequest(1, segments, nodeInfos)

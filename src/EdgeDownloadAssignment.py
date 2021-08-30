@@ -44,7 +44,7 @@ class EdgeDownloadAssignment:
         try:
             if candidate.segment.segment_id not in self.assignments:
                 self.assignments[candidate.segment.segment_id] = candidate
-            print('edge node ' , self.node_id, ' has', len(self.assignments), ' in progress')
+            #print('edge node ' , self.node_id, ' has', len(self.assignments), ' in progress')
         finally:
             self.mutex.release()
     

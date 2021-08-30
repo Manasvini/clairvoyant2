@@ -42,7 +42,6 @@ class EdgeMetadataManager:
             if message:
                 print ("Subscriber got", message['data'])
                 vals  = str(message['data']).split('|')
-                print(vals)
                 if len(vals) >= 2:
                     token_id = int(vals[0])
                     segment_id = vals[1]
@@ -65,7 +64,6 @@ class EdgeMetadataManager:
     def getSegment(self, segment_id):
         segmentInfo = {'segment':None, 'source':None, 'source_ip':None}
         values = self.redis.hgetall(segment_id)
-        print(values)
         segment = clairvoyant_pb2.Segment()
         segment.segment_id = values['segmentid']
         segment.segment_size = values['segmentsize']
@@ -77,7 +75,7 @@ class EdgeMetadataManager:
     def addRoute(self, token_id, arrival_time, contact_time, segments):
         self.mutex.acquire()
         try:
-            print(token_id, arrival_time, contact_time, segments)
+            #print(token_id, arrival_time, contact_time, segments)
             routeInfo = RouteInfo()
             routeInfo.token_id = token_id
             routeInfo.arrival_time = arrival_time

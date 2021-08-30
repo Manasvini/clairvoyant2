@@ -10,11 +10,11 @@ class DownloadDispatcher:
         self.edge_ip_map = edge_ip_map
         self.callback = callback
 
-    async def makeRequest(self, token_id, edge_node_id, segments, segment_sources) -> None:
+    def makeRequest(self, token_id, edge_node_id, segments, segment_sources) -> None:
         if edge_node_id not in self.edge_ip_map:
             return None
         ip = self.edge_ip_map[edge_node_id]    
-        async with grpc.aio.insecure_channel(ip) as channel:
+        with grpc.insecure_channel(ip) as channel:
             stub = clairvoyant_pb2_grpc.EdgeServerStub(channel)
             request = clairvoyant_pb2.DownloadRequest()
             request.token_id = token_id
@@ -23,9 +23,9 @@ class DownloadDispatcher:
                 s.CopyFrom(segment)
             for s in segment_sources:
                 request.segment_sources[s] = segment_sources[s]
-            print('request has' , request.segment_sources , ' sources and ' + str(len(request.segments)) + ' segments')
-            response = await stub.HandleDownloadRequest(request)
-            print(response)
+            print('request has' , len(request.segment_sources) , ' sources and ' + str(len(request.segments)) + ' segments')
+            response = stub.HandleDownloadRequest(request)
+            #print(response)
             if self.callback is not None:
                 self.callback(response)
             logging.info("Dl client received response for token %s: ", response.token_id)

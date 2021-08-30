@@ -1,4 +1,4 @@
-class EdgeNetworkModel
+class EdgeNetworkModel:
 
     def __init__(self):
         self.node_id = None
@@ -10,7 +10,8 @@ class EdgeNetworkModel
         pass
 
     def get(self): #uses the mutex for getting proper nw_dict
-        pass
+        print('got')
+        return {10:500000000}
 
 
 
