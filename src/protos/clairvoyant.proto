@@ -64,12 +64,25 @@ message DownloadRequest {
     int64 token_id = 1;
     repeated Segment segments = 2;
     map<string, string> segment_sources = 3;
+    int64 arrival_time = 4;
+    double contact_time = 5;
+    repeated Coordinate contact_points = 6;    
+}
+
+message DownloadReply {
+  int64 token_id = 1;
+  repeated string segment_ids = 2;  
+}
+
+message DownloadCompleteRequest {
+  repeated string segment_ids = 1;
 }
 
 message CVRequest{
   oneof request {
     VideoRequest videorequest = 1;
     MissedDeliveryRequest misseddeliveryrequest = 2;
+    DownloadCompleteRequest downloadcompleterequest = 3;
   }
 }
 
@@ -81,12 +94,27 @@ message CVReply{
   }
 }
 
+message ModelUpdateRequest {
+  string node_id = 1;
+  map<int64,double> model=2;
+}
+
+message UpdateRequest {
+  oneof update{
+    ModelUpdateRequest modelupdate = 1;
+  }
+}
+
+service MonitoringServer {
+  rpc HandleUpdateRequest (UpdateRequest) returns (StatusReply);
+}
+
 service CVServer {
   rpc HandleCVRequest (CVRequest) returns (CVReply);
     
 }
 
 service EdgeServer {
-  rpc HandleDownloadRequest(DownloadRequest) returns (StatusReply);
+  rpc HandleDownloadRequest(DownloadRequest) returns (DownloadReply);
 }
 

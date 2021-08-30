@@ -1,0 +1,109 @@
+syntax = "proto3";
+ 
+package clairvoyantmeta;
+ 
+message Segment{
+    string segmentId = 1;
+    double popularity = 2;
+    int32 size = 3;
+    int64 lastAccessed = 4;
+    repeated string nodeIds = 5;
+ }
+
+message Video{
+    string videoId = 1;
+    repeated Segment segments = 2;
+}
+
+message Position{
+    double latitude = 1;
+    double longitude = 2;
+} 
+
+message NodeInfo{
+    string nodeId = 1;
+    string address = 2;
+    Position node_pos = 3;
+    int64 user_pos_idx = 4;
+    double distance = 5;
+}
+
+message NodeSegments{
+    string nodeId = 1;
+    repeated string segmentIds = 2;
+}
+
+message Route{
+    string routeId = 1;
+    repeated NodeSegments placements= 2;
+}
+
+message GetVideoInfoRequest{
+    string videoId = 1;
+}
+
+message GetVideoInfoResponse{
+    Video video = 1;
+}
+
+message GetNearestNodesRequest{
+    repeated Position positions = 1;
+}
+
+message GetNearestNodesResponse{
+    repeated NodeInfo nodes = 1;
+}
+
+message SegmentOperation{
+    string operation = 1;
+    Segment segment = 2;
+}
+
+message UpdateSegmentInfoRequest{
+    repeated SegmentOperation segmentOperations = 1;
+}
+
+message StatusResponse{
+    repeated string statuses = 1;
+}
+
+message AddVideoInfoRequest{
+    repeated Video videos = 1;
+}
+
+message AddRouteRequest{
+    string routeId = 1;
+    string status = 2;
+}
+
+message DeleteRouteRequest{
+    string routeId = 1;
+}
+
+message GetRouteRequest {
+    string routeId = 1;
+}
+
+message Request {
+    oneof request {
+        GetVideoInfoRequest getVideoInfoRequest = 1;
+        GetNearestNodesRequest getNearestNodesRequest = 2;
+        UpdateSegmentInfoRequest updateSegmentInfoRequest = 3;
+        AddVideoInfoRequest addVideoInfoRequest = 4;
+        AddRouteRequest addRouteRequest = 5;
+        DeleteRouteRequest deleteRouteRequest = 6;
+        GetRouteRequest getRouteRequest = 7;
+    }
+}
+
+message Response {
+    oneof response{
+        GetVideoInfoResponse getVideoInfoResponse = 1;
+        GetNearestNodesResponse getNearestNodesResponse = 2;
+        StatusResponse statusResponse = 3;
+    }
+}
+
+service MetadataServer {
+    rpc handleRequest (Request) returns (Response) {}
+}

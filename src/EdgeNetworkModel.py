@@ -16,7 +16,8 @@ class EdgeNetworkModel:
         self.mutex.release()
 
     def get(self): #uses the mutex for getting proper nw_dict
-        pass
+        #dummy mode
+        return {10:500000000}
 
 
 
