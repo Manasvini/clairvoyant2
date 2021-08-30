@@ -16,6 +16,10 @@ from CloudMetadataClient import CloudMetadataClient
 from DownloadManager import DownloadManager
 from EdgeNetworkModel import EdgeNetworkModel
 from DownloadDispatcher import DownloadDispatcher
+from monitoring.server import MonitoringServer
+
+from threading import Thread
+
 class CVCloudServer(clairvoyant_pb2_grpc.EdgeServerServicer):
     def __init__(self, filename, mmWaveModels):
         self.configDict = {}
@@ -24,6 +28,11 @@ class CVCloudServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         print('got config', self.configDict)
         self.metaClient = CloudMetadataClient(self.configDict['metaServerAddress'])
         self.dlManager = DownloadManager(self.configDict['nodeIds'], self.configDict['downloadSources'], self.configDict['timeScale'], mmWaveModels, DownloadDispatcher(self.configDict['nodeIps'], None))
+        monServer = MonitoringServer(address=configDict['monServerAddress'], port=configDict['monServerPort'],\
+                edge_model_dict=mmWaveModels)
+        self.monServerThread = Thread(target=monServer.run)
+
+        
         
     def checkDownloadSchedule(self, segments, contact_points):
         #return {segment.segment_id: segment for segment in segments}        
@@ -60,8 +69,9 @@ class CVCloudServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         reply.videoreply.CopyFrom(videoReply)
         return reply
 
-    def shutdown(self):
-        pass
+    def shutdown(self): #TODO: this is probably not called when CloudServer is destroyed. Make sure we clean up server
+        monServer.shutdown()
+        monServerThread.join()
 
 async def serve(filename, listen_addr) -> None:
     server = grpc.aio.server()

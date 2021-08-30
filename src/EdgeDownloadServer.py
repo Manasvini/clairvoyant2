@@ -12,6 +12,8 @@ from ModelReader import Model
 import json
 from argparse import ArgumentParser
 
+from monitoring.client import MonitoringClient
+
 class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
     def __init__(self, filename):
         self.configDict = {}
@@ -22,6 +24,9 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         self.metadataManager.startRedisSubscription()
         print('started subs')
         self.model = Model(self.configDict["modelFile"])
+        self.monClient = MonitoringClient(self.model, self.configDict['monInterval'], \
+                self.configDict['monServerAddress'])
+        monClient.start()
 
     def checkDownloadSchedule(self, segments, contact_points):
         return {segment.segment_id: segment for segment in segments}        
@@ -51,6 +56,8 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
 
     def shutdown(self):
         self.metadataManager.shutdown()
+        self.monClient.stop()
+        monClient.join()
 
 async def serve(filename, listen_addr) -> None:
     server = grpc.aio.server()
