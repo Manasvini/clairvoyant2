@@ -65,7 +65,7 @@ class CVCloudServer(clairvoyant_pb2_grpc.EdgeServerServicer):
 
 async def serve(filename, listen_addr) -> None:
     server = grpc.aio.server()
-    cvServer = CVCloudServer(filename, {'node_0':EdgeNetworkModel()})
+    cvServer = CVCloudServer(filename, {'node_0':EdgeNetworkModel('node_0')})
     clairvoyant_pb2_grpc.add_CVServerServicer_to_server(cvServer, server)
     #listen_addr = '[::]:50056'
     server.add_insecure_port(listen_addr)

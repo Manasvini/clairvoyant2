@@ -19,16 +19,16 @@ class DownloadManager:
 
     def getMeanDownloadSpeed(self, node_id, contact_points, contact_time):
         model = self.mmWaveModels.get(node_id)
-        print(node_id, model, self.mmWaveModels.keys() )
+        dl_map = model.get()
         if model is None:
-            print('boom', self.mmWaveModels)
-        distances = sorted(list(model.get().keys()))
+            print('model is None')
+        distances = sorted(list(dl_map.keys()))
         totalBytes = 0
 
         for point in contact_points:
             distance_idx = bisect.bisect_left(distances, point.distance)
             distance = distances[min(distance_idx, len(distances)-1)]
-            dlSpeed = model.get()[distance]
+            dlSpeed = dl_map[distance]
             totalBytes += (point.time * dlSpeed) / (self.timeScale * 8)
 
         return totalBytes / (contact_time/self.timeScale)
