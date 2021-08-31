@@ -3,3 +3,5 @@
 *.sw*
 logs/
 eval/user_trajectories
+localenv
+gen_confs
