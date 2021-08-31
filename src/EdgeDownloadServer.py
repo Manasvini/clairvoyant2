@@ -31,7 +31,7 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         self.model = Model(self.configDict['modelFile'])
         self.monClient = MonitoringClient(self.configDict['modelFile'], self.configDict['monInterval'], \
                 self.configDict['monServerAddress'], self.configDict['nodeId'])
-        #self.monClient.start()
+        self.monClient.start()
 
         self.queueManager = EdgeDownloadQueue(self.configDict['timeScale'], self.metadataManager)
         self.downloadMonitor = EdgeDownloadMonitor(self.configDict['timeScale'], self.queueManager, self.configDict['serverAddress'], self.configDict['nodeId'], self.configDict['intervalSeconds'])

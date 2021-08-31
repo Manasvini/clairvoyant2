@@ -109,7 +109,8 @@ class DownloadManager:
 
     def handleVideoRequest(self, token_id, segments, nodeInfos):
         assignments = self.getDownloadAssignment(segments, nodeInfos, token_id)
-        print(assignments)
+        if assignments is None:
+            raise ValueError('assignments is none')
         self.sendAssignments(assignments, token_id)
         return assignments
         #for node_id in assignments:

@@ -16,13 +16,14 @@ class EdgeNetworkModel:
 
 
     def get(self): #uses the mutex for getting proper nw_dict
-        tmp_dict = {}
-        self.mutex.acquire()
-        for key,value in self.nw_dict.items():
-            tmp_dict[key] = self.nw_dict[key]
+        return {10:500000000}
+        #tmp_dict = {}
+        #self.mutex.acquire()
+        #for key,value in self.nw_dict.items():
+        #    tmp_dict[key] = self.nw_dict[key]
 
-        self.mutex.release()
-        return tmp_dict
+        #self.mutex.release()
+        #return tmp_dict
 
 
 

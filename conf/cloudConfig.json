@@ -1,7 +1,7 @@
 {
     "modelMap":"models/model_map.csv",
     "modelDir":"models/",
-    "timeScale":10,
+    "timeScale":60,
     "metaServerAddress": "localhost:50051",
     "nodeIds": ["node_0"],
     "downloadSources":{
