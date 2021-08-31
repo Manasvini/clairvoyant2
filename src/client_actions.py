@@ -45,6 +45,9 @@ class Client:
         self.edge_ips = {n : edge_ips[n][:edge_ips[n].find(':')] for n in edge_ips}
         self.edge_idxs = {i: 'node_' + str(i) for i in range(len(self.edge_node_positions))}
 
+        #debug
+        self.count = [0,0]
+
     async def make_request(self):
         request = request_creator.create_user_request(self.id)
         async with grpc.aio.insecure_channel(self.address) as channel:
@@ -105,7 +108,7 @@ class Client:
         return -1, 0
 
     def get_download_speed(self, distance, node_idx):
-        if node_idx != -1 and node_idx in self.model_map:
+        if node_idx != -1 and node_idx < len(self.model_map):
             model = self.model_map[node_idx]
             return model.get_download_speed(distance)/8
         return 4e7/8
@@ -146,49 +149,48 @@ class Client:
         if idx != -1:
             dl_bytes = self.get_download_speed(dist, idx)/self.time_scale
             print('edge contact with node:', idx, 'bytes = ', dl_bytes)
-        segment_count = 0
-        while len(self.buffer) < len(self.urls) and dl_bytes > 0:   
+        else:
+            #TODO: delay cloud downloads
+            if self.playback < len(self.buffer) - 1:
+                return
+
+        while len(self.buffer) < len(self.urls) and dl_bytes > 0: 
             url = self.urls[len(self.buffer)]
             filepath = self.get_filepath(url)
+
             if self.pendingBytes <= 0:
                 self.set_pending_bytes(url)
-            ip, start_idx, end_idx = self.get_ip_from_url(url)
+
             is_cloud_delivery = True
             new_segment_download = False
             
             if idx != -1:
-                if dl_bytes < self.pendingBytes:
-                    is_cloud_delivery = True
-                else:
+                if dl_bytes > self.pendingBytes: # Sufficient b/w exists to download segment
                     url = self.get_url(idx, url)
                     resp = self.session.get(url)
-                    if '{}' not in resp.text:
+                    if '{}' not in resp.text: 
+                        # NOTE: "else" needs special handling, because we already sent a GET request
                         dl_bytes -= self.pendingBytes
-                        new_segment_download = True
-                        segment_count += 1
-                        print('added segment from edge dl bytes', dl_bytes, 'pending', self.pendingBytes)
+                        self.count[0] += 1
                         self.receivedBytesEdge += float(self.video_meta[filepath]['size'])
-                    else:
-                        is_cloud_delivery = True
-            if is_cloud_delivery:
-                
-                if self.pendingBytes > dl_bytes:
-                    self.pendingBytes -= dl_bytes
-                    if self.pendingBytes <= 0:
                         new_segment_download = True
-                    else:
-                        break
-                #if self.playback < len(self.buffer) - 1:
-                #    break
-                dl_bytes -= self.pendingBytes 
-                segment_count += 1
+                        is_cloud_delivery = False
+
+            if is_cloud_delivery:
+                self.pendingBytes -= dl_bytes
+                if self.pendingBytes > 0: #next step, as segment not complete
+                    break
+
+
+                dl_bytes = 0 #simplify, and get dl_bytes in next step
+                self.count[1] += 1
                 self.receivedBytesCloud += float(self.video_meta[filepath]['size'])
                 new_segment_download = True
-                print('added segment from cloud', filepath)
+
             if new_segment_download == True:
                 self.pendingBytes  = 0
                 self.buffer.append(url)
-            print('remaining dl bytes = ', dl_bytes, 'edge', self.receivedBytesEdge, 'cloud:', self.receivedBytesCloud, ' segments =', segment_count)
+            print('cloud:', self.count[1], ' edge:', self.count[0])
      
     #def get_segments(self):    
     #    is_edge_delivery = False

@@ -4,5 +4,5 @@ python3 client_runner.py -a localhost:50058  \
                          -d ../models/ \
                          -m ../models/model_map.csv \
                          -c ../conf/cloudConfig.json \
-                         -u user12 \
+                         -u user22 \
                          -o results/test.json 

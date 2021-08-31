@@ -87,6 +87,11 @@ class MonitoringHandler(BaseHTTPRequestHandler):
             content = f.read()
         return content
 
+    def log_message(self, format, *args):
+        with open('/tmp/monitoring_httpd.log', 'w') as fh:
+            fh.write("%s - - [%s] %s\n" % (self.address_string(), self.log_date_time_string(), format%args))
+
+
 """
 Ideally run this in a different thread.
 """
