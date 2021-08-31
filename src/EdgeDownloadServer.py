@@ -38,7 +38,7 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         self.queueTracker = threading.Thread(target=self.downloadMonitor.run)
         self.queueTracker.start()
        
-        self.deliveryMon = EdgeDeliveryMonitor(self.configDict['timeScale'], self.configDict['serverAddress'], self.configDict['nodeId'], self.configDict['intervalSeconds'], self.metadataManager)
+        #$self.deliveryMon = EdgeDeliveryMonitor(self.configDict['timeScale'], self.configDict['serverAddress'], self.configDict['nodeId'], self.configDict['intervalSeconds'], self.metadataManager)
         #self.deliveryThread = threading.Thread(target=self.deliveryMon.run)
         #self.deliveryThread.start()
 

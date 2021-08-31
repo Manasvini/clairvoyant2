@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sortedcontainers import SortedDict
-
+import random
 class Model:
     def __init__(self, filename):
         self.model = SortedDict()
@@ -16,5 +16,5 @@ class Model:
         if len(keys) > 0:
             mean = self.model[keys[0]]['mean']
             stddev = self.model[keys[0]]['stddev']
-            return np.random.normal(mean, stddev, 1)[0]
+            return mean +  random.uniform(-stddev, stddev)
         return 0

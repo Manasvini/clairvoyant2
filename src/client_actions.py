@@ -130,58 +130,116 @@ class Client:
         start_idx = url.find('://') + 3
         end_idx = start_idx + url[start_idx:].find(':')
         return url[start_idx:end_idx], start_idx, end_idx
-    
-    def get_segments(self):    
-        is_edge_delivery = False
+   
+    def get_url(self, node_idx, url):
+        ip = self.edge_ips['node_' + str(node_idx)]
+
+        start_idx =  url.find('://') + 3
+        end_idx =  start_idx + url[start_idx:].find(':')
+        new_url = url[0:start_idx] + ip + url[end_idx:] 
+        print(url, new_url)
+        return new_url
+
+    def get_segments(self):
         idx, dist = self.get_distance_from_edge_node()
- 
-        #if self.pendingBytes > 0:
-        dl_bytes = (4e7/8) / self.time_scale
+        dl_bytes = (4e7/8) / self.time_scale # 40 Mbps default LTE
         if idx != -1:
-           dl_bytes = self.get_download_speed(dist, idx)/self.time_scale
-           print('edge contact:', idx, 'bytes = ', dl_bytes)
-        
+            dl_bytes = self.get_download_speed(dist, idx)/self.time_scale
+            print('edge contact with node:', idx, 'bytes = ', dl_bytes)
+        segment_count = 0
         while len(self.buffer) < len(self.urls) and dl_bytes > 0:   
-            is_edge_delivery = False 
             url = self.urls[len(self.buffer)]
             filepath = self.get_filepath(url)
-
             if self.pendingBytes <= 0:
                 self.set_pending_bytes(url)
-            print('pending', self.pendingBytes, 'avilable', dl_bytes, 'buf len', len(self.buffer))
             ip, start_idx, end_idx = self.get_ip_from_url(url)
+            is_cloud_delivery = True
+            new_segment_download = False
             
-            if 'ftp' not in url and idx != -1 and ('node_' + str(idx) in self.edge_ips):
-                if ip != self.edge_ips['node_' + str(idx)]:
-                    url = url[:start_idx] + ip + url[end_idx:]
-                    print('new url is ', url)
-                resp = self.session.get(url)
-
-                if '{}' not in resp.text:
-                    is_edge_delivery = True
+            if idx != -1:
+                if dl_bytes < self.pendingBytes:
+                    is_cloud_delivery = True
                 else:
-                    print('did not find ' , url, ' at edge node ', idx)
-            if self.pendingBytes > dl_bytes:
-                self.pendingBytes -= dl_bytes
-                break
-            else:
-                 
-                if is_edge_delivery:
-                    dl_bytes -= self.pendingBytes
-                
-                    print('segment', filepath, ' from edge')
-                    self.receivedBytesEdge += float(self.video_meta[filepath]['size'])
-                else:
-                    if self.playback < len(self.buffer) - 1:
-                        print('playback at ', self.playback, ' buffer at ', len(self.buffer), ' skipping dl')
-                        break
-                    else:
+                    url = self.get_url(idx, url)
+                    resp = self.session.get(url)
+                    if '{}' not in resp.text:
                         dl_bytes -= self.pendingBytes
-                        print('segment', filepath, ' from cloud')
-                        self.receivedBytesCloud += float(self.video_meta[filepath]['size']) 
+                        new_segment_download = True
+                        segment_count += 1
+                        print('added segment from edge dl bytes', dl_bytes, 'pending', self.pendingBytes)
+                        self.receivedBytesEdge += float(self.video_meta[filepath]['size'])
+                    else:
+                        is_cloud_delivery = True
+            if is_cloud_delivery:
+                
+                if self.pendingBytes > dl_bytes:
+                    self.pendingBytes -= dl_bytes
+                    if self.pendingBytes <= 0:
+                        new_segment_download = True
+                    else:
+                        break
+                #if self.playback < len(self.buffer) - 1:
+                #    break
+                dl_bytes -= self.pendingBytes 
+                segment_count += 1
+                self.receivedBytesCloud += float(self.video_meta[filepath]['size'])
+                new_segment_download = True
+                print('added segment from cloud', filepath)
+            if new_segment_download == True:
                 self.pendingBytes  = 0
                 self.buffer.append(url)
+            print('remaining dl bytes = ', dl_bytes, 'edge', self.receivedBytesEdge, 'cloud:', self.receivedBytesCloud, ' segments =', segment_count)
+     
+    #def get_segments(self):    
+    #    is_edge_delivery = False
+    #    idx, dist = self.get_distance_from_edge_node()
+ 
+    #    #if self.pendingBytes > 0:
+    #    dl_bytes = (4e7/8) / self.time_scale
+    #    if idx != -1:
+    #       dl_bytes = self.get_download_speed(dist, idx)/self.time_scale
+    #       print('edge contact:', idx, 'bytes = ', dl_bytes)
+    #    
+    #    while len(self.buffer) < len(self.urls) and dl_bytes > 0:   
+    #        is_edge_delivery = False 
+    #        url = self.urls[len(self.buffer)]
+    #        filepath = self.get_filepath(url)
 
+    #        if self.pendingBytes <= 0:
+    #            self.set_pending_bytes(url)
+    #        ip, start_idx, end_idx = self.get_ip_from_url(url)
+    #        if self.pendingBytes > dl_bytes:
+    #            self.pendingBytes -= dl_bytes
+    #            break
+
+    #        if 'ftp' not in url and idx != -1 and ('node_' + str(idx) in self.edge_ips):
+    #            if ip != self.edge_ips['node_' + str(idx)]:
+    #                url = url[:start_idx] + ip + url[end_idx:]
+    #                print('new url is ', url)
+    #            print('url to query is ', url)
+    #            resp = self.session.get(url)
+
+    #            if '{}' not in resp.text:
+    #                is_edge_delivery = True
+    #            else:
+    #                print('did not find ' , url, ' at edge node ', idx)
+    #        else:
+    #             
+    #            if is_edge_delivery:
+    #                dl_bytes -= self.pendingBytes
+    #            
+    #                print('segment', filepath, ' from edge')
+    #                self.receivedBytesEdge += float(self.video_meta[filepath]['size'])
+    #            else:
+    #                if self.playback < len(self.buffer) - 1:
+    #                    break
+    #                else:
+    #                    dl_bytes -= self.pendingBytes
+    #                    print('segment', filepath, ' from cloud')
+    #                    self.receivedBytesCloud += float(self.video_meta[filepath]['size']) 
+    #        self.pendingBytes  = 0
+    #        self.buffer.append(url)
+    #        print('url is ', url)
 
 class Simulation:
     def __init__(self, clients, time_scale, segment_duration, time_incr, outputfile):

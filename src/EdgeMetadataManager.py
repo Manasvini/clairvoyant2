@@ -30,10 +30,13 @@ class EdgeMetadataManager:
     def updateDeliveryForRoute(self, token_id, segment_id):
         self.mutex.acquire()
         try:
-            print('delivered', segment_id, ' for ', token_id)
             if token_id in self.routes: 
                 routeInfo = self.routes[token_id]
-                routeInfo.segments.pop(segment_id)
+                if segment_id in routeInfo.segments:
+                    print('delivered', segment_id, ' for ', token_id)
+                    routeInfo.segments.pop(segment_id)
+                else:
+                    print('missing segment ', segment_id)
                 self.routes[token_id] = routeInfo 
         finally:
             self.mutex.release()

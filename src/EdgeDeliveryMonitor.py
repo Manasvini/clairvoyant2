@@ -41,7 +41,7 @@ class EdgeDeliveryMonitor:
                 missedDeliveryReq.node_id = self.nodeId
                 request.misseddeliveryrequest.CopyFrom(missedDeliveryReq)
                 response = stub.HandleCVRequest(request)
-                for route in missedSegmentsByRoute:
-                    for seg_id in missedSegmentsByRoute[route].segments:
-                        self.metadataManager.updateDeliveryForRoute(route, seg_id)
+                #for route in missedSegmentsByRoute:
+                #    for seg_id in missedSegmentsByRoute[route].segments:
+                #        self.metadataManager.updateDeliveryForRoute(route, seg_id)
             self.metadataManager.cleanUpRoute(route)
