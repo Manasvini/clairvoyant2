@@ -9,7 +9,7 @@ import datetime
 import time
 from random import randrange
 
-SCALE_TO_SECONDS = 10.0
+SCALE_TO_SECONDS = 60.0
 
 
 def get_point(val1, val2, val3, val4):

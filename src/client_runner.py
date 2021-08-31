@@ -75,7 +75,7 @@ def create_simulation(users, address,  video_seg_data, outputfile, models, confi
     
     clients = []
     time_incr = 1
-    time_scale = 10.0
+    time_scale = 60.0
     edge_ips = get_edge_ips(config)
     for user in users:
         client = Client(user, '../eval/monaco_traffic_lights.csv', address, video_seg_data, time_scale, time_incr, models, edge_ips) 
