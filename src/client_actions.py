@@ -58,6 +58,9 @@ class Client:
     def getId(self):
         return self.id
 
+    def download_complete(self):
+        return len(self.urls) == len(self.buffer)
+
     def move(self, cur_time):
         if int(cur_time) >=  max(0, int(self.traj_df.iloc[0]['time']) - 1000) and self.cv_resp == False:
             print(cur_time, self.traj_df.iloc[0]['time'])
@@ -204,6 +207,13 @@ class Simulation:
         output = [{'id': client.getId(), 'edge':client.get_edge_delivery(), 'cloud':client.get_cloud_delivery()} for client in self.clients]
         with open(self.outputfile, 'w') as ofh:
             json.dump(output, ofh, indent=2)
+
+    def clients_are_complete(self):
+        for client in self.clients:
+            if not client.download_complete():
+                return False
+
+        return True
  
     def run_simulation(self, num_steps):
         i = 0
@@ -217,5 +227,7 @@ class Simulation:
             self.cur_time = i
             if i % 100 == 0:
                 print('Ran simulation step', i)
+                if self.clients_are_complete():
+                    return
         end = time.time()
         print('simulation with', len(self.clients), 'clients took', end - start)

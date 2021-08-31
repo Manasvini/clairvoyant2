@@ -21,18 +21,22 @@ from monitoring.server import MonitoringServer
 from threading import Thread
 
 class CVCloudServer(clairvoyant_pb2_grpc.EdgeServerServicer):
-    def __init__(self, filename, mmWaveModels):
+    def __init__(self, filename):
         self.configDict = {}
         with open(filename) as fh:
             self.configDict = json.load(fh)
         print('got config', self.configDict)
         self.metaClient = CloudMetadataClient(self.configDict['metaServerAddress'])
-        self.dlManager = DownloadManager(self.configDict['nodeIds'], self.configDict['downloadSources'], self.configDict['timeScale'], mmWaveModels, DownloadDispatcher(self.configDict['nodeIps'], None))
+        self.mmWaveModels = self.getModels(self.configDict['nodeIds'])
+        self.dlManager = DownloadManager(self.configDict['nodeIds'], self.configDict['downloadSources'], self.configDict['timeScale'], self.mmWaveModels, DownloadDispatcher(self.configDict['nodeIps'], None))
+
         monServer = MonitoringServer(address=self.configDict['monServerAddress'], port=self.configDict['monServerPort'],\
-                edge_model_dict=mmWaveModels)
+                edge_model_dict=self.mmWaveModels)
         self.monServerThread = Thread(target=monServer.run)
         self.monServerThread.start()
         
+    def getModels(self, nodeids):
+        return {nodeid : EdgeNetworkModel(nodeid) for nodeid in nodeids}
         
     def checkDownloadSchedule(self, segments, contact_points):
         #return {segment.segment_id: segment for segment in segments}        
@@ -107,7 +111,7 @@ def parse_args():
     return args
 
 def create_cv_server(filename):
-    cvServer = CVCloudServer(filename, {'node_0':EdgeNetworkModel('node_0')})
+    cvServer = CVCloudServer(filename)
     return cvServer
 
 def main():

@@ -43,7 +43,7 @@ from EdgeNetworkModel import EdgeNetworkModel
 
 logging.basicConfig()
 logger = logging.getLogger("monitoring")
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
 
 class MonitoringHandler(BaseHTTPRequestHandler):
     def _set_headers(self):
