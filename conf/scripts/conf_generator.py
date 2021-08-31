@@ -4,7 +4,7 @@ import json, os
 parser = ArgumentParser()
 parser.add_argument('-n', '--num-config', type=int, default=1, help='Number of configs to generate')
 parser.add_argument('-t', '--template', type=str, required=True, help='template file')
-parser.add_argument('-p', 'gen-path', required=True, help='path to generated files')
+parser.add_argument('-p', '--gen-path', required=True, help='path to generated files')
 args = parser.parse_args()
 
 
