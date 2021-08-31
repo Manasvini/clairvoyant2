@@ -20,6 +20,13 @@ fi
 mkdir -p gen_conf
 gen_path=$(realpath gen_conf)
 
+if [ ! -f $HOME/.ssh/config ]; then
+  cp scripts/sshconfig $HOME/.ssh/config
+elif [ -z $(grep cv0 $HOME/.ssh/config) ]; then
+  cat scripts/sshconfig >> $HOME/.ssh/config
+fi
+
+
 python3 scripts/conf_generator.py -n $num_vms -t $template -p ${gen_path}
 
 for ((i=0; i<${num_vms}; i++)); do
