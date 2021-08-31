@@ -28,14 +28,15 @@ class CloudMetadataClient:
             pt = clairvoyant_pb2.Coordinate()
             pt.CopyFrom(route.points[i])
             pt.distance = curnode.distance
-
+            
             if curnode.nodeId == nodeInfo.nodeId:
                 cvNodeInfo.contact_time += route.points[i].time - route.points[i-1].time
                 cvpt = cvNodeInfo.contact_points.add()
                 cvpt.CopyFrom(pt)
-                print('copied 1 pt')
             else:
-                if cvNodeInfo.nodeId != '' and cvNodeInfo.nodeId != None:
+                if cvNodeInfo.node_id != '' and cvNodeInfo.node_id != None:
+                    cvNodeInfo.contact_time = cvNodeInfo.contact_points[-1].time - cvNodeInfo.contact_points[0].time
+                    print('node ', cvNodeInfo.node_id, 'contact = ', cvNodeInfo.contact_time, cvNodeInfo.contact_points[0])
                     cvNodeInfos.append(cvNodeInfo)
                 cvNodeInfo = clairvoyant_pb2.NodeInfo()
                 cvNodeInfo.node_ip = curnode.address

@@ -36,7 +36,7 @@ class EdgeDownloadQueue:
                 dlTime = (((qData.segment.segment_size * 8) /self.timeScale) / (qData.sourceSpeed))/self.timeScale 
                 if qData.timestamp/self.timeScale + dlTime <= now:
                     if not self.metadataManager.hasSegment(qData.segment.segment_id):
-                        self.metadataManager.addSegment({'segment':qData.segment, 'source_ip':source})
+                        self.metadataManager.addSegment({'segment':qData.segment, 'source_ip':qData.source})
                     completed.append(copy.deepcopy(self.pending[i]))
                     #print('compltedt:', i, 'dl deadline', dlTime + qData.timestamp/self.timeScale, 'now', now)
                 

@@ -64,6 +64,7 @@ class EdgeMetadataManager:
         values['segmentname'] = segmentInfo['segment'].segment_name
         values['nodeip'] = segmentInfo['source_ip']
         self.redis.hmset(segmentInfo['segment'].segment_id, values)
+        print('added segment',  values)
         #self.redis.sadd(video_id, set(segmentInfo['segment'].segment_id))
 
     def hasSegment(self, segment_id):
@@ -103,8 +104,6 @@ class EdgeMetadataManager:
             now = time.time_ns() / 1e9
             deadline = now + self.missedDeliveryThreshold
             deadline /= self.timeScale
-            if len(self.routes) == 0:
-                print('no routes')
             for token_id in self.routes:
                 print('route is ', token_id)
                 routeInfo =  self.routes[token_id]

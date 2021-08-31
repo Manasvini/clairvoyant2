@@ -20,7 +20,6 @@ class EdgeDeliveryMonitor:
 
     def makeRequest(self):
         missedSegmentsByRoute = self.metadataManager.getOverdueSegments()
-        print('run delivery mon')
         if len(missedSegmentsByRoute) == 0:
             return None
         for route in missedSegmentsByRoute:

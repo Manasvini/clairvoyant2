@@ -20,20 +20,20 @@ class DownloadManager:
         return 'http://ftp.itec.aau.at/DASHDataset2014'
 
     def getMeanDownloadSpeed(self, node_id, contact_points, contact_time):
-        model = self.mmWaveModels.get(node_id)
+        model = self.mmWaveModels[node_id]
         dl_map = model.get()
         if model is None:
             print('model is None')
         distances = sorted(list(dl_map.keys()))
-        totalBytes = 0
+        totalBits = 0
 
         for point in contact_points:
             distance_idx = bisect.bisect_left(distances, point.distance)
             distance = distances[min(distance_idx, len(distances)-1)]
             dlSpeed = dl_map[distance]
-            totalBytes += (point.time * dlSpeed) / (self.timeScale * 8)
+            totalBits += (point.time * dlSpeed) / (self.timeScale )
 
-        return totalBytes / (contact_time/self.timeScale)
+        return totalBits / (contact_time)
 
     def assignDownload(self, node_id, deadline, segment, source):
         source = self.findOptimalSource(node_id)
@@ -52,12 +52,14 @@ class DownloadManager:
         self.routeInfos[token_id] = nodeInfos
         print('got token ', token_id)
         for node in nodeInfos:
+            if node.node_id not in self.mmWaveModels:
+                continue
             if segmentIdx == len(segments):
                 break
             dlSpeed = self.getMeanDownloadSpeed(node.node_id, node.contact_points, node.contact_time)
             availableContactTime = node.contact_time
             assignments[node.node_id] = []
-            print(node.node_id, availableContactTime)
+            print(node.node_id, availableContactTime, node.arrival_time)
             for i in range(segmentIdx, len(segments)):
                 segmentIdx = i
                 if availableContactTime <= 0:

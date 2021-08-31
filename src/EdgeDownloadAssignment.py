@@ -30,13 +30,12 @@ class EdgeDownloadAssignment:
             for ip_segment in self.assignments.values():
                 if ip_segment.source in self.downloadSourceSpeeds:
                     speed = self.downloadSourceSpeeds[ip_segment.source]
-                    segmentTime = ((ip_segment.segment.segment_size/self.timeScale) * 8.0) / speed
-                    totalTime += segmentTime
+                    segTime = ((ip_segment.segment.segment_size/self.timeScale) * 8.0) / speed
+                    totalTime += segTime
                 else:
                     raise ValueError('source ' + ip_segment.source + ' not found')
         finally:
             self.mutex.release()
-
         if (segmentTime + totalTime + now/self.timeScale)  < deadline:
             return True
         return False
