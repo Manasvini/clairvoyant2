@@ -12,7 +12,7 @@ try:
     with open(args.template, 'r') as fh:
         obj = json.loads(fh.read())
     for i in range(args.num_config):
-        outfile = os.path.join(args.gen_path, 'edgeConf{}.json'.format(i))
+        outfile = os.path.join(args.gen_path, 'edgeConfig{}.json'.format(i))
         with open(outfile, 'w') as fw:
             obj['nodeId'] = "node_{}".format(i)
             fw.write(json.dumps(obj))

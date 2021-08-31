@@ -2,7 +2,7 @@
 
 #How to use?
 # bash gen_confs.sh <NUM_CONFS> <TEMPLATE>
-# e.g. bash gen_confs.sh 5 edgeConfig.json
+# e.g. bash scripts/gen_confs.sh 5 edgeConfig.json
 # For changes to conf, please change in conf_generator.py
 
 # Please specify number of vms as argument

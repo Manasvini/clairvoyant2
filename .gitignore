@@ -4,4 +4,4 @@
 logs/
 eval/user_trajectories
 localenv
-gen_confs
+gen_conf
