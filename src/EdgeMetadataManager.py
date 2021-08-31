@@ -64,7 +64,7 @@ class EdgeMetadataManager:
         values['segmentname'] = segmentInfo['segment'].segment_name
         values['nodeip'] = segmentInfo['source_ip']
         self.redis.hmset(segmentInfo['segment'].segment_id, values)
-        print('added segment',  values)
+        #print('added segment',  values)
         #self.redis.sadd(video_id, set(segmentInfo['segment'].segment_id))
 
     def hasSegment(self, segment_id):

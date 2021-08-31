@@ -88,19 +88,22 @@ class DownloadManager:
             response = self.dispatcher.makeRequest(token_id, node_id, segments, sources, assignments[node_id][0].arrival_time) 
           
     def handleMissedDelivery(self, token_id, node_id, segments):
+        if token_id not in self.routeInfos:
+            print('no such route ', token_id)
         nodeInfos = self.routeInfos[token_id]
         idx = 0
         for node in nodeInfos:
             if node.node_id == node_id:
                 break
             idx += 1
-        if len(nodeInfos) > idx + 1:
+        if len(nodeInfos) > idx + 1 and nodeInfos[idx+1].node_id in self.mmWaveModels:
             nodeInfo = nodeInfos[idx+1]
             assignments = self.getDownloadAssignment(segments, [nodeInfo], token_id)
             self.sendAssignments(assignments, token_id)
 
     def handleVideoRequest(self, token_id, segments, nodeInfos):
         assignments = self.getDownloadAssignment(segments, nodeInfos, token_id)
+        
         self.sendAssignments(assignments, token_id)
         return assignments
         #for node_id in assignments:

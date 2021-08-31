@@ -25,7 +25,7 @@ class EdgeDownloadAssignment:
         now = time.time_ns() / 1e9
         totalTime = 0
         segmentTime = ((candidate.segment.segment_size/self.timeScale) * 8.0) / (self.downloadSourceSpeeds[candidate.source] )
-        print(candidate.segment.segment_id, segmentTime)
+        #print(candidate.segment.segment_id, segmentTime)
         try:
             for ip_segment in self.assignments.values():
                 if ip_segment.source in self.downloadSourceSpeeds:
