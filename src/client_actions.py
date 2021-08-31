@@ -105,7 +105,7 @@ class Client:
         return -1, 0
 
     def get_download_speed(self, distance, node_idx):
-        if node_idx != -1:
+        if node_idx != -1 and node_idx in self.model_map:
             model = self.model_map[node_idx]
             return model.get_download_speed(distance)/8
         return 4e7/8
