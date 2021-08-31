@@ -34,7 +34,8 @@ class EdgeDownloadQueue:
             for i in range(len(self.pending)):
                 qData = self.pending[i]
                 dlTime = (((qData.segment.segment_size * 8) /self.timeScale) / (qData.sourceSpeed))/self.timeScale 
-                if qData.timestamp/self.timeScale + dlTime <= now:
+                #if qData.timestamp/self.timeScale + dlTime <= now:
+                if True:
                     if not self.metadataManager.hasSegment(qData.segment.segment_id):
                         self.metadataManager.addSegment({'segment':qData.segment, 'source_ip':qData.source})
                     completed.append(copy.deepcopy(self.pending[i]))

@@ -42,7 +42,7 @@ class EdgeMetadataManager:
         while True:
             message = self.pubsub.get_message()
             if message:
-                #print ("Subscriber got", message['data'])
+                print ("Subscriber got", message['data'])
                 vals  = str(message['data']).split('|')
                 if len(vals) >= 2:
                     token_id = int(vals[0])
@@ -102,13 +102,12 @@ class EdgeMetadataManager:
         undelivered_segments = {}
         try:
             now = time.time_ns() / 1e9
-            deadline = now + self.missedDeliveryThreshold
-            deadline /= self.timeScale
+            now = now/self.timeScale
             for token_id in self.routes:
                 print('route is ', token_id)
                 routeInfo =  self.routes[token_id]
-                print('deadline = ', deadline, ' latest',  routeInfo.arrival_time + routeInfo.contact_time/self.timeScale, ' arrival = ', routeInfo.arrival_time)
-                if len(routeInfo.segments) > 0 and routeInfo.arrival_time + routeInfo.contact_time/self.timeScale > now:
+                print('now = ', now, ' departure=',  routeInfo.arrival_time + routeInfo.contact_time, ' arrival = ', routeInfo.arrival_time)
+                if len(routeInfo.segments) > 0 and routeInfo.arrival_time + routeInfo.contact_time + self.missedDeliveryThreshold/self.timeScale > now:
                     undelivered_segments[token_id] = copy.deepcopy(routeInfo)
         finally:
             self.mutex.release()

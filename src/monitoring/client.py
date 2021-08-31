@@ -16,7 +16,7 @@ from EdgeNetworkModel import EdgeNetworkModel
 
 logging.basicConfig()
 logger = logging.getLogger("monitoring")
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.WARNING)
 
 
 class MonitoringClient(Thread):

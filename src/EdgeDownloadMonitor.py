@@ -17,10 +17,9 @@ class EdgeDownloadMonitor:
         print('finished init dl mon')
     def run(self):
         schedule.every(self.intervalSeconds).seconds.do(self.makeRequest)
-        
         while True:
             schedule.run_pending()
-            time.sleep(1)
+            time.sleep(0.05)
 
     def makeRequest(self):
         logging.info('making dl mon request')

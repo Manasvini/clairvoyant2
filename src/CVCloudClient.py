@@ -23,7 +23,7 @@ class CVCloudClient:
             point = route.points.add()
             point.x = p[0]
             point.y = p[1]
-            point.time = ctr /10
+            point.time = ctr /60
             ctr += 1
         videoReq.route.CopyFrom(route)
         request.videorequest.CopyFrom(videoReq)

@@ -39,8 +39,8 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         self.queueTracker.start()
        
         self.deliveryMon = EdgeDeliveryMonitor(self.configDict['timeScale'], self.configDict['serverAddress'], self.configDict['nodeId'], self.configDict['intervalSeconds'], self.metadataManager)
-        self.deliveryThread = threading.Thread(target=self.deliveryMon.run)
-        self.deliveryThread.start()
+        #self.deliveryThread = threading.Thread(target=self.deliveryMon.run)
+        #self.deliveryThread.start()
 
     def checkDownloadSchedule(self, segments, contact_points):
         return {segment.segment_id: segment for segment in segments}        
