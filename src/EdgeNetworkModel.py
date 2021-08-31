@@ -11,13 +11,18 @@ class EdgeNetworkModel:
         self.mutex.acquire()
         for key,value in model_dict.items():
             self.nw_dict[key] = value
-        pass
         self.timestamp = ts
         self.mutex.release()
 
+
     def get(self): #uses the mutex for getting proper nw_dict
-        #dummy mode
-        return {10:500000000}
+        tmp_dict = {}
+        self.mutex.acquire()
+        for key,value in model_dict.items():
+            tmp_dict[key] = self.nw_dict[key]
+
+        self.mutex.release()
+        return tmp_dict
 
 
 
