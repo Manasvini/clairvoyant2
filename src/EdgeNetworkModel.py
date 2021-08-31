@@ -18,7 +18,7 @@ class EdgeNetworkModel:
     def get(self): #uses the mutex for getting proper nw_dict
         tmp_dict = {}
         self.mutex.acquire()
-        for key,value in model_dict.items():
+        for key,value in self.nw_dict.items():
             tmp_dict[key] = self.nw_dict[key]
 
         self.mutex.release()

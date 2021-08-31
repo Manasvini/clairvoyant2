@@ -24,11 +24,13 @@ class DownloadManager:
         dl_map = model.get()
         if model is None:
             print('model is None')
+        print(dl_map)
         distances = sorted(list(dl_map.keys()))
         totalBits = 0
 
         for point in contact_points:
             distance_idx = bisect.bisect_left(distances, point.distance)
+            print('dust idx = ', distance_idx, 'distances len', len(distances))
             distance = distances[min(distance_idx, len(distances)-1)]
             dlSpeed = dl_map[distance]
             totalBits += (point.time * dlSpeed) / (self.timeScale )
@@ -49,6 +51,9 @@ class DownloadManager:
     def getDownloadAssignment(self, segments, nodeInfos, token_id):
         segmentIdx = 0
         assignments = {}
+        if nodeInfos == None:
+            print('nodeInfos is empty')
+            return assignments
         self.routeInfos[token_id] = nodeInfos
         print('got token ', token_id)
         for node in nodeInfos:
@@ -79,6 +84,7 @@ class DownloadManager:
             return assignments
 
     def sendAssignments(self, assignments, token_id):
+        
         for node_id in assignments:
             segments = [candidate.segment for candidate in assignments[node_id]]
             sources = {candidate.segment.segment_id: candidate.source for candidate in assignments[node_id]}
@@ -103,7 +109,7 @@ class DownloadManager:
 
     def handleVideoRequest(self, token_id, segments, nodeInfos):
         assignments = self.getDownloadAssignment(segments, nodeInfos, token_id)
-        
+        print(assignments)
         self.sendAssignments(assignments, token_id)
         return assignments
         #for node_id in assignments:

@@ -117,7 +117,7 @@ if __name__ == '__main__':
     if opts.userids and len(opts.userids) > 0:
         users = [traj_dir + '/' + u[0] + '.csv'  for u in opts.userids]
     elif opts.nodeid and len(opts.nodeid) > 0:
-        with open('route.json') as fh:
+        with open('../eval/route.json') as fh:
             routes_for_node = json.load(fh)
         if opts.nodeid in routes_for_node:
             users = [traj_dir + '/' + user + '.csv' for user in routes_for_node[opts.nodeid]]
