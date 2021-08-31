@@ -108,7 +108,7 @@ class EdgeMetadataManager:
                 print('route is ', token_id)
                 routeInfo =  self.routes[token_id]
                 print('deadline = ', deadline, ' latest',  routeInfo.arrival_time + routeInfo.contact_time/self.timeScale, ' arrival = ', routeInfo.arrival_time)
-                if len(routeInfo.segments) > 0 and routeInfo.arrival_time + routeInfo.contact_time/self.timeScale > deadline:
+                if len(routeInfo.segments) > 0 and routeInfo.arrival_time + routeInfo.contact_time/self.timeScale > now:
                     undelivered_segments[token_id] = copy.deepcopy(routeInfo)
         finally:
             self.mutex.release()
