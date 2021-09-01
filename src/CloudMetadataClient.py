@@ -46,8 +46,12 @@ class CloudMetadataClient:
                 cvpt.CopyFrom(pt)
                 cvNodeInfo.contact_time = 0
                 nodeInfo.CopyFrom(curnode)
-        if (len(cvNodeInfos) > 0 and cvNodeInfo.node_id != cvNodeInfos[-1].node_id) or (cvNodeInfo.node_id != '' and len(cvNodeInfos) == 0):
-            cvNodeInfos.append(cvNodeInfo)
+
+        if cvNodeInfo.node_id != '':
+            if  len(cvNodeInfos) == 0 or \
+                    (cvNodeInfo.node_id != cvNodeInfos[-1].node_id):
+                cvNodeInfos.append(cvNodeInfo)
+
         return cvNodeInfos
     
     def makeNearestNodesRequest(self, route):

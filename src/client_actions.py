@@ -116,12 +116,18 @@ class Client:
     def get_filepath(self, url):
         http_idx = len('http://')
         filepath_idx = url.find('/', http_idx + 1)
-        filepath = url[filepath_idx + 1:]
+        if "ftp" in url: # cloud path
+            prefix = "http://ftp.itec.aau.at/DASHDataset2014/"
+            filepath = url[len(prefix):]
+        else:
+            filepath = url[filepath_idx + 1:]
         return filepath 
 
     def set_pending_bytes(self, url): 
 
         filepath = self.get_filepath(url)
+        with open('debug.json','w') as fh:
+            fh.write(json.dumps(self.video_meta, indent=2))
         if filepath not in self.video_meta:
             print(filepath, ' not found')
             return None

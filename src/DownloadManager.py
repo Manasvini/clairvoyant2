@@ -50,10 +50,15 @@ class DownloadManager:
 
     def getDownloadAssignment(self, segments, nodeInfos, token_id):
         segmentIdx = 0
-        assignments = {}
+        
         if nodeInfos == None:
             print('nodeInfos is empty')
             return assignments
+
+        # we do this to handle same nodes from cropping up later in the route
+        node_set = set([node.node_id for node in nodeInfos])
+        assignments = {node_id:[] for node_id in node_set if node_id in self.mmWaveModels}
+
         self.routeInfos[token_id] = nodeInfos
         print('got token ', token_id)
         for node in nodeInfos:
@@ -63,14 +68,15 @@ class DownloadManager:
                 break
             dlSpeed = self.getMeanDownloadSpeed(node.node_id, node.contact_points, node.contact_time)
             availableContactTime = node.contact_time
-            assignments[node.node_id] = []
+
             print(node.node_id, availableContactTime, node.arrival_time)
             for i in range(segmentIdx, len(segments)):
                 segmentIdx = i
                 if availableContactTime <= 0:
                     break
                 source = self.findOptimalSource(node.node_id)
-                if self.edgeNodeAssignments[node.node_id].hasSegment(segments[segmentIdx].segment_id) or self.assignDownload(node.node_id, node.arrival_time + node.contact_time, segments[segmentIdx], source):
+                if self.edgeNodeAssignments[node.node_id].hasSegment(segments[segmentIdx].segment_id) or \
+                        self.assignDownload(node.node_id, node.arrival_time + node.contact_time, segments[segmentIdx], source):
                     candidate = SegmentInfo()
                     candidate.segment = segments[segmentIdx]
                     candidate.source = source
@@ -81,7 +87,12 @@ class DownloadManager:
                 else:
                     logging.info('assigned ' + str(len(assignments[node.node_id])) + ' segments to ' + node.node_id)
                     break
-            return assignments
+
+        print('assignments:')
+        for node,value in assignments.items():
+            print(node,  len(value))
+
+        return assignments
 
     def sendAssignments(self, assignments, token_id):
         
