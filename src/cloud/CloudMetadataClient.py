@@ -3,9 +3,9 @@ import asyncio
 import grpc
 import time
 
-import clairvoyant_pb2
-import clairvoyant_meta_pb2
-import clairvoyant_meta_pb2_grpc
+import genprotos.clairvoyant_pb2 as clairvoyant_pb2
+import genprotos.clairvoyant_meta_pb2 as clairvoyant_meta_pb2
+import genprotos.clairvoyant_meta_pb2_grpc as clairvoyant_meta_pb2_grpc
 
 class CloudMetadataClient:
     def __init__(self, address):

@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import clairvoyant_pb2 as clairvoyant__pb2
+from . import clairvoyant_pb2 as clairvoyant__pb2
 
 
 class MonitoringServerStub(object):

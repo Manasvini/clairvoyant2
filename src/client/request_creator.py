@@ -1,13 +1,13 @@
-import clairvoyant_pb2
-import clairvoyant_pb2_grpc
-import grpc
 import json
-
-import pandas as pd
 import sys
 import datetime
 import time
+import pandas as pd
 from random import randrange
+
+import genprotos.clairvoyant_pb2 as clairvoyant_pb2
+import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
+import grpc
 
 SCALE_TO_SECONDS = 60.0
 

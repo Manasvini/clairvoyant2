@@ -1,8 +1,8 @@
 import schedule
 import time
 import grpc
-import clairvoyant_pb2_grpc
-import clairvoyant_pb2
+import genprotos.clairvoyant_pb2 as clairvoyant_pb2
+import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
 
 import logging
 class EdgeDownloadMonitor:

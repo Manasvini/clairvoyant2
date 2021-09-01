@@ -1,26 +1,24 @@
 import sys
 import os
-import asyncio
 import grpc
 import logging
 
-import clairvoyant_pb2
-import clairvoyant_pb2_grpc
+import genprotos.clairvoyant_pb2 as clairvoyant_pb2
+import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
 
-from ModelReader import Model
+from shared.ModelReader import Model
 import json
-from argparse import ArgumentParser
 import time
 
-from CloudMetadataClient import CloudMetadataClient
-from DownloadManager import DownloadManager
-from EdgeNetworkModel import EdgeNetworkModel
-from DownloadDispatcher import DownloadDispatcher
+from cloud.CloudMetadataClient import CloudMetadataClient
+from cloud.DownloadManager import DownloadManager
+from shared.EdgeNetworkModel import EdgeNetworkModel
+from cloud.DownloadDispatcher import DownloadDispatcher
 from monitoring.server import MonitoringServer
 
 from threading import Thread
 
-class CVCloudServer(clairvoyant_pb2_grpc.EdgeServerServicer):
+class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
     def __init__(self, filename):
         self.configDict = {}
         with open(filename) as fh:
@@ -88,38 +86,19 @@ class CVCloudServer(clairvoyant_pb2_grpc.EdgeServerServicer):
             reply.status.CopyFrom(statusReply)
         return reply
 
-    def shutdown(self): #TODO: this is probably not called when CloudServer is destroyed. Make sure we clean up server
+    def shutdown(self): 
+        # TODO: this is probably not called when CloudServer is destroyed. 
+        # Make sure we clean up server.
         monServer.shutdown()
         monServerThread.join()
 
 async def serve(address, cvServer) -> None:
     server = grpc.aio.server()
     clairvoyant_pb2_grpc.add_CVServerServicer_to_server(cvServer, server)
-    #listen_addr = '[::]:50056'
     server.add_insecure_port(address)
+    await server.start()
     try:
-        await server.start()
         await server.wait_for_termination()
     except KeyboardInterrupt:
+        await cvServer.shutdown()
         await server.stop(0)
-        
-def parse_args():
-    parser = ArgumentParser()
-    parser.add_argument('-c', '--config', dest='config', type=str, help='config file')
-    parser.add_argument('-a', '--address', dest='address', type=str, help='config file')
-    args = parser.parse_args()
-    return args
-
-def create_cv_server(filename):
-    cvServer = CVCloudServer(filename)
-    return cvServer
-
-def main():
-    args = parse_args()
-    print("it's alive")
-    logging.basicConfig(level=logging.INFO)
-    cvServer = create_cv_server(args.config) 
-    asyncio.run(serve(args.address, cvServer))
-
-if __name__=='__main__':
-    main()

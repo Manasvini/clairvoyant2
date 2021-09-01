@@ -1,18 +1,18 @@
 #!/usr/bin/python3
 import grpc
-import pandas as pd
 import requests
 import time
 import os
 import sklearn.neighbors
-import numpy as np
 import requests
-#from concurrent.futures import ThreadPoolExecutor
 import asyncio
-import clairvoyant_pb2
-import clairvoyant_pb2_grpc
-import request_creator
 import json
+import pandas as pd
+import numpy as np
+
+import genprotos.clairvoyant_pb2 as clairvoyant_pb2
+import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
+import client.request_creator as request_creator
 
 dist = sklearn.neighbors.DistanceMetric.get_metric('haversine')
 

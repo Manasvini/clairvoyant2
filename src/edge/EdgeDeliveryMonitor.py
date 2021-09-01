@@ -1,8 +1,9 @@
 import schedule
 import time
 import grpc
-import clairvoyant_pb2_grpc
-import clairvoyant_pb2
+import genprotos.clairvoyant_pb2 as clairvoyant_pb2
+import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
+
 class EdgeDeliveryMonitor:
     def __init__(self, timeScale, serverAddress, nodeId, intervalSeconds, metadataManager):
         self.serverAddress = serverAddress

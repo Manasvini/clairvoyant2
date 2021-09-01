@@ -1,19 +1,22 @@
-import clairvoyant_pb2
-import clairvoyant_pb2_grpc
-import grpc
-import request_creator
 import sys
 import time
 import logging
 import asyncio
-from argparse import ArgumentParser
-import random
-from client_actions import Client, Simulation
-from ModelReader import Model
-import json
-from aiohttp import ClientSession, ClientResponseError
 import os
+import json
+import random
+
+from argparse import ArgumentParser
+from aiohttp import ClientSession, ClientResponseError
 from rediscluster import RedisCluster
+
+import genprotos.clairvoyant_pb2 as clairvoyant_pb2
+import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
+import grpc
+
+from shared.ModelReader import Model
+from client.client_actions import Client, Simulation
+import client.request_creator as request_creator
 
 SEGMENT_DURATION_SECONDS = 1.0
 

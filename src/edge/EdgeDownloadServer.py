@@ -1,22 +1,18 @@
 import sys
 import os
-import asyncio
 import grpc
 import logging
 import threading
-
-import clairvoyant_pb2
-import clairvoyant_pb2_grpc
-
-from EdgeMetadataManager import EdgeMetadataManager
-from ModelReader import Model
 import json
-from argparse import ArgumentParser
-from EdgeDownloadQueue import EdgeDownloadQueue
-from EdgeDownloadMonitor import EdgeDownloadMonitor
-from EdgeDeliveryMonitor import EdgeDeliveryMonitor
 
+import genprotos.clairvoyant_pb2 as clairvoyant_pb2
+import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
 
+from edge.EdgeMetadataManager import EdgeMetadataManager
+from edge.EdgeDownloadQueue import EdgeDownloadQueue
+from edge.EdgeDownloadMonitor import EdgeDownloadMonitor
+from edge.EdgeDeliveryMonitor import EdgeDeliveryMonitor
+from shared.ModelReader import Model
 from monitoring.client import MonitoringClient
 
 class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
@@ -77,14 +73,9 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         self.monClient.stop()
         monClient.join()
 
-def create_dl_server(filename):
-    dlServer = EdgeDownloadServer(filename)
-    return dlServer
-
 async def serve(dlServer, listen_addr) -> None:
     server = grpc.aio.server()
     clairvoyant_pb2_grpc.add_EdgeServerServicer_to_server(dlServer, server)
-    #listen_addr = '[::]:50056'
     server.add_insecure_port(listen_addr)
     logging.info('starting server on %s', listen_addr)
     await server.start()
@@ -93,21 +84,4 @@ async def serve(dlServer, listen_addr) -> None:
     except KeyboardInterrupt:
         await dlServer.shutdown()
         await server.stop(0)
-        
-def parse_args():
-    parser = ArgumentParser()
-    parser.add_argument('-c', '--config', dest='config', type=str, help='config file')
-    parser.add_argument('-a', '--address', dest='address', type=str, help='config file')
-    args = parser.parse_args()
-    return args
 
-
-def main():
-    args = parse_args()
-    print("it's alive")
-    logging.basicConfig(level=logging.INFO)
-    dlServer = create_dl_server(args.config)
-    asyncio.run(serve(dlServer, args.address))
-
-if __name__=='__main__':
-    main()

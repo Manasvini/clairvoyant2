@@ -2,6 +2,7 @@ import threading
 import time
 import copy
 import logging
+
 class QueueData:
     def __init__(self, segment, sourceSpeed, source):
         self.segment = segment

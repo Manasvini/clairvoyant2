@@ -2,6 +2,7 @@ import threading
 import time
 import copy
 import logging
+
 class SegmentInfo:
     def __init__(self):
         self.segment = None

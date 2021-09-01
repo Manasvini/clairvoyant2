@@ -1,11 +1,14 @@
-import asyncio
-from EdgeDownloadAssignment import EdgeDownloadAssignment, SegmentInfo
-import bisect
-from EdgeNetworkModel import EdgeNetworkModel
-import logging
-import clairvoyant_pb2
-from DownloadDispatcher import DownloadDispatcher
 import time
+import logging
+import bisect
+import asyncio
+
+from cloud.EdgeDownloadAssignment import EdgeDownloadAssignment, SegmentInfo
+from shared.EdgeNetworkModel import EdgeNetworkModel
+from cloud.DownloadDispatcher import DownloadDispatcher
+import genprotos.clairvoyant_pb2 as clairvoyant_pb2
+
+
 class DownloadManager:
     def __init__(self, node_ids, downloadSources, timeScale, mmWaveModels, dispatcher):
         self.downloadSources = downloadSources

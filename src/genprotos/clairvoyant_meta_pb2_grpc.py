@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import clairvoyant_meta_pb2 as clairvoyant__meta__pb2
+from . import clairvoyant_meta_pb2 as clairvoyant__meta__pb2
 
 
 class MetadataServerStub(object):

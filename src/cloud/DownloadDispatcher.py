@@ -2,8 +2,8 @@ import logging
 import asyncio
 import grpc
 
-import clairvoyant_pb2
-import clairvoyant_pb2_grpc
+import genprotos.clairvoyant_pb2 as clairvoyant_pb2
+import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
 
 class DownloadDispatcher:
     def __init__(self, edge_ip_map, callback):

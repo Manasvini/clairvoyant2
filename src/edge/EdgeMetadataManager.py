@@ -1,10 +1,10 @@
-import clairvoyant_pb2
-
 from redis import Redis
+from collections import OrderedDict
 import threading
 import time
-from collections import OrderedDict
 import copy
+
+import genprotos.clairvoyant_pb2 as clairvoyant_pb2
 
 class RouteInfo:
     def __init__(self):
