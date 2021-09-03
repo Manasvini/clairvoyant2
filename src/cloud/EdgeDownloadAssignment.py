@@ -7,7 +7,8 @@ class SegmentInfo:
     def __init__(self):
         self.segment = None
         self.source = None
-        self.contact_time = None
+        self.arrival_time = None
+        self.expected_dlc_time = None
 
 class EdgeDownloadAssignment:
     def __init__(self, node_id, downloadSources, timeScale):
@@ -17,15 +18,50 @@ class EdgeDownloadAssignment:
         self.timeScale = timeScale
         self.downloadedSegments = {}
         self.node_id = node_id    
+
     def hasSegment(self, segment_id):
         return segment_id in self.downloadedSegments
+
+    """
+    Note: the add function is cloud executive. i.e. doesn't need to talk to edge to know
+    about it. This could change to have it ask edge node about it's willingness to download
+    segments (potentially more than 1)
+    """
+    def add(self, candidate, request_timestamp):
+        #NOTE: deadline is the arrival time of the vehicle at the candidate
+
+        add_success = False
+        self.mutex.acquire()
+
+        #prune stale assignments. TODO: explore if periodically pruning is better
+        max_dlc_time = request_timestamp 
+
+        for seg_id in list(self.assignments.keys()):
+            seg_info = self.assignments[seg_id]
+            if seg_info.expected_dlc_time < request_timestamp:
+                del self.assignments[seg_info]
+            else:
+                max_dlc_time = max(max_dlc_time, seg_info.expected_dlc_time)
+
+        segmentTime = (candidate.segment.segment_size * 8.0) / self.downloadSourceSpeeds[candidate.source]
+        if max_dlc_time + segmentTime < candidate.arrival_time:
+            logging.debug("segment {} meets deadline".format(candidate.segment.segment_id))
+            candidate.expected_dlc_time = max_dlc_time + segmentTime
+            self.assignments[candidate.segment.segment_id] = candidate
+            add_success = True
+
+        self.mutex.release()
+
+        return add_success
+        
 
     def isDownloadPossible(self, deadline, candidate):
         self.mutex.acquire()
         bytesInProgress = 0 
-        now = time.time_ns() / 1e9
+        #TODO: use sumo time to see if download is possible
+        now = time.time_ns() / 1e9 #this should refer to when node is free to download
         totalTime = 0
-        segmentTime = ((candidate.segment.segment_size/self.timeScale) * 8.0) / (self.downloadSourceSpeeds[candidate.source] )
+        segmentTime = ((candidate.segment.segment_size) * 8.0) / (self.downloadSourceSpeeds[candidate.source] )
         #print(candidate.segment.segment_id, segmentTime)
         try:
             for ip_segment in self.assignments.values():

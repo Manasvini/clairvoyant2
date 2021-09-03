@@ -3,7 +3,6 @@ python3 client_runner.py -a localhost:50058  \
                          -f ../eval/user_trajectories/ \
                          -d ../models/ \
                          -m ../models/model_map.csv \
-                         -c ../conf/cloudConfig.json \
-                         -u user14 \
-                         -u user23 \
+                         -c ../conf/cv0cloudConfig.json \
+                         -u user22 \
                          -o results/test.json 

@@ -20,6 +20,8 @@ import client.request_creator as request_creator
 
 SEGMENT_DURATION_SECONDS = 1.0
 
+logging.basicConfig()
+logger = logging.getLogger("client")
 
 def populate_videos():
     startup_nodes = [{"host":"127.0.0.1", "port":"7000"}]

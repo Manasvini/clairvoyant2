@@ -15,6 +15,7 @@ class EdgeDownloadMonitor:
         logging.basicConfig(level=logging.INFO)
         logging.info("inited")
         print('finished init dl mon')
+
     def run(self):
         schedule.every(self.intervalSeconds).seconds.do(self.makeRequest)
         while True:

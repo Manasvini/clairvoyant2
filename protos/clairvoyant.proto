@@ -38,10 +38,10 @@ message Route {
   repeated Coordinate points = 2;
 }
 
-
 message VideoRequest {
   string video_id = 1;
   Route route = 2;
+  int64 timestamp = 3;
 }
 
 message VideoReply {

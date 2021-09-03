@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x11\x63lairvoyant.proto\x12\x0b\x63lairvoyant\"\x89\x01\n\x08NodeInfo\x12\x0f\n\x07node_id\x18\x01 \x01(\t\x12\x0f\n\x07node_ip\x18\x02 \x01(\t\x12\x14\n\x0c\x61rrival_time\x18\x03 \x01(\x01\x12\x14\n\x0c\x63ontact_time\x18\x04 \x01(\x01\x12/\n\x0e\x63ontact_points\x18\x05 \x03(\x0b\x32\x17.clairvoyant.Coordinate\"I\n\x07Segment\x12\x12\n\nsegment_id\x18\x01 \x01(\t\x12\x14\n\x0csegment_size\x18\x02 \x01(\x05\x12\x14\n\x0csegment_name\x18\x03 \x01(\t\"_\n\x0cSegmentOwner\x12%\n\x07segment\x18\x01 \x01(\x0b\x32\x14.clairvoyant.Segment\x12(\n\tnode_info\x18\x02 \x01(\x0b\x32\x15.clairvoyant.NodeInfo\"Q\n\nCoordinate\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\x12\r\n\x05speed\x18\x03 \x01(\x01\x12\x0c\n\x04time\x18\x04 \x01(\x01\x12\x10\n\x08\x64istance\x18\x05 \x01(\x01\"B\n\x05Route\x12\x10\n\x08route_id\x18\x01 \x01(\x05\x12\'\n\x06points\x18\x02 \x03(\x0b\x32\x17.clairvoyant.Coordinate\"C\n\x0cVideoRequest\x12\x10\n\x08video_id\x18\x01 \x01(\t\x12!\n\x05route\x18\x02 \x01(\x0b\x32\x12.clairvoyant.Route\",\n\nVideoReply\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12\x0c\n\x04urls\x18\x02 \x03(\t\"\x1d\n\x0bStatusReply\x12\x0e\n\x06status\x18\x01 \x01(\t\"b\n\x15MissedDeliveryRequest\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12&\n\x08segments\x18\x02 \x03(\x0b\x32\x14.clairvoyant.Segment\x12\x0f\n\x07node_id\x18\x04 \x01(\t\"\xaa\x02\n\x0f\x44ownloadRequest\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12&\n\x08segments\x18\x02 \x03(\x0b\x32\x14.clairvoyant.Segment\x12I\n\x0fsegment_sources\x18\x03 \x03(\x0b\x32\x30.clairvoyant.DownloadRequest.SegmentSourcesEntry\x12\x14\n\x0c\x61rrival_time\x18\x04 \x01(\x03\x12\x14\n\x0c\x63ontact_time\x18\x05 \x01(\x01\x12/\n\x0e\x63ontact_points\x18\x06 \x03(\x0b\x32\x17.clairvoyant.Coordinate\x1a\x35\n\x13SegmentSourcesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"6\n\rDownloadReply\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12\x13\n\x0bsegment_ids\x18\x02 \x03(\t\"?\n\x17\x44ownloadCompleteRequest\x12\x13\n\x0bsegment_ids\x18\x01 \x03(\t\x12\x0f\n\x07node_id\x18\x02 \x01(\t\"\xd7\x01\n\tCVRequest\x12\x31\n\x0cvideorequest\x18\x01 \x01(\x0b\x32\x19.clairvoyant.VideoRequestH\x00\x12\x43\n\x15misseddeliveryrequest\x18\x02 \x01(\x0b\x32\".clairvoyant.MissedDeliveryRequestH\x00\x12G\n\x17\x64ownloadcompleterequest\x18\x03 \x01(\x0b\x32$.clairvoyant.DownloadCompleteRequestH\x00\x42\t\n\x07request\"m\n\x07\x43VReply\x12-\n\nvideoreply\x18\x01 \x01(\x0b\x32\x17.clairvoyant.VideoReplyH\x00\x12*\n\x06status\x18\x02 \x01(\x0b\x32\x18.clairvoyant.StatusReplyH\x00\x42\x07\n\x05reply\"\x8e\x01\n\x12ModelUpdateRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\t\x12\x39\n\x05model\x18\x02 \x03(\x0b\x32*.clairvoyant.ModelUpdateRequest.ModelEntry\x1a,\n\nModelEntry\x12\x0b\n\x03key\x18\x01 \x01(\x03\x12\r\n\x05value\x18\x02 \x01(\x01:\x02\x38\x01\"Q\n\rUpdateRequest\x12\x36\n\x0bmodelupdate\x18\x01 \x01(\x0b\x32\x1f.clairvoyant.ModelUpdateRequestH\x00\x42\x08\n\x06update2_\n\x10MonitoringServer\x12K\n\x13HandleUpdateRequest\x12\x1a.clairvoyant.UpdateRequest\x1a\x18.clairvoyant.StatusReply2K\n\x08\x43VServer\x12?\n\x0fHandleCVRequest\x12\x16.clairvoyant.CVRequest\x1a\x14.clairvoyant.CVReply2_\n\nEdgeServer\x12Q\n\x15HandleDownloadRequest\x12\x1c.clairvoyant.DownloadRequest\x1a\x1a.clairvoyant.DownloadReplyb\x06proto3'
+  serialized_pb=b'\n\x11\x63lairvoyant.proto\x12\x0b\x63lairvoyant\"\x89\x01\n\x08NodeInfo\x12\x0f\n\x07node_id\x18\x01 \x01(\t\x12\x0f\n\x07node_ip\x18\x02 \x01(\t\x12\x14\n\x0c\x61rrival_time\x18\x03 \x01(\x01\x12\x14\n\x0c\x63ontact_time\x18\x04 \x01(\x01\x12/\n\x0e\x63ontact_points\x18\x05 \x03(\x0b\x32\x17.clairvoyant.Coordinate\"I\n\x07Segment\x12\x12\n\nsegment_id\x18\x01 \x01(\t\x12\x14\n\x0csegment_size\x18\x02 \x01(\x05\x12\x14\n\x0csegment_name\x18\x03 \x01(\t\"_\n\x0cSegmentOwner\x12%\n\x07segment\x18\x01 \x01(\x0b\x32\x14.clairvoyant.Segment\x12(\n\tnode_info\x18\x02 \x01(\x0b\x32\x15.clairvoyant.NodeInfo\"Q\n\nCoordinate\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\x12\r\n\x05speed\x18\x03 \x01(\x01\x12\x0c\n\x04time\x18\x04 \x01(\x01\x12\x10\n\x08\x64istance\x18\x05 \x01(\x01\"B\n\x05Route\x12\x10\n\x08route_id\x18\x01 \x01(\x05\x12\'\n\x06points\x18\x02 \x03(\x0b\x32\x17.clairvoyant.Coordinate\"V\n\x0cVideoRequest\x12\x10\n\x08video_id\x18\x01 \x01(\t\x12!\n\x05route\x18\x02 \x01(\x0b\x32\x12.clairvoyant.Route\x12\x11\n\ttimestamp\x18\x03 \x01(\x03\",\n\nVideoReply\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12\x0c\n\x04urls\x18\x02 \x03(\t\"\x1d\n\x0bStatusReply\x12\x0e\n\x06status\x18\x01 \x01(\t\"b\n\x15MissedDeliveryRequest\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12&\n\x08segments\x18\x02 \x03(\x0b\x32\x14.clairvoyant.Segment\x12\x0f\n\x07node_id\x18\x04 \x01(\t\"\xaa\x02\n\x0f\x44ownloadRequest\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12&\n\x08segments\x18\x02 \x03(\x0b\x32\x14.clairvoyant.Segment\x12I\n\x0fsegment_sources\x18\x03 \x03(\x0b\x32\x30.clairvoyant.DownloadRequest.SegmentSourcesEntry\x12\x14\n\x0c\x61rrival_time\x18\x04 \x01(\x03\x12\x14\n\x0c\x63ontact_time\x18\x05 \x01(\x01\x12/\n\x0e\x63ontact_points\x18\x06 \x03(\x0b\x32\x17.clairvoyant.Coordinate\x1a\x35\n\x13SegmentSourcesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"6\n\rDownloadReply\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12\x13\n\x0bsegment_ids\x18\x02 \x03(\t\"?\n\x17\x44ownloadCompleteRequest\x12\x13\n\x0bsegment_ids\x18\x01 \x03(\t\x12\x0f\n\x07node_id\x18\x02 \x01(\t\"\xd7\x01\n\tCVRequest\x12\x31\n\x0cvideorequest\x18\x01 \x01(\x0b\x32\x19.clairvoyant.VideoRequestH\x00\x12\x43\n\x15misseddeliveryrequest\x18\x02 \x01(\x0b\x32\".clairvoyant.MissedDeliveryRequestH\x00\x12G\n\x17\x64ownloadcompleterequest\x18\x03 \x01(\x0b\x32$.clairvoyant.DownloadCompleteRequestH\x00\x42\t\n\x07request\"m\n\x07\x43VReply\x12-\n\nvideoreply\x18\x01 \x01(\x0b\x32\x17.clairvoyant.VideoReplyH\x00\x12*\n\x06status\x18\x02 \x01(\x0b\x32\x18.clairvoyant.StatusReplyH\x00\x42\x07\n\x05reply\"\x8e\x01\n\x12ModelUpdateRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\t\x12\x39\n\x05model\x18\x02 \x03(\x0b\x32*.clairvoyant.ModelUpdateRequest.ModelEntry\x1a,\n\nModelEntry\x12\x0b\n\x03key\x18\x01 \x01(\x03\x12\r\n\x05value\x18\x02 \x01(\x01:\x02\x38\x01\"Q\n\rUpdateRequest\x12\x36\n\x0bmodelupdate\x18\x01 \x01(\x0b\x32\x1f.clairvoyant.ModelUpdateRequestH\x00\x42\x08\n\x06update2_\n\x10MonitoringServer\x12K\n\x13HandleUpdateRequest\x12\x1a.clairvoyant.UpdateRequest\x1a\x18.clairvoyant.StatusReply2K\n\x08\x43VServer\x12?\n\x0fHandleCVRequest\x12\x16.clairvoyant.CVRequest\x1a\x14.clairvoyant.CVReply2_\n\nEdgeServer\x12Q\n\x15HandleDownloadRequest\x12\x1c.clairvoyant.DownloadRequest\x1a\x1a.clairvoyant.DownloadReplyb\x06proto3'
 )
 
 
@@ -291,6 +291,13 @@ _VIDEOREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='timestamp', full_name='clairvoyant.VideoRequest.timestamp', index=2,
+      number=3, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -304,7 +311,7 @@ _VIDEOREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=497,
-  serialized_end=564,
+  serialized_end=583,
 )
 
 
@@ -342,8 +349,8 @@ _VIDEOREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=566,
-  serialized_end=610,
+  serialized_start=585,
+  serialized_end=629,
 )
 
 
@@ -374,8 +381,8 @@ _STATUSREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=612,
-  serialized_end=641,
+  serialized_start=631,
+  serialized_end=660,
 )
 
 
@@ -420,8 +427,8 @@ _MISSEDDELIVERYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=643,
-  serialized_end=741,
+  serialized_start=662,
+  serialized_end=760,
 )
 
 
@@ -459,8 +466,8 @@ _DOWNLOADREQUEST_SEGMENTSOURCESENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=989,
-  serialized_end=1042,
+  serialized_start=1008,
+  serialized_end=1061,
 )
 
 _DOWNLOADREQUEST = _descriptor.Descriptor(
@@ -525,8 +532,8 @@ _DOWNLOADREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=744,
-  serialized_end=1042,
+  serialized_start=763,
+  serialized_end=1061,
 )
 
 
@@ -564,8 +571,8 @@ _DOWNLOADREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1044,
-  serialized_end=1098,
+  serialized_start=1063,
+  serialized_end=1117,
 )
 
 
@@ -603,8 +610,8 @@ _DOWNLOADCOMPLETEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1100,
-  serialized_end=1163,
+  serialized_start=1119,
+  serialized_end=1182,
 )
 
 
@@ -654,8 +661,8 @@ _CVREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1166,
-  serialized_end=1381,
+  serialized_start=1185,
+  serialized_end=1400,
 )
 
 
@@ -698,8 +705,8 @@ _CVREPLY = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1383,
-  serialized_end=1492,
+  serialized_start=1402,
+  serialized_end=1511,
 )
 
 
@@ -737,8 +744,8 @@ _MODELUPDATEREQUEST_MODELENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1593,
-  serialized_end=1637,
+  serialized_start=1612,
+  serialized_end=1656,
 )
 
 _MODELUPDATEREQUEST = _descriptor.Descriptor(
@@ -775,8 +782,8 @@ _MODELUPDATEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1495,
-  serialized_end=1637,
+  serialized_start=1514,
+  serialized_end=1656,
 )
 
 
@@ -812,8 +819,8 @@ _UPDATEREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1639,
-  serialized_end=1720,
+  serialized_start=1658,
+  serialized_end=1739,
 )
 
 _NODEINFO.fields_by_name['contact_points'].message_type = _COORDINATE
@@ -1009,8 +1016,8 @@ _MONITORINGSERVER = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=1722,
-  serialized_end=1817,
+  serialized_start=1741,
+  serialized_end=1836,
   methods=[
   _descriptor.MethodDescriptor(
     name='HandleUpdateRequest',
@@ -1035,8 +1042,8 @@ _CVSERVER = _descriptor.ServiceDescriptor(
   index=1,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=1819,
-  serialized_end=1894,
+  serialized_start=1838,
+  serialized_end=1913,
   methods=[
   _descriptor.MethodDescriptor(
     name='HandleCVRequest',
@@ -1061,8 +1068,8 @@ _EDGESERVER = _descriptor.ServiceDescriptor(
   index=2,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=1896,
-  serialized_end=1991,
+  serialized_start=1915,
+  serialized_end=2010,
   methods=[
   _descriptor.MethodDescriptor(
     name='HandleDownloadRequest',
