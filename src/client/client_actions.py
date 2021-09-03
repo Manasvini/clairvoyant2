@@ -14,6 +14,7 @@ import numpy as np
 import genprotos.clairvoyant_pb2 as clairvoyant_pb2
 import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
 import client.request_creator as request_creator
+from client.clock import CVClock
 
 dist = sklearn.neighbors.DistanceMetric.get_metric('haversine')
 
@@ -63,9 +64,9 @@ class Client:
         self.availBits = 0
         self.last_dist = -1
         self.time_of_last_dist = 0
-        self.traj_df['time'] = 2*self.traj_df['time']
-        #self.traj_df['time'] = self.traj_df['scaled_time']
-        #import pdb; pdb.set_trace()
+
+        #scaling
+        #self.traj_df['time'] = 2*self.traj_df['time']
 
     async def make_request(self, request_timestamp):
         request = request_creator.create_request(self.traj_df, request_timestamp)
@@ -106,7 +107,7 @@ class Client:
                 #catch up trajectory with the cur_time
                 if len(self.buffer) < len(self.urls):
                     self.get_segments(self.traj_df.iloc[self.idx]['time'])
-                self.idx += self.time_incr
+                self.idx += 1#self.time_incr
 
     def get_delivery_stats(self):
         logger.debug(f"len_buffer:{len(self.buffer)}")
@@ -405,8 +406,16 @@ class Simulation:
         return True
  
     def run_simulation(self, num_steps):
-        i = 0
         start = time.time()
+        clock = CVClock(time_incr=self.time_incr, end_of_time=num_steps)
+        try:
+            while True:
+                clock.advance()
+                time.sleep(1)
+        except KeyboardInterrupt:
+            clock.shutdown()
+            sys.exit()
+
         while i < num_steps:
             self.simulate_step()
             #loop = asyncio.get_event_loop()

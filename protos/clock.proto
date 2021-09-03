@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package clairvoyant;
+
+message SyncRequest {
+  string node_id = 1;
+}
+
+message SyncResponse {
+  int64 cur_time = 2;
+}
+
+service ClockServer {
+  rpc HandleSyncRequest (SyncRequest) returns (SyncResponse);
+}
+

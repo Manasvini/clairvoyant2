@@ -21,8 +21,8 @@ class Model:
         mean = self.model[dist]['mean']
         stddev = self.model[dist]['stddev']
         stdtdev = 0
-        #return mean +  random.uniform(-stddev, stddev)
-        return mean
+        return mean +  random.uniform(-stddev, stddev)
+        #return mean
 
     def get_model_dist(self, distance):
         idx = bisect.bisect_left(self.dists, distance)

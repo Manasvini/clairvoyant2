@@ -1,10 +1,10 @@
 import sys
 import os
-import grpc
 import logging
 import threading
 import json
 
+import grpc
 import genprotos.clairvoyant_pb2 as clairvoyant_pb2
 import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
 
@@ -21,7 +21,11 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         with open(filename) as fh:
             self.configDict = json.load(fh)
         print('got config', self.configDict)
-        self.metadataManager = EdgeMetadataManager(self.configDict['redisHost'], self.configDict['redisPort'], self.configDict['missedDeliveryThreshold'], self.configDict['timeScale'])
+        self.metadataManager = EdgeMetadataManager(self.configDict['redisHost'], \
+                self.configDict['redisPort'], 
+                self.configDict['missedDeliveryThreshold'],
+                self.configDict['timeScale'],
+                self.configDict['nodeId'])
         self.metadataManager.startRedisSubscription()
         print('started subs')
         self.model = Model(self.configDict['modelFile'])
@@ -34,9 +38,9 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         #self.queueTracker = threading.Thread(target=self.downloadMonitor.run)
         #self.queueTracker.start()
        
-        #$self.deliveryMon = EdgeDeliveryMonitor(self.configDict['timeScale'], self.configDict['serverAddress'], self.configDict['nodeId'], self.configDict['intervalSeconds'], self.metadataManager)
-        #self.deliveryThread = threading.Thread(target=self.deliveryMon.run)
-        #self.deliveryThread.start()
+        self.deliveryMon = EdgeDeliveryMonitor(self.configDict['timeScale'], self.configDict['serverAddress'], self.configDict['nodeId'], self.configDict['intervalSeconds'], self.metadataManager)
+        self.deliveryThread = threading.Thread(target=self.deliveryMon.run)
+        self.deliveryThread.start()
 
     def checkDownloadSchedule(self, segments, contact_points):
         """

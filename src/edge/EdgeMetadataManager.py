@@ -3,8 +3,16 @@ from collections import OrderedDict
 import threading
 import time
 import copy
+import logging
 
+import grpc
 import genprotos.clairvoyant_pb2 as clairvoyant_pb2
+import genprotos.clock_pb2 as clock_pb2
+import genprotos.clock_pb2_grpc as clock_pb2_grpc
+
+logging.basicConfig()
+logger = logging.getLogger("edge")
+logger.setLevel(logging.DEBUG)
 
 class RouteInfo:
     def __init__(self):
@@ -15,7 +23,7 @@ class RouteInfo:
 
 class EdgeMetadataManager:
     
-    def __init__(self, redis_address, redis_port, missedDeliveryThreshold, timeScale):
+    def __init__(self, redis_address, redis_port, missedDeliveryThreshold, timeScale, node_id):
         self.redis = Redis(host=redis_address, port=redis_port, decode_responses=True)
         self.routes_queue = []
         self.routes = OrderedDict()
@@ -26,6 +34,17 @@ class EdgeMetadataManager:
         self.mutex = threading.Lock()
         self.missedDeliveryThreshold = missedDeliveryThreshold
         self.timeScale = timeScale
+
+
+    
+        self.exitThread = False
+        self.node_id = node_id
+        self.clockServerAddr = "192.168.160.22:8383"
+        self.cur_time = 0
+        self.time_incr = 4
+        self.sync_threshold = 16
+        self.clockThread = threading.Thread(target=self.runClockThread)
+        self.clockThread.start()
 
     def updateDeliveryForRoute(self, token_id, segment_id):
         self.mutex.acquire()
@@ -99,6 +118,33 @@ class EdgeMetadataManager:
             self.routes[token_id] = routeInfo        
         finally:
             self.mutex.release()
+
+    def synchronize_time(self):
+        with grpc.insecure_channel(self.clockServerAddr) as channel:
+            stub = clock_pb2_grpc.ClockServerStub(channel)
+            request = clock_pb2.SyncRequest()
+            request.node_id = self.node_id
+            try:
+                response = stub.HandleSyncRequest(request)
+            except grpc._channel._InactiveRpcError:
+                logger.debug('client has not started clock')
+                return 0
+            if response:
+                logger.debug(f"cur_time: {self.cur_time}, received time: {response.cur_time}")
+                return response.cur_time
+            else:
+                logger.warning("No response from Clock Server")
+
+    def runClockThread(self):
+        while not self.exitThread:
+            self.cur_time += self.time_incr
+            time.sleep(1)
+            if self.cur_time % self.sync_threshold == 0:
+                self.cur_time = self.synchronize_time()
+
+
+
+             
  
     def getOverdueSegments(self):
         self.mutex.acquire()
@@ -138,5 +184,7 @@ class EdgeMetadataManager:
             self.mutex.release()
     
     def shutdown(self):
+        self.exitThread = True
+        self.clockThread.join()
         self.updateListener.join()
         

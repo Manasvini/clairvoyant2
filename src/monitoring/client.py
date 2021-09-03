@@ -41,7 +41,6 @@ class MonitoringClient(Thread):
             reader = csv.reader(fh, delimiter=',')
             for row in reader:
                 model_dict[row[0]] = {"mean":float(row[1]), "sdev":float(row[2])}
-                #model_dict[row[0]] = {"mean":float(row[1]), "sdev":float(0)}
                 
 
         return model_dict
@@ -52,8 +51,8 @@ class MonitoringClient(Thread):
         while not self.stopped.wait(self.interval):
             dict_to_send = {}
             for key,value in self.model_dict.items():
-                #dict_to_send[key] = value['mean'] + random.uniform(-value['sdev'], value['sdev'])
-                dict_to_send[key] = value['mean']
+                dict_to_send[key] = value['mean'] + random.uniform(-value['sdev'], value['sdev'])
+                #dict_to_send[key] = value['mean']
 
             payload = {}
             payload['nodeid'] = self.node_id

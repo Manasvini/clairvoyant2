@@ -79,7 +79,7 @@ def get_models(model_node_map, model_dir, n):
 def create_simulation(users, address,  video_seg_data, outputfile, models, config):
     
     clients = []
-    time_incr = 1
+    time_incr = 4
     time_scale = 60.0
     edge_ips = get_edge_ips(config)
     for user in users:
