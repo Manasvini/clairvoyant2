@@ -6,3 +6,4 @@ google
 requests
 sortedcontainers
 schedule
+sklearn

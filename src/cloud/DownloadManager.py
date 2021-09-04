@@ -19,6 +19,7 @@ class DownloadManager:
         self.edgeNodeAssignments = {node_id: EdgeDownloadAssignment(node_id, downloadSources[node_id], timeScale) for node_id in node_ids}
         self.dispatcher = dispatcher    
         self.routeInfos = {}
+        self.phase3 = True
         
     def findOptimalSource(self, node_id):
         return 'http://ftp.itec.aau.at/DASHDataset2014'
@@ -107,9 +108,8 @@ class DownloadManager:
         assignments = {node_id:[] for node_id in node_set if node_id in self.mmWaveModels}
 
 
-        # FIXME: when do we clear this? We need this to handle Phase 3. Think later
-        #self.routeInfos[token_id] = nodeInfos
-        #logger.info("Added token {}".format(token_id))
+        #required for phase3
+        self.routeInfos[token_id] = []
 
         for node in nodeInfos:
             if node.node_id not in self.mmWaveModels:
@@ -122,6 +122,7 @@ class DownloadManager:
             maxAvailDlBytes = self.getDownloadBytes(node.node_id, node.contact_points) 
             logger.debug("Max avaliable bytes: {} | Node: {}".format(maxAvailDlBytes, node.node_id))
 
+            assignedNode = False
             while segmentIdx < len(segments):
                 
                 if maxAvailDlBytes < segments[segmentIdx].segment_size:
@@ -134,14 +135,25 @@ class DownloadManager:
                 candidate.segment = segments[segmentIdx]
                 candidate.source = source
                 candidate.arrival_time = node.arrival_time
+                candidate.contact_time = node.contact_time
 
                 if self.edgeNodeAssignments[node.node_id].add(candidate, request_timestamp):
                     assignments[node.node_id].append(candidate)
                     maxAvailDlBytes -= segments[segmentIdx].segment_size
+                    assignedNode = True
                 else:
-                    logger.debug("assignments aborted at segment {}".format(segments[segmentIdx]))
+                    logger.debug("assignments aborted at segment {}, node={}"\
+                            .format(segments[segmentIdx], node.node_id))
                     break
                 segmentIdx += 1
+
+            if assignedNode:
+                self.routeInfos[token_id].append(node)
+
+        if not self.phase3:
+            self.routeInfos[token_id] = None
+        else:
+            logger.info(f"routeInfos is tracking token={token_id}")
 
         logger.debug('Assignments:')
         for node,value in assignments.items():
@@ -150,76 +162,59 @@ class DownloadManager:
         return assignments
 
 
-
-    #def getDownloadAssignment(self, segments, nodeInfos, token_id):
-    #    segmentIdx = 0
-    #    
-    #    if nodeInfos == None:
-    #        print('nodeInfos is empty')
-    #        return assignments
-
-    #    # we do this to handle same nodes from cropping up later in the route
-    #    node_set = set([node.node_id for node in nodeInfos])
-    #    assignments = {node_id:[] for node_id in node_set if node_id in self.mmWaveModels}
-
-    #    self.routeInfos[token_id] = nodeInfos
-    #    print('got token ', token_id)
-    #    for node in nodeInfos:
-    #        if node.node_id not in self.mmWaveModels:
-    #            continue
-    #        if segmentIdx == len(segments):
-    #            break
-
-    #        dlBytes = self.getDownloadBytes(node.node_id, node.contact_points)
-    #        print("dlBytes: ", dlBytes)
-
-    #        for i in range(segmentIdx, len(segments)):
-    #            segmentIdx = i
-    #            if dlBytes <= 0:
-    #                break
-    #            source = self.findOptimalSource(node.node_id)
-    #            if self.edgeNodeAssignments[node.node_id].hasSegment(segments[segmentIdx].segment_id) or \
-    #                    self.assignDownload(node.node_id, node.arrival_time + node.contact_time, segments[segmentIdx], source):
-    #                candidate = SegmentInfo()
-    #                candidate.segment = segments[segmentIdx]
-    #                candidate.source = source
-    #                candidate.arrival_time = node.arrival_time
-    #                assignments[node.node_id].append(candidate)
-    #                dlBytes -= segments[segmentIdx].segment_size
-    #            else:
-    #                logging.info('assigned ' + str(len(assignments[node.node_id])) + ' segments to ' + node.node_id)
-    #                break
-
-    #    print('assignments:')
-    #    for node,value in assignments.items():
-    #        print(node,  len(value))
-
-    #    return assignments
-
     def sendAssignments(self, assignments, token_id):
         
         for node_id in assignments:
             segments = [candidate.segment for candidate in assignments[node_id]]
-            sources = {candidate.segment.segment_id: candidate.source for candidate in assignments[node_id]}
+            sources = {candidate.segment.segment_id: \
+                    candidate.source for candidate in assignments[node_id]}
                 
             if len(segments) == 0:
                 continue
-            response = self.dispatcher.makeRequest(token_id, node_id, segments, sources, assignments[node_id][0].arrival_time) 
+            response = self.dispatcher.makeRequest(token_id, node_id, segments, sources,\
+                    assignments[node_id][0].arrival_time, assignments[node_id][0].contact_time) 
           
     # For phase 3
-    def handleMissedDelivery(self, token_id, node_id, segments):
+    def handleMissedDelivery(self, token_id, node_id, segments, request_timestamp):
         if token_id not in self.routeInfos:
-            print('no such route ', token_id)
+            logger.warning(f"route={token_id} not found!")
+            return
+
         nodeInfos = self.routeInfos[token_id]
-        idx = 0
+        next_node_idx = 0
         for node in nodeInfos:
+            next_node_idx += 1
             if node.node_id == node_id:
                 break
-            idx += 1
-        if len(nodeInfos) > idx + 1 and nodeInfos[idx+1].node_id in self.mmWaveModels:
-            nodeInfo = nodeInfos[idx+1]
-            assignments = self.getDownloadAssignment(segments, [nodeInfo], token_id)
-            self.sendAssignments(assignments, token_id)
+
+        if next_node_idx >= len(nodeInfos):
+            logger.info(f" route={token_id} - Received MissedDelivery notification from last node")
+            del self.routeInfos[token_id]
+            return
+
+        # Forward segments to next node alone
+        segment_idx = 0
+        new_assignments = {node.node_id:[] for node in nodeInfos[next_node_idx:]}
+
+        node = nodeInfos[next_node_idx]
+        while segment_idx < len(segments):
+            candidate = SegmentInfo()
+            candidate.segment = segments[segment_idx]
+            candidate.source = source
+            candidate.arrival_time = node.arrival_time
+            candidate.contact_time = node.contact_time
+
+            if self.edgeNodeAssignments[node.node_id].add(candidate, request_timestamp):
+                new_assignments[node.node_id].append(candidate)
+            else:
+                logger.debug(f"phase3 - node={node.node_id}, segment_idx={segment_idx} failed")
+                break
+            segment_idx += 1
+
+        if segment_idx < len(segments):
+            logger.warning(f"phase3 - no assignments for {len(segments)-segment_idx} segments")
+
+        self.sendAssignments(assignments, token_id)
 
     def handleVideoRequest(self, token_id, segments, nodeInfos, request_timestamp):
         assignments = self.getDownloadAssignment(segments, nodeInfos, token_id, request_timestamp)
@@ -227,14 +222,6 @@ class DownloadManager:
             raise ValueError('assignments is none')
         self.sendAssignments(assignments, token_id)
         return assignments
-        #for node_id in assignments:
-        #    segments = [candidate.segment for candidate in assignments[node_id]]
-        #    sources = {candidate.segment.segment_id: candidate.source for candidate in assignments[node_id]}
-        #        
-        #    if len(segments) == 0:
-        #        continue
-        #    response = self.dispatcher.makeRequest(token_id, node_id, segments, sources) 
-        #return assignments
   
      
     def updateDownloads(self, node_id, segment_ids):

@@ -15,6 +15,10 @@ from edge.EdgeDeliveryMonitor import EdgeDeliveryMonitor
 from shared.ModelReader import Model
 from monitoring.client import MonitoringClient
 
+logging.basicConfig()
+logger = logging.getLogger("edge")
+logger.setLevel(logging.DEBUG)
+
 class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
     def __init__(self, filename):
         self.configDict = {}
@@ -24,13 +28,13 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         self.metadataManager = EdgeMetadataManager(self.configDict['redisHost'], \
                 self.configDict['redisPort'], 
                 self.configDict['missedDeliveryThreshold'],
-                self.configDict['timeScale'],
-                self.configDict['nodeId'])
+                self.configDict['timeScale'])
         self.metadataManager.startRedisSubscription()
-        print('started subs')
         self.model = Model(self.configDict['modelFile'])
-        self.monClient = MonitoringClient(self.configDict['modelFile'], self.configDict['monInterval'], \
-                self.configDict['monServerAddress'], self.configDict['nodeId'])
+        self.monClient = MonitoringClient(self.configDict['modelFile'], 
+                self.configDict['monInterval'], \
+                self.configDict['monServerAddress'],\
+                self.configDict['nodeId'])
         self.monClient.start()
 
         #self.queueManager = EdgeDownloadQueue(self.configDict['timeScale'], self.metadataManager)
@@ -52,7 +56,6 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
                 self, request: clairvoyant_pb2.DownloadRequest, 
                 context: grpc.aio.ServicerContext) -> clairvoyant_pb2.DownloadReply:
         
-        print('token = ', request.token_id,'num segments',  len(request.segments))
         committed_segments = self.checkDownloadSchedule(request.segments, request.contact_points)
         reply = clairvoyant_pb2.DownloadReply()
         reply.token_id = request.token_id
@@ -68,17 +71,20 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         #    self.queueManager.enqueue(segment, sourceSpeed, request.segment_sources[segment.segment_id])
         #    #segment_id = reply.segment_ids.add(sefmen)
         #    #segment_id = segment.segment_id
+
         reply.segment_ids.extend(committed_segments.keys())
-        print('req ', request.token_id, ' has arrival', request.arrival_time)
-        self.metadataManager.addRoute(request.token_id, request.arrival_time, request.contact_time, list(committed_segments.values()))
+        logger.info(f"request-token={request.token_id}, arrival_time={request.arrival_time}")
+        self.metadataManager.addRoute(request.token_id, request.arrival_time, \
+                request.contact_time, request.segments, request.segment_sources)
         print('responding to server with ' + str(len(reply.segment_ids)) + ' segments')        
         return reply
 
     def shutdown(self):
+        logger.warning('meta shut')
         self.metadataManager.shutdown()
         #self.queueTracker.join()
+        logger.warning('monclient shut')
         self.monClient.stop()
-        monClient.join()
 
 async def serve(dlServer, listen_addr) -> None:
     server = grpc.aio.server()
@@ -86,9 +92,9 @@ async def serve(dlServer, listen_addr) -> None:
     server.add_insecure_port(listen_addr)
     logging.info('starting server on %s', listen_addr)
     await server.start()
-    try:
-        await server.wait_for_termination()
-    except KeyboardInterrupt:
-        await dlServer.shutdown()
-        await server.stop(0)
+    await server.wait_for_termination()
+    logger.warning('server shut')
+    #await server.stop(0)
+    logger.warning('dlserver shut')
+    await dlServer.shutdown()
 

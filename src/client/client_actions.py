@@ -14,7 +14,7 @@ import numpy as np
 import genprotos.clairvoyant_pb2 as clairvoyant_pb2
 import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
 import client.request_creator as request_creator
-from client.clock import CVClock
+from client.clock import CVClock, ClockEndException
 
 dist = sklearn.neighbors.DistanceMetric.get_metric('haversine')
 
@@ -68,17 +68,16 @@ class Client:
         #scaling
         #self.traj_df['time'] = 2*self.traj_df['time']
 
-    async def make_request(self, request_timestamp):
+    def make_request(self, request_timestamp):
         request = request_creator.create_request(self.traj_df, request_timestamp)
-        #request = request_creator.create_user_request(self.id, request_timestamp)
-        async with grpc.aio.insecure_channel(self.address) as channel:
+        with grpc.insecure_channel(self.address) as channel:
             stub = clairvoyant_pb2_grpc.CVServerStub(channel)
-            response = await stub.HandleCVRequest(request)
-
+            response = stub.HandleCVRequest(request)
             self.session.headers.update({'token':str(response.videoreply.token_id)})
             self.urls = response.videoreply.urls
-            print('have ' , len(self.urls) , ' for client client id ', self.id, ' token is ', response.videoreply.token_id)
-            #print(self.urls)
+            logger.info(f"client={self.id}, urls_len={len(self.urls)},\
+                    token={response.videoreply.token_id}")
+
     def getId(self):
         return self.id
 
@@ -92,12 +91,10 @@ class Client:
             # Make a request only only after you are 1000 seconds before travel
             logger.debug("current_time: {}, journey_start_time: {}"
                     .format(cur_time, self.traj_df.iloc[0]['time']))
-            self.cv_resp = True
             start = time.time()
-            loop = asyncio.get_event_loop()
-            future = asyncio.ensure_future(self.make_request(cur_time))
-            loop.run_until_complete(future)    
+            self.make_request(cur_time)
             end = time.time()
+            self.cv_resp = True
             logger.info('Client {} request duration '.format(self.id, (end - start)))
 
          
@@ -408,25 +405,18 @@ class Simulation:
     def run_simulation(self, num_steps):
         start = time.time()
         clock = CVClock(time_incr=self.time_incr, end_of_time=num_steps)
-        try:
-            while True:
-                clock.advance()
-                time.sleep(1)
-        except KeyboardInterrupt:
-            clock.shutdown()
-            sys.exit()
-
-        while i < num_steps:
+        while self.cur_time < num_steps:
+            time.sleep(0.01)
+            self.cur_time = clock.advance()
             self.simulate_step()
-            #loop = asyncio.get_event_loop()
-            #future = asyncio.ensure_future(self.simulate_step_async())
-            #loop.run_until_complete(future)
-            i += self.time_incr
-            self.cur_time = i
-            if i % 100 == 0:
-                print('Ran simulation step', i)
+            if self.cur_time % 100 == 0:
+                print('Ran simulation step', self.cur_time)
                 if self.clients_are_complete():
                     logger.info("All client downloads are complete")
+                    try:
+                        clock.shutdown()
+                    except ClockEndException:
+                        pass
                     return
         end = time.time()
         print('simulation with', len(self.clients), 'clients took', end - start)

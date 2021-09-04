@@ -8,6 +8,7 @@ class SegmentInfo:
         self.segment = None
         self.source = None
         self.arrival_time = None
+        self.contact_time = None
         self.expected_dlc_time = None
 
 class EdgeDownloadAssignment:
@@ -53,7 +54,6 @@ class EdgeDownloadAssignment:
         self.mutex.release()
 
         return add_success
-        
 
     def isDownloadPossible(self, deadline, candidate):
         self.mutex.acquire()

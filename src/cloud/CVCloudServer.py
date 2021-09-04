@@ -88,7 +88,9 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
         
         elif request.HasField('misseddeliveryrequest'):
             logger.info('got missed delivery for token', request.misseddeliveryrequest.token_id)
-            newAssignment = self.dlManager.handleMissedDelivery(request.misseddeliveryrequest.token_id, request.misseddeliveryrequest.node_id, request.misseddeliveryrequest.segments)
+            newAssignment = self.dlManager.handleMissedDelivery(request.misseddeliveryrequest.token_id,
+                    request.misseddeliveryrequest.node_id, request.misseddeliveryrequest.segments, 
+                    request.misseddeliveryrequest.timestamp)
             statusReply = clairvoyant_pb2.StatusReply()
             statusReply.status = 'Updated'
             reply.status.CopyFrom(statusReply)

@@ -10,7 +10,7 @@
         }
     },
     "nodeIps":{
-        "node_0": "0.0.0.0:50056" 
+        "node_0": "0.0.0.0:51050" 
     },
     "defaultSource":"http://ftp.itec.aau.at/DASHDataset2014",
     "monServerAddress": "localhost",

@@ -6,7 +6,7 @@
     "redisPort": 6379,
     "nodeId": "node_0",
     "intervalSeconds":1,
-    "serverAddress":"localhost:50058",
+    "serverAddress":"localhost:60050",
     "downloadSources":{
         "http://ftp.itec.aau.at/DASHDataset2014": 100000000
 

@@ -7,7 +7,6 @@ import json
 import random
 
 from argparse import ArgumentParser
-from aiohttp import ClientSession, ClientResponseError
 from rediscluster import RedisCluster
 
 import genprotos.clairvoyant_pb2 as clairvoyant_pb2
@@ -79,14 +78,15 @@ def get_models(model_node_map, model_dir, n):
 def create_simulation(users, address,  video_seg_data, outputfile, models, config):
     
     clients = []
-    time_incr = 4
+    time_incr = 1
     time_scale = 60.0
+    simulation_max_steps = 20000 
     edge_ips = get_edge_ips(config)
     for user in users:
         client = Client(user, '../eval/monaco_traffic_lights.csv', address, video_seg_data, time_scale, time_incr, models, edge_ips) 
         clients.append(client)
     simulation = Simulation(clients, time_scale, SEGMENT_DURATION_SECONDS, time_incr, outputfile)
-    simulation.run_simulation(10000)
+    simulation.run_simulation(simulation_max_steps)
     
     for c in clients:
         print('client', c.getId(), 'delivery stats =', c.get_delivery_stats())

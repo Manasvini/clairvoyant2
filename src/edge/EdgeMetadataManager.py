@@ -7,11 +7,9 @@ import logging
 
 import grpc
 import genprotos.clairvoyant_pb2 as clairvoyant_pb2
-import genprotos.clock_pb2 as clock_pb2
-import genprotos.clock_pb2_grpc as clock_pb2_grpc
 
-logging.basicConfig()
-logger = logging.getLogger("edge")
+parent_logger = logging.getLogger("edge")
+logger = parent_logger.getChild("metadatamgr")
 logger.setLevel(logging.DEBUG)
 
 class RouteInfo:
@@ -23,28 +21,18 @@ class RouteInfo:
 
 class EdgeMetadataManager:
     
-    def __init__(self, redis_address, redis_port, missedDeliveryThreshold, timeScale, node_id):
+    def __init__(self, redis_address, redis_port, missedDeliveryThreshold, timeScale):
         self.redis = Redis(host=redis_address, port=redis_port, decode_responses=True)
         self.routes_queue = []
         self.routes = OrderedDict()
 
         self.pubsub = self.redis.pubsub()
-        self.pubsub.subscribe('user_download_notify')
+        self.sub_topic = 'user_download_notify'
+        self.pubsub.subscribe(self.sub_topic)
         self.updateListener = None
         self.mutex = threading.Lock()
         self.missedDeliveryThreshold = missedDeliveryThreshold
         self.timeScale = timeScale
-
-
-    
-        self.exitThread = False
-        self.node_id = node_id
-        self.clockServerAddr = "192.168.160.22:8383"
-        self.cur_time = 0
-        self.time_incr = 4
-        self.sync_threshold = 16
-        self.clockThread = threading.Thread(target=self.runClockThread)
-        self.clockThread.start()
 
     def updateDeliveryForRoute(self, token_id, segment_id):
         self.mutex.acquire()
@@ -52,10 +40,10 @@ class EdgeMetadataManager:
             if token_id in self.routes: 
                 routeInfo = self.routes[token_id]
                 if segment_id in routeInfo.segments:
-                    print('delivered', segment_id, ' for ', token_id)
-                    routeInfo.segments.pop(segment_id)
+                    logger.info(f"route={token_id}, delivered segment={segment_id}")
+                    del routeInfo.segments[segment_id]
                 else:
-                    print('missing segment ', segment_id)
+                    logger.error("missing segment metadata")
                 self.routes[token_id] = routeInfo 
         finally:
             self.mutex.release()
@@ -64,13 +52,12 @@ class EdgeMetadataManager:
         while True:
             message = self.pubsub.get_message()
             if message:
-                print ("Subscriber got", message['data'])
                 vals  = str(message['data']).split('|')
                 if len(vals) >= 2:
                     token_id = int(vals[0])
                     segment_id = vals[1]
                     self.updateDeliveryForRoute(token_id, segment_id)
-                    self.cleanUpRoute(token_id)
+                    #self.cleanUpRoute(token_id)
 
 
             time.sleep(0.001)
@@ -78,6 +65,7 @@ class EdgeMetadataManager:
     def startRedisSubscription(self):
         self.updateListener = threading.Thread(target=self.listen)
         self.updateListener.start()
+        logger.info(f"redis subscription started on topic={self.sub_topic}")
    
     def addSegment(self, segmentInfo):
         values = {}
@@ -105,58 +93,48 @@ class EdgeMetadataManager:
         segmentInfo['nodeip'] = values['nodeip']
         return segmentInfo
 
-    def addRoute(self, token_id, arrival_time, contact_time, segments):
+    def addSegments(self, segments, segment_sources):
+        for segment in segments:
+            source_ip = segment_sources[segment.segment_id]
+
+            values = {}
+            values['segmentid'] = segment.segment_id
+            values['segmentsize'] = str(segment.segment_size)
+            values['segmentname'] = segment.segment_name
+            values['nodeip'] = source_ip
+            self.redis.hmset(segment.segment_id, values)
+
+
+    def addRoute(self, token_id, arrival_time, contact_time, segments, segment_sources):
         self.mutex.acquire()
         try:
             #print(token_id, arrival_time, contact_time, segments)
-            print('added route', token_id)
             routeInfo = RouteInfo()
             routeInfo.token_id = token_id
             routeInfo.arrival_time = arrival_time
             routeInfo.contact_time = contact_time
             routeInfo.segments = {segment.segment_id: segment for segment in segments}
             self.routes[token_id] = routeInfo        
+            logger.debug(f"add_route={token_id}, contact_time={routeInfo.contact_time}")
+            self.addSegments(segments, segment_sources)
+            logger.debug(f"added segments - count={len(segments)}")
         finally:
             self.mutex.release()
 
-    def synchronize_time(self):
-        with grpc.insecure_channel(self.clockServerAddr) as channel:
-            stub = clock_pb2_grpc.ClockServerStub(channel)
-            request = clock_pb2.SyncRequest()
-            request.node_id = self.node_id
-            try:
-                response = stub.HandleSyncRequest(request)
-            except grpc._channel._InactiveRpcError:
-                logger.debug('client has not started clock')
-                return 0
-            if response:
-                logger.debug(f"cur_time: {self.cur_time}, received time: {response.cur_time}")
-                return response.cur_time
-            else:
-                logger.warning("No response from Clock Server")
 
-    def runClockThread(self):
-        while not self.exitThread:
-            self.cur_time += self.time_incr
-            time.sleep(1)
-            if self.cur_time % self.sync_threshold == 0:
-                self.cur_time = self.synchronize_time()
-
-
-
-             
- 
-    def getOverdueSegments(self):
-        self.mutex.acquire()
+    def getOverdueSegments(self, cur_time):
+        self.mutex.acquire() # contending with redis listener
         undelivered_segments = {}
         try:
-            now = time.time_ns() / 1e9
-            now = now/self.timeScale
             for token_id in self.routes:
-                print('route is ', token_id)
                 routeInfo =  self.routes[token_id]
-                print('now = ', now, ' departure=',  routeInfo.arrival_time + routeInfo.contact_time, ' arrival = ', routeInfo.arrival_time)
-                if len(routeInfo.segments) > 0 and routeInfo.arrival_time + routeInfo.contact_time + self.missedDeliveryThreshold/self.timeScale > now:
+
+                deadline = routeInfo.arrival_time + routeInfo.contact_time + \
+                        self.missedDeliveryThreshold 
+
+                #logger.debug(f"cur_time={cur_time}, contact_time={routeInfo.contact_time}, arrival={routeInfo.arrival_time},deadline={deadline}")
+
+                if len(routeInfo.segments) > 0 and cur_time > deadline:
                     undelivered_segments[token_id] = copy.deepcopy(routeInfo)
         finally:
             self.mutex.release()
@@ -178,8 +156,8 @@ class EdgeMetadataManager:
         self.mutex.acquire()
         try:
             if token_id in self.routes and len(self.routes[token_id].segments) == 0:
-                print('removed route', token_id)
-                self.routes.pop(token_id)
+                logger.info(f"Removed route={token_id}")
+                del self.routes[token_id]
         finally:
             self.mutex.release()
     
