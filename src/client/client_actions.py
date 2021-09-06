@@ -121,7 +121,7 @@ class Client:
         if cur_time < float(self.traj_df.iloc[0]['time']) or self.playback >= len(self.urls):
             return None
         if cur_time >= float(self.traj_df.iloc[0]['time']): 
-            self.playback += 1#0.25
+            self.playback += 0.25
     
     def get_distance_from_nearest_edge_node(self):
         max_dist = 30 #meters
@@ -207,6 +207,11 @@ class Client:
             else:
                 totalBytes = -1
 
+            #check url_list before continuing:
+            if len(self.buffer) >= len(self.urls):
+                logger.debug("buffer complete - within edge actions")
+                return
+
     def get_segments(self, timestamp):
         node_id, act_dist = self.get_distance_from_nearest_edge_node()
         
@@ -236,6 +241,8 @@ class Client:
             logger.debug("counts - cloud: {} | edge: {}".format(self.count[0], self.count[1]))
 
         else:
+            #if node_id != 0:
+            #    import pdb; pdb.set_trace()
             dist = self.model_map[node_id].get_model_dist(act_dist)
             if self.last_node == -1: #first time node encounter after gap
                 self.availBits = 0

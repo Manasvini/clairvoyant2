@@ -172,11 +172,17 @@ if __name__ == "__main__":
         default="localhost",
         help="redis ip",
         )
+    parser.add_argument(
+        "--redis-port",
+        type=int,
+        default=6379,
+        help="Specify the redis port",
+    )
     args = parser.parse_args()
     writePidFile()
 
 
-    redisc = redis.Redis(host=args.redis, port=6379)
+    redisc = redis.Redis(host=args.redis, port=args.redis_port)
     pubsub = redisc.pubsub()
     channel = "user_download_notify"
     pubsub.subscribe(channel)

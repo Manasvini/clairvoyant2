@@ -9,7 +9,8 @@ from cloud.DownloadDispatcher import DownloadDispatcher
 import genprotos.clairvoyant_pb2 as clairvoyant_pb2
 
 
-logger = logging.getLogger("cloud")
+parent_logger = logging.getLogger("cloud")
+logger = parent_logger.getChild('downloadmgr')
 logger.setLevel(logging.DEBUG)
 
 class DownloadManager:
@@ -129,11 +130,9 @@ class DownloadManager:
                     logger.debug("Not enough bytes available to deliver")
                     break
 
-                source = self.findOptimalSource(node.node_id)
-
                 candidate = SegmentInfo()
                 candidate.segment = segments[segmentIdx]
-                candidate.source = source
+                candidate.source = self.findOptimalSource(node.node_id)
                 candidate.arrival_time = node.arrival_time
                 candidate.contact_time = node.contact_time
 
@@ -188,8 +187,8 @@ class DownloadManager:
                 break
 
         if next_node_idx >= len(nodeInfos):
-            logger.info(f" route={token_id} - Received MissedDelivery notification from last node")
-            del self.routeInfos[token_id]
+            logger.debug(f"route={token_id},  count={len(segments)} - MissedDelivery notification from last node")
+            #TODO: clean up routeInfos on last segment notification
             return
 
         # Forward segments to next node alone
@@ -200,7 +199,7 @@ class DownloadManager:
         while segment_idx < len(segments):
             candidate = SegmentInfo()
             candidate.segment = segments[segment_idx]
-            candidate.source = source
+            candidate.source = self.findOptimalSource(node.node_id)
             candidate.arrival_time = node.arrival_time
             candidate.contact_time = node.contact_time
 
@@ -214,7 +213,7 @@ class DownloadManager:
         if segment_idx < len(segments):
             logger.warning(f"phase3 - no assignments for {len(segments)-segment_idx} segments")
 
-        self.sendAssignments(assignments, token_id)
+        self.sendAssignments(new_assignments, token_id)
 
     def handleVideoRequest(self, token_id, segments, nodeInfos, request_timestamp):
         assignments = self.getDownloadAssignment(segments, nodeInfos, token_id, request_timestamp)

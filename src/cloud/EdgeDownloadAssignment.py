@@ -10,6 +10,7 @@ class SegmentInfo:
         self.arrival_time = None
         self.contact_time = None
         self.expected_dlc_time = None
+        self.is_last = False
 
 class EdgeDownloadAssignment:
     def __init__(self, node_id, downloadSources, timeScale):
@@ -40,7 +41,7 @@ class EdgeDownloadAssignment:
         for seg_id in list(self.assignments.keys()):
             seg_info = self.assignments[seg_id]
             if seg_info.expected_dlc_time < request_timestamp:
-                del self.assignments[seg_info]
+                del self.assignments[seg_id]
             else:
                 max_dlc_time = max(max_dlc_time, seg_info.expected_dlc_time)
 

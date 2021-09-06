@@ -20,14 +20,14 @@ from threading import Thread
 
 logging.basicConfig()
 logger = logging.getLogger("cloud")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
     def __init__(self, filename):
         self.configDict = {}
         with open(filename) as fh:
             self.configDict = json.load(fh)
-        logger.info('cloud config = {}'.format(self.configDict))
+        logger.info('cloud config = {}'.format(json.dumps(self.configDict, indent=2)))
         self.metaClient = CloudMetadataClient(self.configDict['metaServerAddress'])
         self.mmWaveModels = self.getModels(self.configDict['nodeIds'])
         self.dlManager = DownloadManager(self.configDict['nodeIds'], \
@@ -51,7 +51,7 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
         nodeInfos = self.metaClient.makeNearestNodesRequest(videoRequest.route)
         segments = self.metaClient.makeGetVideoInfoRequest(videoRequest.video_id)
         token = int(time.time_ns()/1e6)
-        print('token = ', token, 'num node infos', len(nodeInfos), 'num segments = ', len(segments))
+        logger.info(f"token={token}, num_candidate_nodes={len(nodeInfos)}, num_segments={len(segments)}")
         assignments = self.dlManager.handleVideoRequest(token, segments, nodeInfos, videoRequest.timestamp)
         urls = []
         assigned_segments = set()
@@ -87,7 +87,7 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
             reply.status.CopyFrom(statusReply)
         
         elif request.HasField('misseddeliveryrequest'):
-            logger.info('got missed delivery for token', request.misseddeliveryrequest.token_id)
+            logger.debug(f"missed delivery for token={request.misseddeliveryrequest.token_id}")
             newAssignment = self.dlManager.handleMissedDelivery(request.misseddeliveryrequest.token_id,
                     request.misseddeliveryrequest.node_id, request.misseddeliveryrequest.segments, 
                     request.misseddeliveryrequest.timestamp)

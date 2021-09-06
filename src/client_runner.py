@@ -73,6 +73,7 @@ def get_models(model_node_map, model_dir, n):
     edge_models = []
     for i in model_map:
         edge_models.append(Model(model_dir + '/' + model_map[i]))
+    logger.debug(f"model_count={len(edge_models)}")
     return edge_models
  
 def create_simulation(users, address,  video_seg_data, outputfile, models, config):

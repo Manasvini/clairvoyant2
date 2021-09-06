@@ -128,14 +128,13 @@ class EdgeMetadataManager:
         try:
             for token_id in self.routes:
                 routeInfo =  self.routes[token_id]
-
                 deadline = routeInfo.arrival_time + routeInfo.contact_time + \
                         self.missedDeliveryThreshold 
 
                 #logger.debug(f"cur_time={cur_time}, contact_time={routeInfo.contact_time}, arrival={routeInfo.arrival_time},deadline={deadline}")
-
                 if len(routeInfo.segments) > 0 and cur_time > deadline:
-                    undelivered_segments[token_id] = copy.deepcopy(routeInfo)
+                    logger.debug("clean up routeInfo post overdue calculation")
+                    undelivered_segments[token_id] = self.routes.pop(token_id)
         finally:
             self.mutex.release()
         return undelivered_segments

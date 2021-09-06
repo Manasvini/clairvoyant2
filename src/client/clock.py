@@ -55,6 +55,7 @@ class CVClock(clock_pb2_grpc.ClockServerServicer):
 
     def shutdown(self):
         raise ClockEndException
+        self.server_thread.join()
         
 
     def advance(self):

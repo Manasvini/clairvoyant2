@@ -7,6 +7,10 @@ import genprotos.clairvoyant_pb2 as clairvoyant_pb2
 import genprotos.clairvoyant_meta_pb2 as clairvoyant_meta_pb2
 import genprotos.clairvoyant_meta_pb2_grpc as clairvoyant_meta_pb2_grpc
 
+parent_logger = logging.getLogger("cloud")
+logger = parent_logger.getChild('metadata')
+logger.setLevel(logging.DEBUG)
+
 class CloudMetadataClient:
     def __init__(self, address):
         self.address = address
@@ -65,9 +69,10 @@ class CloudMetadataClient:
                 position.latitude = point.y
             request.getNearestNodesRequest.CopyFrom(nearestNodesReq)
  
-            print('request has ', len(nearestNodesReq.positions), ' points')
+            logger.info(f"trajectory point count={len(nearestNodesReq.positions)}")
             response = stub.handleRequest(request)
             nodeInfos = self.processNearestNodesResponse(response, route)
+
             return nodeInfos
 
     def processVideoResponse(self, response, video_id):

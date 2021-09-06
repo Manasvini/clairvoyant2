@@ -25,7 +25,7 @@ class EdgeDeliveryMonitor:
         self.clockServerAddr = "localhost:8383"
         self.cur_time = 0
         self.time_incr = 1
-        self.sync_threshold = 10
+        self.sync_threshold = 5
 
     def run(self):
         while not self.exitThread:
@@ -59,7 +59,6 @@ class EdgeDeliveryMonitor:
             return None
         for route in missedSegmentsByRoute:
             logger.info(f" Route={route} | Missed Segment count={len(missedSegmentsByRoute[route].segments)} | time={self.cur_time}")
-            import pdb; pdb.set_trace()
             routeInfo = missedSegmentsByRoute[route]
             with grpc.insecure_channel(self.serverAddress) as channel:
                 stub = clairvoyant_pb2_grpc.CVServerStub(channel)
