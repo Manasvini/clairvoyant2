@@ -25,8 +25,10 @@ LTE_SPEED = 4e7 #40Mbps
 
 class Client:
     def __init__(self, filename, edgenodes_file, address, video_meta, time_scale, time_incr, models, edge_ips):
+
         self.video_meta = video_meta
         self.traj_df = pd.read_csv(filename)
+
         self.idx = 0
         self.playback = 0
         self.urls = []
@@ -64,12 +66,29 @@ class Client:
         self.availBits = 0
         self.last_dist = -1
         self.time_of_last_dist = 0
+        self.buffer_set = set()
 
+        self.is_complete = False
+
+        self.token = None
         #scaling
         #self.traj_df['time'] = 2*self.traj_df['time']
+        
+        self.bench_info = None
+
+
+    def set_benchmark_info(self, info):
+        self.bench_info = info
+
+    def add_route_start_offset(self, offset):
+        self.traj_df['time'] += offset
 
     def make_request(self, request_timestamp):
-        request = request_creator.create_request(self.traj_df, request_timestamp)
+        if self.bench_info == "bench2":
+            request = request_creator.create_request(self.traj_df, request_timestamp, dont_random=True)
+        else:
+            request = request_creator.create_request(self.traj_df, request_timestamp)
+
         with grpc.insecure_channel(self.address) as channel:
             stub = clairvoyant_pb2_grpc.CVServerStub(channel)
             response = stub.HandleCVRequest(request)
@@ -77,6 +96,7 @@ class Client:
             self.urls = response.videoreply.urls
             logger.info(f"client={self.id}, urls_len={len(self.urls)},\
                     token={response.videoreply.token_id}")
+            self.token = response.videoreply.token_id
 
     def getId(self):
         return self.id
@@ -84,7 +104,15 @@ class Client:
     def download_complete(self):
         return (self.cv_resp == True and len(self.urls) == len(self.buffer))
 
+    def add_token_to_logger(self):
+        logger.propagate = False
+        logger.addHandler(logging.StreamHandler())
+        formatter = logging.Formatter(f"%(levelname)s:%(name)s: routeid={self.token} -  %(message)s")
+        logger.handlers[0].setFormatter(formatter)
+
     def move(self, cur_time):
+        if self.is_complete:
+            return
 
         if self.cv_resp == False and \
                 int(cur_time) >=  max(0, int(self.traj_df.iloc[0]['time']) - 100):
@@ -95,16 +123,29 @@ class Client:
             self.make_request(cur_time)
             end = time.time()
             self.cv_resp = True
-            logger.info('Client {} request duration '.format(self.id, (end - start)))
+
+            logger.info(f"client={self.token},  request duration={(end - start)}")
+
+            if self.bench_info == "bench2":
+                self.is_complete = True
+                return
 
          
-        if self.idx < len(self.traj_df) - 1 and \
+        if self.idx < len(self.traj_df) and \
                 cur_time >= float(self.traj_df.iloc[self.idx]['time']):
-            while float(self.traj_df.iloc[self.idx]['time']) <= cur_time:
-                #catch up trajectory with the cur_time
+
+            while self.idx < len(self.traj_df) and \
+                    float(self.traj_df.iloc[self.idx]['time']) == cur_time:
+                #traverse trajectory at cur_time
                 if len(self.buffer) < len(self.urls):
                     self.get_segments(self.traj_df.iloc[self.idx]['time'])
                 self.idx += 1#self.time_incr
+
+        if self.idx >= len(self.traj_df):
+            self.is_complete = True
+            logger.info(f"client={self.id} journey ended")
+
+
 
     def get_delivery_stats(self):
         logger.debug(f"len_buffer:{len(self.buffer)}")
@@ -121,10 +162,10 @@ class Client:
         if cur_time < float(self.traj_df.iloc[0]['time']) or self.playback >= len(self.urls):
             return None
         if cur_time >= float(self.traj_df.iloc[0]['time']): 
-            self.playback += 0.25
+            self.playback += 1
     
     def get_distance_from_nearest_edge_node(self):
-        max_dist = 30 #meters
+        max_dist = 32 #30 meters, but allow room for error 2 meters
         
         if self.idx < len(self.dists) and self.dists.iloc[self.idx].min() * 1000 < max_dist:
 
@@ -132,7 +173,7 @@ class Client:
 
             row = self.traj_df.iloc[self.idx]
             cur_dist = self.dists.iloc[self.idx].min()
-            logger.debug(f"node{min_dist_node_idx}, idx{self.idx}, contact points ({row['x']},{row['y']}), dist: {cur_dist}")
+            #logger.debug(f"node{min_dist_node_idx}, idx{self.idx}, contact points ({row['x']},{row['y']}), dist: {cur_dist}")
 
             return min_dist_node_idx, self.dists.iloc[self.idx].min() * 1000
         return -1, 0
@@ -184,48 +225,118 @@ class Client:
         print(url, new_url)
         return new_url
 
+    def make_edge_request(self, node_idx, segment=None, reset=False):
+        ip = self.edge_ips['node_' + str(node_idx)]
+        url = f"http://{ip}:8000"
+
+        if reset:
+            logger.info('Reset contact history, as no segments to fetch')
+            params = {"reset":True}
+
+        elif segment == None:
+            logger.info('First request to edge')
+
+            # HACK: weird fix to get the key. TODO: make it more streamlined
+            splits = self.urls[0].split('/')
+            for part in splits:
+                if 'BigBuckBunny' in part:
+                    key = part
+                    break
+
+            params = {"key": key, \
+                    "start_time": self.start_contact_time, \
+                    "end_time": self.end_contact_time}
+        else:
+            #logger.debug(f"request to segment={segment}")
+            params = {"segment":segment}
+
+        resp = self.session.get(url, params=params)
+        time.sleep(0.01)
+
+        return resp.json()
+
+
     def complete_edge_actions(self):
 
         #add last_dist (TODO: experiment with this)
         bits = self.get_download_speed(self.last_dist, self.last_node)
         self.availBits += bits
         logger.debug(f"Accumulate for dist={self.last_dist}, time=1, bits={bits}")
-        logger.info(f"availableBits to download for node {self.last_node} = {self.availBits}")
+        logger.info(f"availableBytes to download for node {self.last_node} = {self.availBits/8}")
         totalBytes = self.availBits / 8
-        while totalBytes >= 0:
-            url = self.urls[len(self.buffer)]
-            filepath = self.get_filepath(url)
-            filesize = float(self.video_meta[filepath]['size'])
-            if filesize < totalBytes:
-                self.receivedBytesEdge += filesize
-                self.buffer.append(url)
-                url = self.get_url(self.last_node, url)
-                resp = self.session.get(url)
-                totalBytes -= filesize
-                self.count[1] += 1
-                logger.debug("counts - cloud: {} | edge: {}".format(self.count[0], self.count[1]))
-            else:
-                totalBytes = -1
 
-            #check url_list before continuing:
-            if len(self.buffer) >= len(self.urls):
-                logger.debug("buffer complete - within edge actions")
-                return
+        #get list of segments available at edge:
+        res = self.make_edge_request(self.last_node)
+
+        to_download = []
+        if 'segments' in res:
+            segments = res['segments']
+            for seg in segments:
+                if seg not in self.buffer_set:
+                    to_download.append(seg)
+
+        logger.info(f"client={self.token}, to_download={len(to_download)}")
+        if len(to_download) == 0:
+            logger.info('no data on edge avaialable')
+            if 'error' in res:
+                logger.info(f"{res['error']}")
+            self.make_edge_request(self.last_node, reset=True)
+            return
+        
+        idx = 0
+        if self.bench_info == "bench3":
+            #sort to_download for data set
+            def sorter(x):
+                tokens = x.split('.')
+                target = tokens[1]
+                comp = target.split('-')
+                minor = int(comp[1][1:])
+                major = int(comp[0][3:])
+
+                return major, minor
+
+            import pdb; pdb.set_trace()
+            to_download = list(sorted(to_download, key=sorter))
+        
+
+
+        dcount = 0
+
+        while totalBytes >=0 and idx < len(to_download):
+            cur_seg = to_download[idx]
+            filesize = float(self.video_meta[cur_seg]['size'])
+            if filesize < totalBytes:
+                res = self.make_edge_request(self.last_node, cur_seg)
+                if '{}' in res:
+                    logger.error(f"missing segment on edge={self.last_node}")
+                else:
+                    totalBytes -= filesize
+                    self.buffer_set.add(cur_seg)
+                    self.count[1] += 1
+                    dcount = 1
+                    self.receivedBytesEdge += filesize
+            else:
+                totalBytes = -1 # not enough bytes
+            idx += 1
+        if dcount:
+            logger.debug(f"client={self.token} | counts - cloud: {self.count[0]} | edge: {self.count[1]}")
+        
+
+    def need_cloud(self, url, segment):
+        if segment in self.buffer_set:
+            self.buffer.append(url)
+            return False
+
+        return True
 
     def get_segments(self, timestamp):
         node_id, act_dist = self.get_distance_from_nearest_edge_node()
         
-
         if node_id == -1:
             # Complete any pending tasks of the last valid edge
             if self.last_node != -1:
                 self.complete_edge_actions()
                 self.last_node = -1
-
-            # Implies a cloud delivery
-            if self.playback < len(self.buffer) - 1:
-                #delay cloud downloads
-                return
 
             """
             NOTE: Download segments from cloud, don't need to worry about keeping time of the download.
@@ -233,16 +344,31 @@ class Client:
             Playback check ensures next segment isn't downloaded until duly required, 
             and at that time edge contact is also checked.
             """
-            url = self.urls[len(self.buffer)]
-            filepath = self.get_filepath(url)
-            self.receivedBytesCloud += float(self.video_meta[filepath]['size'])
-            self.buffer.append(url)
-            self.count[0] += 1
-            logger.debug("counts - cloud: {} | edge: {}".format(self.count[0], self.count[1]))
+            # Implies a cloud delivery
+            while len(self.buffer) <= len(self.urls) and self.playback+30 >= len(self.buffer):
+                """
+                the while loop to catch up to playback with cloud downloads.
+                I know, it doesn't make sense for playback to cross buffer. 
+                But this is simulation where we don't do anything to buffer when connected to edge.
+                Alternate approach: check if cloud download needed after every edge action.
+                """
+                url = self.urls[len(self.buffer)]
+                filepath = self.get_filepath(url)
+
+                if not self.need_cloud(url, filepath):
+                    #fill from edge buffer_set
+                    continue
+
+                self.receivedBytesCloud += float(self.video_meta[filepath]['size'])
+                self.buffer.append(url)
+                self.buffer_set.add(filepath)
+                self.count[0] += 1
+                #if self.count[0]%100 == 0:
+                import pdb; pdb.set_trace()
+                logger.debug(f"client={self.token} | counts - cloud: {self.count[0]} | edge: {self.count[1]} | time: {self.traj_df.iloc[self.idx]['time']}")
 
         else:
             #if node_id != 0:
-            #    import pdb; pdb.set_trace()
             dist = self.model_map[node_id].get_model_dist(act_dist)
             if self.last_node == -1: #first time node encounter after gap
                 self.availBits = 0
@@ -250,7 +376,12 @@ class Client:
                 self.time_of_last_dist = timestamp
                 self.last_node = node_id
 
+                #need this to inform edge server of when i am asking for content
+                self.start_contact_time = timestamp
+
             elif self.last_node != node_id: # no cloud gap between 2 edge nodes
+                #need this to inform edge server of when i am asking for content
+                self.end_contact_time = timestamp
                 self.complete_edge_actions()
                 self.availBits = 0 
                 self.last_node = node_id
@@ -270,113 +401,13 @@ class Client:
 
                     self.availBits += bits
 
-                    logger.debug(f"Accumulate for dist={self.last_dist}, time={point_contact_time}, bits={bits}")
+                    logger.debug(f"Accumulate for traj_i={self.idx}, dist={self.last_dist}, time={point_contact_time}, bits={bits}")
                     self.last_dist = dist
                     self.time_of_last_dist = timestamp
+                
+                    #need this to inform edge server of when i am asking for content
+                    self.end_contact_time = timestamp
 
-
-    #def get_segments(self):
-    #    node_id, dist = self.get_distance_from_nearest_edge_node()
-
-    #    dl_bytes = LTE_SPEED
-
-    #    if idx != -1:
-    #        dl_bytes = self.get_download_speed(dist, idx)
-    #        self.edge_dlBytes += dl_bytes
-    #    else:
-    #        #delay only cloud downloads
-    #        if self.playback < len(self.buffer) - 1:
-    #            return
-    #        is_cloud_delivery = True
-
-    #    while len(self.buffer) < len(self.urls) and dl_bytes > 0: 
-    #        url = self.urls[len(self.buffer)]
-    #        filepath = self.get_filepath(url)
-
-    #        if self.pendingBytes <= 0:
-    #            self.set_pending_bytes(url)
-
-    #        is_cloud_delivery = True
-    #        new_segment_download = False
-    #        
-    #        if idx != -1:
-    #            if dl_bytes > self.pendingBytes: # Sufficient b/w exists to download segment
-    #                url = self.get_url(idx, url)
-    #                resp = self.session.get(url)
-    #                if '{}' not in resp.text: 
-    #                    # NOTE: "else" needs special handling, because we already sent a GET request
-    #                    dl_bytes -= self.pendingBytes
-    #                    self.count[0] += 1
-    #                    self.receivedBytesEdge += float(self.video_meta[filepath]['size'])
-    #                    new_segment_download = True
-    #                    is_cloud_delivery = False
-
-    #        if is_cloud_delivery:
-    #            self.pendingBytes -= dl_bytes
-    #            if self.pendingBytes > 0: #next step, as segment not complete
-    #                break
-
-
-    #            dl_bytes = 0 #simplify, and get dl_bytes in next step
-    #            self.count[1] += 1
-    #            self.receivedBytesCloud += float(self.video_meta[filepath]['size'])
-    #            new_segment_download = True
-
-    #        if new_segment_download == True:
-    #            self.pendingBytes  = 0
-    #            self.buffer.append(url)
-    #        print('cloud:', self.count[1], ' edge:', self.count[0])
-     
-    #def get_segments(self):    
-    #    is_edge_delivery = False
-    #    idx, dist = self.get_distance_from_edge_node()
- 
-    #    #if self.pendingBytes > 0:
-    #    dl_bytes = (4e7/8) / self.time_scale
-    #    if idx != -1:
-    #       dl_bytes = self.get_download_speed(dist, idx)/self.time_scale
-    #       print('edge contact:', idx, 'bytes = ', dl_bytes)
-    #    
-    #    while len(self.buffer) < len(self.urls) and dl_bytes > 0:   
-    #        is_edge_delivery = False 
-    #        url = self.urls[len(self.buffer)]
-    #        filepath = self.get_filepath(url)
-
-    #        if self.pendingBytes <= 0:
-    #            self.set_pending_bytes(url)
-    #        ip, start_idx, end_idx = self.get_ip_from_url(url)
-    #        if self.pendingBytes > dl_bytes:
-    #            self.pendingBytes -= dl_bytes
-    #            break
-
-    #        if 'ftp' not in url and idx != -1 and ('node_' + str(idx) in self.edge_ips):
-    #            if ip != self.edge_ips['node_' + str(idx)]:
-    #                url = url[:start_idx] + ip + url[end_idx:]
-    #                print('new url is ', url)
-    #            print('url to query is ', url)
-    #            resp = self.session.get(url)
-
-    #            if '{}' not in resp.text:
-    #                is_edge_delivery = True
-    #            else:
-    #                print('did not find ' , url, ' at edge node ', idx)
-    #        else:
-    #             
-    #            if is_edge_delivery:
-    #                dl_bytes -= self.pendingBytes
-    #            
-    #                print('segment', filepath, ' from edge')
-    #                self.receivedBytesEdge += float(self.video_meta[filepath]['size'])
-    #            else:
-    #                if self.playback < len(self.buffer) - 1:
-    #                    break
-    #                else:
-    #                    dl_bytes -= self.pendingBytes
-    #                    print('segment', filepath, ' from cloud')
-    #                    self.receivedBytesCloud += float(self.video_meta[filepath]['size']) 
-    #        self.pendingBytes  = 0
-    #        self.buffer.append(url)
-    #        print('url is ', url)
 
 class Simulation:
     def __init__(self, clients, time_scale, segment_duration, time_incr, outputfile):
@@ -386,6 +417,7 @@ class Simulation:
         self.segment_duration = segment_duration
         self.time_incr = time_incr
         self.outputfile = outputfile
+
 
 
     def simulate_step(self):
@@ -403,12 +435,17 @@ class Simulation:
             json.dump(output, ofh, indent=2)
 
     def clients_are_complete(self):
-        for client in self.clients:
-            if not client.download_complete():
-                return False
+        res = []
 
-        return True
- 
+        for client in self.clients:
+            res.append(client.download_complete())
+            res[-1] = client.is_complete
+            if res[-1]:
+                if client.idx < len(client.traj_df):
+                    logger.info(f"client={client.token} complete, last_time={client.traj_df.iloc[client.idx]['time']}")
+
+        return all(res)
+
     def run_simulation(self, num_steps):
         start = time.time()
         clock = CVClock(time_incr=self.time_incr, end_of_time=num_steps)
@@ -417,7 +454,7 @@ class Simulation:
             self.cur_time = clock.advance()
             self.simulate_step()
             if self.cur_time % 100 == 0:
-                print('Ran simulation step', self.cur_time)
+                logger.info(f"Ran simulation step = {self.cur_time}")
                 if self.clients_are_complete():
                     logger.info("All client downloads are complete")
                     try:

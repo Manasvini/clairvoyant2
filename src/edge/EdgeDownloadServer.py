@@ -42,7 +42,11 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         #self.queueTracker = threading.Thread(target=self.downloadMonitor.run)
         #self.queueTracker.start()
        
-        self.deliveryMon = EdgeDeliveryMonitor(self.configDict['timeScale'], self.configDict['serverAddress'], self.configDict['nodeId'], self.configDict['intervalSeconds'], self.metadataManager)
+        self.deliveryMon = EdgeDeliveryMonitor(self.configDict['timeScale'], 
+                                            self.configDict['serverAddress'], 
+                                            self.configDict['nodeId'], 
+                                            self.configDict['intervalSeconds'], 
+                                            self.metadataManager)
         self.deliveryThread = threading.Thread(target=self.deliveryMon.run)
         self.deliveryThread.start()
 
@@ -56,6 +60,7 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
                 self, request: clairvoyant_pb2.DownloadRequest, 
                 context: grpc.aio.ServicerContext) -> clairvoyant_pb2.DownloadReply:
         
+        logger.info(f"request-token={request.token_id}, arrival_time={request.arrival_time}, num_segments={len(request.segments)}")
         committed_segments = self.checkDownloadSchedule(request.segments, request.contact_points)
         reply = clairvoyant_pb2.DownloadReply()
         reply.token_id = request.token_id
@@ -73,10 +78,9 @@ class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
         #    #segment_id = segment.segment_id
 
         reply.segment_ids.extend(committed_segments.keys())
-        logger.info(f"request-token={request.token_id}, arrival_time={request.arrival_time}")
         self.metadataManager.addRoute(request.token_id, request.arrival_time, \
                 request.contact_time, request.segments, request.segment_sources)
-        print('responding to server with ' + str(len(reply.segment_ids)) + ' segments')        
+        logger.info('responding to server with ' + str(len(reply.segment_ids)) + ' segments')        
         return reply
 
     def shutdown(self):

@@ -32,7 +32,6 @@ class CVClock(clock_pb2_grpc.ClockServerServicer):
             self.loop.run_until_complete(task)
         except (KeyboardInterrupt, ClockEndException) as e :
             self.loop.stop()
-            self.loop.run_until_complete(task)
             self.loop.close()
 
     async def serve(self) -> None:

@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
-import json, os
+import json, os, csv
+import pandas as pd
 
 parser = ArgumentParser()
 parser.add_argument('-n', '--num-config', type=int, default=1, help='Number of configs to generate')
@@ -7,6 +8,8 @@ parser.add_argument('-t', '--template', type=str, required=True, help='template 
 parser.add_argument('-p', '--gen-path', required=True, help='path to generated files')
 args = parser.parse_args()
 
+modelmapfile='../models/model_map.csv'
+df = pd.read_csv(modelmapfile, header=None)
 
 try:
     with open(args.template, 'r') as fh:
@@ -15,7 +18,11 @@ try:
         outfile = os.path.join(args.gen_path, 'edgeConfig{}.json'.format(i))
         with open(outfile, 'w') as fw:
             obj['nodeId'] = "node_{}".format(i)
-            fw.write(json.dumps(obj))
+            obj['modelFile'] = f"models/{df[1][i]}"
+            obj['serverAddress'] = "192.168.160.42:60050"
+            obj['monServerAddress'] = "192.168.160.42:8192"
+            obj['nodeAddress'] = "0.0.0.0:50056"
+            fw.write(json.dumps(obj, indent=2))
 except Exception as e:
     print(e.trace())
     print('Incorrrect template file')

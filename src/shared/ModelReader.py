@@ -21,10 +21,20 @@ class Model:
         mean = self.model[dist]['mean']
         stddev = self.model[dist]['stddev']
         stdtdev = 0
-        return mean +  random.uniform(-stddev, stddev)
-        #return mean
+        #return mean +  random.uniform(-stddev, stddev)
+        return mean
 
     def get_model_dist(self, distance):
         idx = bisect.bisect_left(self.dists, distance)
-        dist = self.dists[min(idx, len(self.dists)-1)]
-        return dist
+
+        if idx > len(self.dists) - 1:
+            return self.dists[len(self.dists)-1]
+
+        if idx != 0:
+            if abs(distance - self.dists[idx]) < abs(distance - self.dists[idx-1]):
+                return self.dists[idx]
+            else:
+                return self.dists[idx-1]
+        else:
+            return self.dists[idx]
+            

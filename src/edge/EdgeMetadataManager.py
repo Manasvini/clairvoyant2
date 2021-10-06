@@ -10,7 +10,7 @@ import genprotos.clairvoyant_pb2 as clairvoyant_pb2
 
 parent_logger = logging.getLogger("edge")
 logger = parent_logger.getChild("metadatamgr")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 class RouteInfo:
     def __init__(self):
@@ -33,6 +33,10 @@ class EdgeMetadataManager:
         self.mutex = threading.Lock()
         self.missedDeliveryThreshold = missedDeliveryThreshold
         self.timeScale = timeScale
+        
+        #debug
+        self.dcount = 0
+        self.missing = []
 
     def updateDeliveryForRoute(self, token_id, segment_id):
         self.mutex.acquire()
@@ -40,10 +44,12 @@ class EdgeMetadataManager:
             if token_id in self.routes: 
                 routeInfo = self.routes[token_id]
                 if segment_id in routeInfo.segments:
-                    logger.info(f"route={token_id}, delivered segment={segment_id}")
+                    self.dcount += 1
+                    #logger.info(f"route={token_id}, delivered segment={segment_id}, dcount={self.dcount}")
                     del routeInfo.segments[segment_id]
                 else:
-                    logger.error("missing segment metadata")
+                    logger.error(f"missing metadata - segment={segment_id}")
+                    self.missing.append(segment_id)
                 self.routes[token_id] = routeInfo 
         finally:
             self.mutex.release()
@@ -52,6 +58,7 @@ class EdgeMetadataManager:
         while True:
             message = self.pubsub.get_message()
             if message:
+                logger.debug("Got pubsub message from topic")
                 vals  = str(message['data']).split('|')
                 if len(vals) >= 2:
                     token_id = int(vals[0])
@@ -115,9 +122,10 @@ class EdgeMetadataManager:
             routeInfo.contact_time = contact_time
             routeInfo.segments = {segment.segment_id: segment for segment in segments}
             self.routes[token_id] = routeInfo        
-            logger.debug(f"add_route={token_id}, contact_time={routeInfo.contact_time}")
+            logger.info(f"add_route={token_id}, contact_time={routeInfo.contact_time}")
+            #logger.debug(f"segments={routeInfo.segments}")
             self.addSegments(segments, segment_sources)
-            logger.debug(f"added segments - count={len(segments)}")
+            logger.info(f"added segments - count={len(segments)}, first_arrival={arrival_time}")
         finally:
             self.mutex.release()
 
@@ -126,15 +134,18 @@ class EdgeMetadataManager:
         self.mutex.acquire() # contending with redis listener
         undelivered_segments = {}
         try:
+            deadline = None
             for token_id in self.routes:
                 routeInfo =  self.routes[token_id]
                 deadline = routeInfo.arrival_time + routeInfo.contact_time + \
                         self.missedDeliveryThreshold 
 
-                #logger.debug(f"cur_time={cur_time}, contact_time={routeInfo.contact_time}, arrival={routeInfo.arrival_time},deadline={deadline}")
+                logger.debug(f"cur_time={cur_time}, contact_time={routeInfo.contact_time}, arrival={routeInfo.arrival_time},deadline={deadline}")
                 if len(routeInfo.segments) > 0 and cur_time > deadline:
                     logger.debug("clean up routeInfo post overdue calculation")
                     undelivered_segments[token_id] = self.routes.pop(token_id)
+            #if deadline:
+            #    logger.info(f'deadline={deadline}')
         finally:
             self.mutex.release()
         return undelivered_segments

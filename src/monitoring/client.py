@@ -52,7 +52,7 @@ class MonitoringClient(Thread):
             dict_to_send = {}
             for key,value in self.model_dict.items():
                 dict_to_send[key] = value['mean'] + random.uniform(-value['sdev'], value['sdev'])
-                #dict_to_send[key] = value['mean']
+                dict_to_send[key] = value['mean']
 
             payload = {}
             payload['nodeid'] = self.node_id

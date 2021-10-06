@@ -18,7 +18,7 @@ class EdgeDownloadAssignment:
         self.downloadSourceSpeeds = downloadSources
         self.mutex = threading.Lock()
         self.timeScale = timeScale
-        self.downloadedSegments = {}
+        self.downloadedSegments = set()  
         self.node_id = node_id    
 
     def hasSegment(self, segment_id):
@@ -41,6 +41,7 @@ class EdgeDownloadAssignment:
         for seg_id in list(self.assignments.keys()):
             seg_info = self.assignments[seg_id]
             if seg_info.expected_dlc_time < request_timestamp:
+                self.downloadedSegments.add(seg_id)
                 del self.assignments[seg_id]
             else:
                 max_dlc_time = max(max_dlc_time, seg_info.expected_dlc_time)

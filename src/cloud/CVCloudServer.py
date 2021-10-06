@@ -18,6 +18,7 @@ from monitoring.server import MonitoringServer
 
 from threading import Thread
 
+
 logging.basicConfig()
 logger = logging.getLogger("cloud")
 logger.setLevel(logging.INFO)
@@ -30,9 +31,16 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
         logger.info('cloud config = {}'.format(json.dumps(self.configDict, indent=2)))
         self.metaClient = CloudMetadataClient(self.configDict['metaServerAddress'])
         self.mmWaveModels = self.getModels(self.configDict['nodeIds'])
-        self.dlManager = DownloadManager(self.configDict['nodeIds'], \
-                self.configDict['downloadSources'], self.configDict['timeScale'],\
-                self.mmWaveModels, DownloadDispatcher(self.configDict['nodeIps'], None))
+        mode = None
+        if 'mode' in self.configDict:
+            mode=self.configDict['mode']
+
+        self.dlManager = DownloadManager(self.configDict['nodeIds'],
+                self.configDict['downloadSources'], 
+                self.configDict['timeScale'],
+                self.mmWaveModels, 
+                DownloadDispatcher(self.configDict['nodeIps'], None),
+                mode)
 
         monServer = MonitoringServer(address=self.configDict['monServerAddress'], \
                 port=self.configDict['monServerPort'], edge_model_dict=self.mmWaveModels)
@@ -50,22 +58,30 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
     def handleVideoRequest(self, videoRequest):
         nodeInfos = self.metaClient.makeNearestNodesRequest(videoRequest.route)
         segments = self.metaClient.makeGetVideoInfoRequest(videoRequest.video_id)
+        logger.debug(f"nodes_len={len(nodeInfos)}")
         token = int(time.time_ns()/1e6)
-        logger.info(f"token={token}, num_candidate_nodes={len(nodeInfos)}, num_segments={len(segments)}")
-        assignments = self.dlManager.handleVideoRequest(token, segments, nodeInfos, videoRequest.timestamp)
+                
+        logger.info(f"token={token}, num_candidate_nodes={len(nodeInfos)}, video={videoRequest.video_id}, num_segments={len(segments)}")
+        supposed_playback_start = videoRequest.route.points[0].time
+        results = self.dlManager.handleVideoRequest(token, supposed_playback_start,\
+                segments, nodeInfos, videoRequest.timestamp)
         urls = []
-        assigned_segments = set()
-        for node in assignments:
-            http_node_ip = self.configDict['httpAddress'][node]
+        #assigned_segments = set()
 
-            for segment in assignments[node]:
-                urls.append('http://' + http_node_ip + '/' + segment.segment.segment_id)
-                assigned_segments.add(segment.segment.segment_id)
+        #for node in assignments:
+        #    http_node_ip = self.configDict['httpAddress'][node]
 
-        for s in segments:
-            if s.segment_id not in assigned_segments:
-                urls.append(self.configDict['defaultSource'] + '/' + s.segment_id)
-        print('num urls = ', len(urls), token)
+        #    for segment in assignments[node]:
+        #        urls.append('http://' + http_node_ip + '/' + segment.segment.segment_id)
+        #        assigned_segments.add(segment.segment.segment_id)
+
+        #for s in segments:
+        #    if s.segment_id not in assigned_segments:
+        #        urls.append(self.configDict['defaultSource'] + '/' + s.segment_id)
+
+        for segment in segments:
+            urls.append(self.configDict['defaultSource'] + segment.segment_id)
+
         return urls, token
 
     async def HandleCVRequest(

@@ -1,0 +1,3004 @@
+{
+  "lastMile": [
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1505.csv",
+      "token": 1630884515342,
+      "edge": 456304999.0,
+      "cloud": 150555066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5953.csv",
+      "token": 1630893643459,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user601.csv",
+      "token": 1630882593175,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4891.csv",
+      "token": 1630891720600,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user404.csv",
+      "token": 1630882240663,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5263.csv",
+      "token": 1630892422918,
+      "edge": 382005069.0,
+      "cloud": 224854996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5005.csv",
+      "token": 1630891949181,
+      "edge": 106602070.0,
+      "cloud": 500257995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user450.csv",
+      "token": 1630882327536,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1532.csv",
+      "token": 1630884570729,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7074.csv",
+      "token": 1630895572456,
+      "edge": 394005069.0,
+      "cloud": 212854996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5262.csv",
+      "token": 1630892404138,
+      "edge": 456305069.0,
+      "cloud": 150554996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1062.csv",
+      "token": 1630883592179,
+      "edge": 200694070.0,
+      "cloud": 406165995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1940.csv",
+      "token": 1630885572650,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3154.csv",
+      "token": 1630888500614,
+      "edge": 238167069.0,
+      "cloud": 368692996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6073.csv",
+      "token": 1630893733489,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user493.csv",
+      "token": 1630882400161,
+      "edge": 0,
+      "cloud": 500257995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7323.csv",
+      "token": 1630896344192,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1233.csv",
+      "token": 1630883986391,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6164.csv",
+      "token": 1630893926300,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2819.csv",
+      "token": 1630887760644,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4223.csv",
+      "token": 1630890461362,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user687.csv",
+      "token": 1630882779414,
+      "edge": 164561070.0,
+      "cloud": 442298995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6964.csv",
+      "token": 1630895347916,
+      "edge": 511526067.0,
+      "cloud": 95333998.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4041.csv",
+      "token": 1630890221496,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5340.csv",
+      "token": 1630892586606,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user93.csv",
+      "token": 1630881510969,
+      "edge": 83898000.0,
+      "cloud": 522962065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4079.csv",
+      "token": 1630890265654,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1040.csv",
+      "token": 1630883546490,
+      "edge": 95333998.0,
+      "cloud": 511526067.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5613.csv",
+      "token": 1630893107895,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5878.csv",
+      "token": 1630893539693,
+      "edge": 104402070.0,
+      "cloud": 502457995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6130.csv",
+      "token": 1630893811013,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3479.csv",
+      "token": 1630889123356,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2928.csv",
+      "token": 1630888013639,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6870.csv",
+      "token": 1630895168611,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2328.csv",
+      "token": 1630886280497,
+      "edge": 218894069.0,
+      "cloud": 387965996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user25.csv",
+      "token": 1630880643756,
+      "edge": 249367069.0,
+      "cloud": 357492996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4310.csv",
+      "token": 1630890626871,
+      "edge": 243667069.0,
+      "cloud": 363192996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6959.csv",
+      "token": 1630895339984,
+      "edge": 83331070.0,
+      "cloud": 523528995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2436.csv",
+      "token": 1630886537283,
+      "edge": 67335070.0,
+      "cloud": 539524995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6898.csv",
+      "token": 1630895261062,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2307.csv",
+      "token": 1630886236608,
+      "edge": 0,
+      "cloud": 298279996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4965.csv",
+      "token": 1630891856778,
+      "edge": 171461070.0,
+      "cloud": 435398995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4056.csv",
+      "token": 1630890244156,
+      "edge": 456305069.0,
+      "cloud": 150554996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user711.csv",
+      "token": 1630882830835,
+      "edge": 394005069.0,
+      "cloud": 212854996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1320.csv",
+      "token": 1630884139032,
+      "edge": 54033999.0,
+      "cloud": 552826066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5314.csv",
+      "token": 1630892524978,
+      "edge": 163138000.0,
+      "cloud": 256678995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3321.csv",
+      "token": 1630888861543,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user237.csv",
+      "token": 1630881848751,
+      "edge": 373110069.0,
+      "cloud": 233749996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2673.csv",
+      "token": 1630887416714,
+      "edge": 432604999.0,
+      "cloud": 174255066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2117.csv",
+      "token": 1630885797187,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1514.csv",
+      "token": 1630884535557,
+      "edge": 243609999.0,
+      "cloud": 363250066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user730.csv",
+      "token": 1630882892307,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2012.csv",
+      "token": 1630885651206,
+      "edge": 107696000.0,
+      "cloud": 499164065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1879.csv",
+      "token": 1630885420751,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3940.csv",
+      "token": 1630890033242,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user969.csv",
+      "token": 1630883379006,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user318.csv",
+      "token": 1630882055234,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4887.csv",
+      "token": 1630891714159,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4449.csv",
+      "token": 1630890911388,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2991.csv",
+      "token": 1630888177271,
+      "edge": 382005069.0,
+      "cloud": 224854996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5902.csv",
+      "token": 1630893580991,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1920.csv",
+      "token": 1630885514453,
+      "edge": 72331070.0,
+      "cloud": 534528995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user869.csv",
+      "token": 1630883143047,
+      "edge": 0,
+      "cloud": 560467995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4508.csv",
+      "token": 1630891033891,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5546.csv",
+      "token": 1630892970348,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7291.csv",
+      "token": 1630895979508,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4963.csv",
+      "token": 1630891839605,
+      "edge": 456305069.0,
+      "cloud": 150554996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3169.csv",
+      "token": 1630888518911,
+      "edge": 0,
+      "cloud": 91533998.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1563.csv",
+      "token": 1630884640122,
+      "edge": 122402070.0,
+      "cloud": 484457995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3408.csv",
+      "token": 1630889025574,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7226.csv",
+      "token": 1630895785481,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6407.csv",
+      "token": 1630894327262,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4254.csv",
+      "token": 1630890539624,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1341.csv",
+      "token": 1630884184815,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user44.csv",
+      "token": 1630880895408,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6771.csv",
+      "token": 1630895038037,
+      "edge": 206394069.0,
+      "cloud": 400465996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3277.csv",
+      "token": 1630888782544,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1844.csv",
+      "token": 1630885340134,
+      "edge": 257902069.0,
+      "cloud": 348957996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3682.csv",
+      "token": 1630889540407,
+      "edge": 46392070.0,
+      "cloud": 560467995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2584.csv",
+      "token": 1630887139653,
+      "edge": 193694000.0,
+      "cloud": 413166065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3750.csv",
+      "token": 1630889620714,
+      "edge": 362775069.0,
+      "cloud": 244084996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3483.csv",
+      "token": 1630889128419,
+      "edge": 99002070.0,
+      "cloud": 507857995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2414.csv",
+      "token": 1630886426333,
+      "edge": 367475069.0,
+      "cloud": 239384996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5916.csv",
+      "token": 1630893595504,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4631.csv",
+      "token": 1630891292626,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6638.csv",
+      "token": 1630894810179,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5183.csv",
+      "token": 1630892241293,
+      "edge": 155902000.0,
+      "cloud": 450958065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6248.csv",
+      "token": 1630894115865,
+      "edge": 414005069.0,
+      "cloud": 192854996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7401.csv",
+      "token": 1630896994145,
+      "edge": 257902069.0,
+      "cloud": 348957996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user19.csv",
+      "token": 1630880649532,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6219.csv",
+      "token": 1630894044521,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6007.csv",
+      "token": 1630893677507,
+      "edge": 253667069.0,
+      "cloud": 353192996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6510.csv",
+      "token": 1630894511285,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7366.csv",
+      "token": 1630896698736,
+      "edge": 416605069.0,
+      "cloud": 190254996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2793.csv",
+      "token": 1630887632124,
+      "edge": 225267069.0,
+      "cloud": 381592996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3831.csv",
+      "token": 1630889786018,
+      "edge": 403005069.0,
+      "cloud": 203854996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6538.csv",
+      "token": 1630894538221,
+      "edge": 140461070.0,
+      "cloud": 466398995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6631.csv",
+      "token": 1630894801834,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1662.csv",
+      "token": 1630884924132,
+      "edge": 361980069.0,
+      "cloud": 244879996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5289.csv",
+      "token": 1630892485070,
+      "edge": 102733997.0,
+      "cloud": 504126068.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3825.csv",
+      "token": 1630889768407,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4369.csv",
+      "token": 1630890730328,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2214.csv",
+      "token": 1630886010780,
+      "edge": 265802069.0,
+      "cloud": 341057996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2119.csv",
+      "token": 1630885811087,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2954.csv",
+      "token": 1630888079316,
+      "edge": 122402070.0,
+      "cloud": 484457995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3471.csv",
+      "token": 1630889114833,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2849.csv",
+      "token": 1630887833000,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1517.csv",
+      "token": 1630884544924,
+      "edge": 380605069.0,
+      "cloud": 226254996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3930.csv",
+      "token": 1630889994497,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1297.csv",
+      "token": 1630884109220,
+      "edge": 70631070.0,
+      "cloud": 536228995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2951.csv",
+      "token": 1630888070966,
+      "edge": 143754996.0,
+      "cloud": 463105069.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2090.csv",
+      "token": 1630885739424,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4165.csv",
+      "token": 1630890359522,
+      "edge": 183201999.0,
+      "cloud": 423658066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6203.csv",
+      "token": 1630894020663,
+      "edge": 294894069.0,
+      "cloud": 311965996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3888.csv",
+      "token": 1630889887974,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user797.csv",
+      "token": 1630883026105,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7382.csv",
+      "token": 1630896793341,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6078.csv",
+      "token": 1630893748070,
+      "edge": 436705069.0,
+      "cloud": 170154996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user962.csv",
+      "token": 1630883360980,
+      "edge": 46392070.0,
+      "cloud": 560467995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user558.csv",
+      "token": 1630882514129,
+      "edge": 0,
+      "cloud": 264979996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1688.csv",
+      "token": 1630884999125,
+      "edge": 328280069.0,
+      "cloud": 278579996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6412.csv",
+      "token": 1630894330736,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2562.csv",
+      "token": 1630887083420,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user777.csv",
+      "token": 1630882970252,
+      "edge": 337982999.0,
+      "cloud": 268877066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4895.csv",
+      "token": 1630891729061,
+      "edge": 606860065.0,
+      "cloud": 0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user744.csv",
+      "token": 1630882910181,
+      "edge": 278779996.0,
+      "cloud": 229077999.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user925.csv",
+      "token": 1630883328808,
+      "edge": 242972999.0,
+      "cloud": 363887066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user762.csv",
+      "token": 1630882945163,
+      "edge": 202294070.0,
+      "cloud": 404565995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user213.csv",
+      "token": 1630881806769,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2534.csv",
+      "token": 1630887011781,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user29.csv",
+      "token": 1630880653786,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user723.csv",
+      "token": 1630882856487,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4599.csv",
+      "token": 1630891211565,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3968.csv",
+      "token": 1630890093455,
+      "edge": 353780069.0,
+      "cloud": 253079996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5461.csv",
+      "token": 1630892786644,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4750.csv",
+      "token": 1630891455029,
+      "edge": 418505069.0,
+      "cloud": 188354996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2425.csv",
+      "token": 1630886516250,
+      "edge": 368575069.0,
+      "cloud": 238284996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user907.csv",
+      "token": 1630883270160,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3754.csv",
+      "token": 1630889630802,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2499.csv",
+      "token": 1630886880203,
+      "edge": 457705069.0,
+      "cloud": 149154996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3597.csv",
+      "token": 1630889372227,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6151.csv",
+      "token": 1630893886163,
+      "edge": 150554996.0,
+      "cloud": 456305069.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2201.csv",
+      "token": 1630886003156,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7050.csv",
+      "token": 1630895516068,
+      "edge": 275002069.0,
+      "cloud": 331857996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5500.csv",
+      "token": 1630892864515,
+      "edge": 143754996.0,
+      "cloud": 463105069.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1487.csv",
+      "token": 1630884460768,
+      "edge": 361980069.0,
+      "cloud": 244879996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2644.csv",
+      "token": 1630887312307,
+      "edge": 238167069.0,
+      "cloud": 368692996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2938.csv",
+      "token": 1630888037851,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3517.csv",
+      "token": 1630889208370,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5920.csv",
+      "token": 1630893600327,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7071.csv",
+      "token": 1630895567720,
+      "edge": 392070.0,
+      "cloud": 606467995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3765.csv",
+      "token": 1630889653852,
+      "edge": 470464069.0,
+      "cloud": 136395996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6722.csv",
+      "token": 1630894938394,
+      "edge": 206394069.0,
+      "cloud": 400465996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7418.csv",
+      "token": 1630897134826,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4290.csv",
+      "token": 1630890589968,
+      "edge": 130102070.0,
+      "cloud": 476757995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7339.csv",
+      "token": 1630896481940,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user366.csv",
+      "token": 1630882145409,
+      "edge": 600760065.0,
+      "cloud": 6100000.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7512.csv",
+      "token": 1630897720244,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5431.csv",
+      "token": 1630892756599,
+      "edge": 26392070.0,
+      "cloud": 580467995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6904.csv",
+      "token": 1630895269340,
+      "edge": 34192070.0,
+      "cloud": 572667995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2194.csv",
+      "token": 1630885978944,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7042.csv",
+      "token": 1630895497429,
+      "edge": 600760065.0,
+      "cloud": 6100000.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user589.csv",
+      "token": 1630882573815,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4983.csv",
+      "token": 1630891890105,
+      "edge": 20592070.0,
+      "cloud": 586267995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7218.csv",
+      "token": 1630895774700,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4417.csv",
+      "token": 1630890847788,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7179.csv",
+      "token": 1630895726477,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5782.csv",
+      "token": 1630893347786,
+      "edge": 34192000.0,
+      "cloud": 572668065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user154.csv",
+      "token": 1630881688438,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7477.csv",
+      "token": 1630897463460,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2154.csv",
+      "token": 1630885900025,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5558.csv",
+      "token": 1630892990559,
+      "edge": 442305069.0,
+      "cloud": 164554996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user615.csv",
+      "token": 1630882619641,
+      "edge": 0,
+      "cloud": 586267995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3334.csv",
+      "token": 1630888886283,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2719.csv",
+      "token": 1630887457971,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5552.csv",
+      "token": 1630892985038,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6759.csv",
+      "token": 1630895001067,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2435.csv",
+      "token": 1630886531539,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6849.csv",
+      "token": 1630895148515,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user168.csv",
+      "token": 1630881734858,
+      "edge": 87598070.0,
+      "cloud": 519261995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7066.csv",
+      "token": 1630895557855,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7414.csv",
+      "token": 1630897081386,
+      "edge": 414005069.0,
+      "cloud": 192854996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user61.csv",
+      "token": 1630881150390,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1785.csv",
+      "token": 1630885173158,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4952.csv",
+      "token": 1630891825212,
+      "edge": 595426066.0,
+      "cloud": 11433999.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user855.csv",
+      "token": 1630883097895,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3227.csv",
+      "token": 1630888624383,
+      "edge": 599526065.0,
+      "cloud": 7334000.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2074.csv",
+      "token": 1630885714860,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1014.csv",
+      "token": 1630883489139,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5427.csv",
+      "token": 1630892751481,
+      "edge": 414005069.0,
+      "cloud": 192854996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user300.csv",
+      "token": 1630881975745,
+      "edge": 241367069.0,
+      "cloud": 365492996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2720.csv",
+      "token": 1630887462040,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user314.csv",
+      "token": 1630882034586,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2448.csv",
+      "token": 1630886664171,
+      "edge": 414004999.0,
+      "cloud": 192855066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1620.csv",
+      "token": 1630884839276,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5832.csv",
+      "token": 1630893465819,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6560.csv",
+      "token": 1630894562383,
+      "edge": 0,
+      "cloud": 432376995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1553.csv",
+      "token": 1630884597870,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4372.csv",
+      "token": 1630890743942,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2978.csv",
+      "token": 1630888161111,
+      "edge": 27592070.0,
+      "cloud": 579267995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4007.csv",
+      "token": 1630890161412,
+      "edge": 57433999.0,
+      "cloud": 549426066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4909.csv",
+      "token": 1630891758932,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2424.csv",
+      "token": 1630886508990,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2555.csv",
+      "token": 1630887064928,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3178.csv",
+      "token": 1630888539551,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5741.csv",
+      "token": 1630893308027,
+      "edge": 135499999.0,
+      "cloud": 471360066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1290.csv",
+      "token": 1630884099584,
+      "edge": 328280069.0,
+      "cloud": 278579996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1849.csv",
+      "token": 1630885351176,
+      "edge": 102733997.0,
+      "cloud": 504126068.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2463.csv",
+      "token": 1630886712879,
+      "edge": 442112999.0,
+      "cloud": 137154996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1562.csv",
+      "token": 1630884649412,
+      "edge": 114902000.0,
+      "cloud": 491958065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2172.csv",
+      "token": 1630885922947,
+      "edge": 178235999.0,
+      "cloud": 349792996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1401.csv",
+      "token": 1630884313253,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user664.csv",
+      "token": 1630882725425,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4097.csv",
+      "token": 1630890294918,
+      "edge": 581726066.0,
+      "cloud": 25133999.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4323.csv",
+      "token": 1630890657225,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7012.csv",
+      "token": 1630895417308,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3139.csv",
+      "token": 1630888452419,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7207.csv",
+      "token": 1630895751635,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4366.csv",
+      "token": 1630890725488,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6324.csv",
+      "token": 1630894230857,
+      "edge": 246172999.0,
+      "cloud": 360687066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4443.csv",
+      "token": 1630890887010,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7084.csv",
+      "token": 1630895605140,
+      "edge": 167761070.0,
+      "cloud": 439098995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7381.csv",
+      "token": 1630896775740,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user244.csv",
+      "token": 1630881866066,
+      "edge": 354880069.0,
+      "cloud": 251979996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2193.csv",
+      "token": 1630885985407,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4335.csv",
+      "token": 1630890676514,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5516.csv",
+      "token": 1630892897173,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5373.csv",
+      "token": 1630892650300,
+      "edge": 140461070.0,
+      "cloud": 466398995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3083.csv",
+      "token": 1630888388539,
+      "edge": 294893999.0,
+      "cloud": 311966066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7231.csv",
+      "token": 1630895809209,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6351.csv",
+      "token": 1630894262503,
+      "edge": 20592070.0,
+      "cloud": 586267995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6880.csv",
+      "token": 1630895237306,
+      "edge": 421605069.0,
+      "cloud": 185254996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7488.csv",
+      "token": 1630897532071,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4753.csv",
+      "token": 1630891468677,
+      "edge": 472626069.0,
+      "cloud": 134233996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5150.csv",
+      "token": 1630892183956,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2163.csv",
+      "token": 1630885911410,
+      "edge": 401305069.0,
+      "cloud": 205554996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3697.csv",
+      "token": 1630889558144,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2218.csv",
+      "token": 1630886018338,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1250.csv",
+      "token": 1630884024328,
+      "edge": 217474999.0,
+      "cloud": 389385066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1885.csv",
+      "token": 1630885438653,
+      "edge": 401305069.0,
+      "cloud": 205554996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6142.csv",
+      "token": 1630893873009,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4474.csv",
+      "token": 1630890946534,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1787.csv",
+      "token": 1630885185345,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2076.csv",
+      "token": 1630885718725,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1435.csv",
+      "token": 1630884363012,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2384.csv",
+      "token": 1630886351650,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5004.csv",
+      "token": 1630891937076,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6826.csv",
+      "token": 1630895109193,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3560.csv",
+      "token": 1630889305867,
+      "edge": 267901999.0,
+      "cloud": 338958066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7444.csv",
+      "token": 1630897290555,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2107.csv",
+      "token": 1630885782710,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2809.csv",
+      "token": 1630887690694,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6579.csv",
+      "token": 1630894689805,
+      "edge": 0,
+      "cloud": 392065996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6065.csv",
+      "token": 1630893718246,
+      "edge": 368575069.0,
+      "cloud": 238284996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user226.csv",
+      "token": 1630881825528,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4311.csv",
+      "token": 1630890634619,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7227.csv",
+      "token": 1630895800439,
+      "edge": 70631070.0,
+      "cloud": 536228995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2250.csv",
+      "token": 1630886098407,
+      "edge": 370375069.0,
+      "cloud": 236484996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6302.csv",
+      "token": 1630894206935,
+      "edge": 421605069.0,
+      "cloud": 185254996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6378.csv",
+      "token": 1630894297305,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6622.csv",
+      "token": 1630894769587,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4327.csv",
+      "token": 1630890667440,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6985.csv",
+      "token": 1630895368556,
+      "edge": 225267069.0,
+      "cloud": 381592996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6576.csv",
+      "token": 1630894620881,
+      "edge": 85198070.0,
+      "cloud": 521661995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6420.csv",
+      "token": 1630894346566,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user691.csv",
+      "token": 1630882793517,
+      "edge": 477231069.0,
+      "cloud": 129628996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6561.csv",
+      "token": 1630894579009,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5796.csv",
+      "token": 1630893389527,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7237.csv",
+      "token": 1630895817625,
+      "edge": 104402070.0,
+      "cloud": 502457995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1130.csv",
+      "token": 1630883715307,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2465.csv",
+      "token": 1630886723522,
+      "edge": 128533996.0,
+      "cloud": 478326069.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5313.csv",
+      "token": 1630892522274,
+      "edge": 259602069.0,
+      "cloud": 347257996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5306.csv",
+      "token": 1630892502366,
+      "edge": 167761070.0,
+      "cloud": 439098995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3905.csv",
+      "token": 1630889940219,
+      "edge": 368575069.0,
+      "cloud": 238284996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3312.csv",
+      "token": 1630888821466,
+      "edge": 181452999.0,
+      "cloud": 425407066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user63.csv",
+      "token": 1630881200535,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6010.csv",
+      "token": 1630893680915,
+      "edge": 401305069.0,
+      "cloud": 205554996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1270.csv",
+      "token": 1630884060900,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4710.csv",
+      "token": 1630891397076,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7315.csv",
+      "token": 1630896273721,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6286.csv",
+      "token": 1630894195583,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5818.csv",
+      "token": 1630893443713,
+      "edge": 442305069.0,
+      "cloud": 164554996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4786.csv",
+      "token": 1630891574220,
+      "edge": 304680069.0,
+      "cloud": 302179996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6746.csv",
+      "token": 1630894982387,
+      "edge": 218477999.0,
+      "cloud": 388382066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user179.csv",
+      "token": 1630881758285,
+      "edge": 179003000.0,
+      "cloud": 427857065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2185.csv",
+      "token": 1630885947842,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4147.csv",
+      "token": 1630890338075,
+      "edge": 134202070.0,
+      "cloud": 472657995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3452.csv",
+      "token": 1630889094655,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5792.csv",
+      "token": 1630893373620,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6338.csv",
+      "token": 1630894240771,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5484.csv",
+      "token": 1630892812406,
+      "edge": 374005069.0,
+      "cloud": 232854996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6801.csv",
+      "token": 1630895089440,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6273.csv",
+      "token": 1630894161770,
+      "edge": 102733997.0,
+      "cloud": 504126068.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user40.csv",
+      "token": 1630880852811,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7343.csv",
+      "token": 1630896518484,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user24.csv",
+      "token": 1630880656443,
+      "edge": 20592000.0,
+      "cloud": 586268065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3051.csv",
+      "token": 1630888279560,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user286.csv",
+      "token": 1630881956245,
+      "edge": 20592000.0,
+      "cloud": 586268065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3291.csv",
+      "token": 1630888798931,
+      "edge": 87433999.0,
+      "cloud": 519426066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1692.csv",
+      "token": 1630885022165,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4964.csv",
+      "token": 1630891848002,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6767.csv",
+      "token": 1630895024018,
+      "edge": 222329069.0,
+      "cloud": 384530996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7173.csv",
+      "token": 1630895718232,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5256.csv",
+      "token": 1630892368424,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3333.csv",
+      "token": 1630888869881,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user776.csv",
+      "token": 1630882964963,
+      "edge": 259602069.0,
+      "cloud": 347257996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2103.csv",
+      "token": 1630885765456,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6922.csv",
+      "token": 1630895285732,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6601.csv",
+      "token": 1630894710529,
+      "edge": 328280069.0,
+      "cloud": 278579996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2843.csv",
+      "token": 1630887827108,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2803.csv",
+      "token": 1630887675794,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user503.csv",
+      "token": 1630882435149,
+      "edge": 442305069.0,
+      "cloud": 164554996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4773.csv",
+      "token": 1630891549427,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1558.csv",
+      "token": 1630884633272,
+      "edge": 85198070.0,
+      "cloud": 521661995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5853.csv",
+      "token": 1630893492939,
+      "edge": 238167069.0,
+      "cloud": 368692996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2491.csv",
+      "token": 1630886863999,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5408.csv",
+      "token": 1630892699159,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2068.csv",
+      "token": 1630885710479,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1192.csv",
+      "token": 1630883801311,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1228.csv",
+      "token": 1630883968852,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5098.csv",
+      "token": 1630892093958,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6265.csv",
+      "token": 1630894136219,
+      "edge": 414005069.0,
+      "cloud": 192854996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1837.csv",
+      "token": 1630885315200,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3910.csv",
+      "token": 1630889972577,
+      "edge": 196794070.0,
+      "cloud": 410065995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5065.csv",
+      "token": 1630892030193,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4274.csv",
+      "token": 1630890570279,
+      "edge": 26392070.0,
+      "cloud": 580467995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user901.csv",
+      "token": 1630883186087,
+      "edge": 239967069.0,
+      "cloud": 366892996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1351.csv",
+      "token": 1630884201128,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7491.csv",
+      "token": 1630897556046,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5433.csv",
+      "token": 1630892763719,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1593.csv",
+      "token": 1630884728353,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1444.csv",
+      "token": 1630884398178,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7025.csv",
+      "token": 1630895461022,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1831.csv",
+      "token": 1630885255637,
+      "edge": 257902069.0,
+      "cloud": 348957996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4194.csv",
+      "token": 1630890393920,
+      "edge": 150801999.0,
+      "cloud": 456058066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2654.csv",
+      "token": 1630887349847,
+      "edge": 95333998.0,
+      "cloud": 511526067.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4897.csv",
+      "token": 1630891735237,
+      "edge": 200694070.0,
+      "cloud": 406165995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4026.csv",
+      "token": 1630890207359,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3166.csv",
+      "token": 1630888515129,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user256.csv",
+      "token": 1630881891570,
+      "edge": 432605069.0,
+      "cloud": 174254996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5828.csv",
+      "token": 1630893452708,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3627.csv",
+      "token": 1630889425313,
+      "edge": 62435070.0,
+      "cloud": 544424995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1633.csv",
+      "token": 1630884869168,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user224.csv",
+      "token": 1630881817617,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4166.csv",
+      "token": 1630890367559,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1231.csv",
+      "token": 1630883973068,
+      "edge": 164561070.0,
+      "cloud": 442298995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3449.csv",
+      "token": 1630889090050,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4743.csv",
+      "token": 1630891447076,
+      "edge": 145535999.0,
+      "cloud": 461324066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6675.csv",
+      "token": 1630894895123,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2959.csv",
+      "token": 1630888091965,
+      "edge": 171461070.0,
+      "cloud": 435398995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7350.csv",
+      "token": 1630896574763,
+      "edge": 136395996.0,
+      "cloud": 470464069.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4044.csv",
+      "token": 1630890233091,
+      "edge": 20592070.0,
+      "cloud": 586267995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7111.csv",
+      "token": 1630895632869,
+      "edge": 13792070.0,
+      "cloud": 593067995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1066.csv",
+      "token": 1630883603187,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7112.csv",
+      "token": 1630895637559,
+      "edge": 348980069.0,
+      "cloud": 257879996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7017.csv",
+      "token": 1630895440493,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3223.csv",
+      "token": 1630888616265,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4497.csv",
+      "token": 1630891018906,
+      "edge": 488426069.0,
+      "cloud": 118433996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5506.csv",
+      "token": 1630892875895,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1162.csv",
+      "token": 1630883740031,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user837.csv",
+      "token": 1630883066740,
+      "edge": 416605069.0,
+      "cloud": 190254996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user569.csv",
+      "token": 1630882537373,
+      "edge": 456305069.0,
+      "cloud": 150554996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5773.csv",
+      "token": 1630893343584,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user48.csv",
+      "token": 1630880997235,
+      "edge": 20592000.0,
+      "cloud": 586268065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7209.csv",
+      "token": 1630895760739,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4793.csv",
+      "token": 1630891582511,
+      "edge": 26392070.0,
+      "cloud": 580467995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4365.csv",
+      "token": 1630890720195,
+      "edge": 202294070.0,
+      "cloud": 404565995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2407.csv",
+      "token": 1630886419178,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3021.csv",
+      "token": 1630888200476,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4649.csv",
+      "token": 1630891314556,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3575.csv",
+      "token": 1630889347546,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4222.csv",
+      "token": 1630890450458,
+      "edge": 72331070.0,
+      "cloud": 534528995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7297.csv",
+      "token": 1630896144284,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7091.csv",
+      "token": 1630895613447,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user13.csv",
+      "token": 1630880666114,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1674.csv",
+      "token": 1630884968770,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1908.csv",
+      "token": 1630885505880,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3185.csv",
+      "token": 1630888556463,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2527.csv",
+      "token": 1630886988427,
+      "edge": 259602069.0,
+      "cloud": 347257996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2164.csv",
+      "token": 1630885915834,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4834.csv",
+      "token": 1630891632984,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user488.csv",
+      "token": 1630882390585,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6779.csv",
+      "token": 1630895049192,
+      "edge": 146199999.0,
+      "cloud": 460660066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5845.csv",
+      "token": 1630893479779,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2557.csv",
+      "token": 1630887071977,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4001.csv",
+      "token": 1630890144610,
+      "edge": 72331070.0,
+      "cloud": 534528995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1729.csv",
+      "token": 1630885090305,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4563.csv",
+      "token": 1630891139321,
+      "edge": 193694070.0,
+      "cloud": 413165995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3856.csv",
+      "token": 1630889808091,
+      "edge": 308580069.0,
+      "cloud": 298279996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5051.csv",
+      "token": 1630892011697,
+      "edge": 67335070.0,
+      "cloud": 539524995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5563.csv",
+      "token": 1630892999949,
+      "edge": 455698995.0,
+      "cloud": 63563000.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3566.csv",
+      "token": 1630889313156,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6580.csv",
+      "token": 1630894692096,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6509.csv",
+      "token": 1630894505690,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1601.csv",
+      "token": 1630884774103,
+      "edge": 341880069.0,
+      "cloud": 264979996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user390.csv",
+      "token": 1630882206190,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1957.csv",
+      "token": 1630885604901,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5571.csv",
+      "token": 1630893018473,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user678.csv",
+      "token": 1630882750803,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user839.csv",
+      "token": 1630883071227,
+      "edge": 134202070.0,
+      "cloud": 472657995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user634.csv",
+      "token": 1630882650921,
+      "edge": 218894069.0,
+      "cloud": 387965996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4370.csv",
+      "token": 1630890737142,
+      "edge": 13792070.0,
+      "cloud": 593067995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5320.csv",
+      "token": 1630892543424,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6108.csv",
+      "token": 1630893790883,
+      "edge": 567933996.0,
+      "cloud": 38925999.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3391.csv",
+      "token": 1630888989543,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2667.csv",
+      "token": 1630887376021,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7365.csv",
+      "token": 1630896671210,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5795.csv",
+      "token": 1630893383156,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2131.csv",
+      "token": 1630885852546,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7064.csv",
+      "token": 1630895549618,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6479.csv",
+      "token": 1630894447437,
+      "edge": 122633996.0,
+      "cloud": 484226069.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3573.csv",
+      "token": 1630889342017,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1263.csv",
+      "token": 1630884043416,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user89.csv",
+      "token": 1630881469969,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1407.csv",
+      "token": 1630884329073,
+      "edge": 251667069.0,
+      "cloud": 355192996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5524.csv",
+      "token": 1630892916731,
+      "edge": 196794070.0,
+      "cloud": 410065995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5322.csv",
+      "token": 1630892560167,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2631.csv",
+      "token": 1630887298803,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6680.csv",
+      "token": 1630894901324,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5609.csv",
+      "token": 1630893096141,
+      "edge": 376605069.0,
+      "cloud": 230254996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7486.csv",
+      "token": 1630897514128,
+      "edge": 416605069.0,
+      "cloud": 190254996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5350.csv",
+      "token": 1630892597155,
+      "edge": 178483070.0,
+      "cloud": 428376995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1726.csv",
+      "token": 1630885077812,
+      "edge": 600760065.0,
+      "cloud": 6100000.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5837.csv",
+      "token": 1630893471364,
+      "edge": 370375069.0,
+      "cloud": 236484996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2290.csv",
+      "token": 1630886213702,
+      "edge": 202294070.0,
+      "cloud": 404565995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2657.csv",
+      "token": 1630887365936,
+      "edge": 124202000.0,
+      "cloud": 482658065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user850.csv",
+      "token": 1630883092154,
+      "edge": 281202069.0,
+      "cloud": 325657996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5151.csv",
+      "token": 1630892191092,
+      "edge": 394005069.0,
+      "cloud": 212854996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1200.csv",
+      "token": 1630883893385,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1865.csv",
+      "token": 1630885391983,
+      "edge": 196794070.0,
+      "cloud": 410065995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3434.csv",
+      "token": 1630889074183,
+      "edge": 40692070.0,
+      "cloud": 566167995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1366.csv",
+      "token": 1630884227877,
+      "edge": 136730999.0,
+      "cloud": 470129066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3523.csv",
+      "token": 1630889217617,
+      "edge": 110733996.0,
+      "cloud": 496126069.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2671.csv",
+      "token": 1630887386413,
+      "edge": 219529069.0,
+      "cloud": 387330996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user571.csv",
+      "token": 1630882546265,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6454.csv",
+      "token": 1630894403901,
+      "edge": 167020997.0,
+      "cloud": 369207998.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5319.csv",
+      "token": 1630892537334,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2093.csv",
+      "token": 1630885741737,
+      "edge": 326287999.0,
+      "cloud": 280572066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6875.csv",
+      "token": 1630895220149,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3487.csv",
+      "token": 1630889139587,
+      "edge": 193694070.0,
+      "cloud": 413165995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5424.csv",
+      "token": 1630892726019,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user877.csv",
+      "token": 1630883153779,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5831.csv",
+      "token": 1630893460391,
+      "edge": 184983070.0,
+      "cloud": 421876995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7015.csv",
+      "token": 1630895431097,
+      "edge": 470926069.0,
+      "cloud": 135933996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5255.csv",
+      "token": 1630892363887,
+      "edge": 46392070.0,
+      "cloud": 560467995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6185.csv",
+      "token": 1630893983098,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user181.csv",
+      "token": 1630881763689,
+      "edge": 57192070.0,
+      "cloud": 549667995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3996.csv",
+      "token": 1630890132183,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2106.csv",
+      "token": 1630885775067,
+      "edge": 143561070.0,
+      "cloud": 463298995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user741.csv",
+      "token": 1630882905623,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6107.csv",
+      "token": 1630893784281,
+      "edge": 20592070.0,
+      "cloud": 586267995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5257.csv",
+      "token": 1630892372539,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5851.csv",
+      "token": 1630893487135,
+      "edge": 238167069.0,
+      "cloud": 368692996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2886.csv",
+      "token": 1630887921078,
+      "edge": 193694070.0,
+      "cloud": 413165995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1077.csv",
+      "token": 1630883640321,
+      "edge": 186683000.0,
+      "cloud": 420177065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3873.csv",
+      "token": 1630889821716,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4139.csv",
+      "token": 1630890328946,
+      "edge": 460005069.0,
+      "cloud": 146854996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7255.csv",
+      "token": 1630895853931,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4342.csv",
+      "token": 1630890697586,
+      "edge": 51092070.0,
+      "cloud": 555767995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1537.csv",
+      "token": 1630884580384,
+      "edge": 488426069.0,
+      "cloud": 118433996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2851.csv",
+      "token": 1630887836245,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5260.csv",
+      "token": 1630892392584,
+      "edge": 136395996.0,
+      "cloud": 470464069.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user778.csv",
+      "token": 1630882989712,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7063.csv",
+      "token": 1630895541271,
+      "edge": 414005069.0,
+      "cloud": 192854996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4095.csv",
+      "token": 1630890283600,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7332.csv",
+      "token": 1630896428796,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3341.csv",
+      "token": 1630888938879,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4380.csv",
+      "token": 1630890783114,
+      "edge": 20592070.0,
+      "cloud": 586267995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user103.csv",
+      "token": 1630881627352,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1668.csv",
+      "token": 1630884951646,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7118.csv",
+      "token": 1630895651776,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3492.csv",
+      "token": 1630889186740,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4338.csv",
+      "token": 1630890682628,
+      "edge": 220109999.0,
+      "cloud": 346057996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4532.csv",
+      "token": 1630891066237,
+      "edge": 172327070.0,
+      "cloud": 434532995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1598.csv",
+      "token": 1630884762708,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user906.csv",
+      "token": 1630883190780,
+      "edge": 182383070.0,
+      "cloud": 424476995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6845.csv",
+      "token": 1630895140042,
+      "edge": 0,
+      "cloud": 143754996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6268.csv",
+      "token": 1630894146557,
+      "edge": 518030065.0,
+      "cloud": 88830000.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4133.csv",
+      "token": 1630890321824,
+      "edge": 154361070.0,
+      "cloud": 452498995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6647.csv",
+      "token": 1630894819924,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7467.csv",
+      "token": 1630897401667,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user7116.csv",
+      "token": 1630895645143,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1935.csv",
+      "token": 1630885533772,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5678.csv",
+      "token": 1630893205557,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2965.csv",
+      "token": 1630888121511,
+      "edge": 224329069.0,
+      "cloud": 382530996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user656.csv",
+      "token": 1630882694849,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1053.csv",
+      "token": 1630883579523,
+      "edge": 259602069.0,
+      "cloud": 347257996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1038.csv",
+      "token": 1630883553012,
+      "edge": 238167069.0,
+      "cloud": 368692996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user1457.csv",
+      "token": 1630884416361,
+      "edge": 53392070.0,
+      "cloud": 553467995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user3538.csv",
+      "token": 1630889259179,
+      "edge": 428605069.0,
+      "cloud": 178254996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user2421.csv",
+      "token": 1630886440382,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user712.csv",
+      "token": 1630882837547,
+      "edge": 407812999.0,
+      "cloud": 199047066.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user95.csv",
+      "token": 1630881561378,
+      "edge": 456305069.0,
+      "cloud": 150554996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user6578.csv",
+      "token": 1630894682587,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user274.csv",
+      "token": 1630881925723,
+      "edge": 238167069.0,
+      "cloud": 368692996.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5293.csv",
+      "token": 1630892492105,
+      "edge": 0,
+      "cloud": 579267995.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4540.csv",
+      "token": 1630891083241,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user4622.csv",
+      "token": 1630891262868,
+      "edge": 0,
+      "cloud": 606860065.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user866.csv",
+      "token": 1630883139292,
+      "edge": 600760065.0,
+      "cloud": 6100000.0
+    },
+    {
+      "id": "../../clairvoyant2/eval/user_trajectories//user5064.csv",
+      "token": 1630892025948,
+      "edge": 0,
+      "cloud": 606860065.0
+    }
+  ]
+}

@@ -3,4 +3,4 @@
 
 #2 node
 id=$1
-python src/edge_runner.py -a 0.0.0.0:5105$id -c conf/n${id}_edgeConfig.json
+python3 src/edge_runner.py -a 0.0.0.0:50056 -c conf/edgeConfig$1.json

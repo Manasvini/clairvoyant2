@@ -20,10 +20,13 @@ def get_point(val1, val2, val3, val4):
     point.time = val4
     return point
     
-def create_request(df, request_timestamp):
+def create_request(df, request_timestamp, dont_random=False):
     req = clairvoyant_pb2.VideoRequest()
 
     req.video_id = 'v' + str(1 + randrange(10))
+    if dont_random:
+        req.video_id = 'v1'
+        
     req.timestamp = request_timestamp
 
     route = clairvoyant_pb2.Route()

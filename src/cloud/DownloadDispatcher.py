@@ -5,6 +5,10 @@ import grpc
 import genprotos.clairvoyant_pb2 as clairvoyant_pb2
 import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
 
+parent_logger = logging.getLogger("cloud")
+logger = parent_logger.getChild('dwnlddispatch')
+logger.setLevel(logging.DEBUG)
+
 class DownloadDispatcher:
     def __init__(self, edge_ip_map, callback):
         self.edge_ip_map = edge_ip_map
@@ -26,7 +30,7 @@ class DownloadDispatcher:
                 s.CopyFrom(segment)
             for s in segment_sources:
                 request.segment_sources[s] = segment_sources[s]
-            print('request has' , len(request.segment_sources) , ' sources and ' + str(len(request.segments)) + ' segments')
+            logger.info(f"node_id={edge_node_id}, num_segments={len(request.segments)}")
             response = stub.HandleDownloadRequest(request)
             #print(response)
             if self.callback is not None:

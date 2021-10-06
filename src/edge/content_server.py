@@ -36,6 +36,7 @@ import json
 import logging
 from concurrent import futures
 import threading
+import base64
 
 def writePidFile():
     pid = str(os.getpid())
@@ -51,6 +52,8 @@ redisc = None
 channel = "user_download_notify"
 #pubsub.subscribe(channel)
 
+contact_history = {} #dict of routeid:[start,end] pairs
+
 def update_metadata_task(routeid, segment):
     logging.info("Begin Metadata update task | route={}, segement={}".format(routeid, segment))
     msg = "{}|{}".format(routeid, segment)
@@ -60,10 +63,30 @@ def update_metadata_task(routeid, segment):
 ex = futures.ThreadPoolExecutor(max_workers=5)
 
 
+def can_make_contact(cur_routeid, start, end):
+    """
+    Rest assured this system will receive sequential requests due to the nature of the simulation (being serial).
+    and so do not worry about race conditions in accessing the contact history
+    """
+    count = 0
+    for routeid, interval in contact_history.items():
+        if end > interval[0] and start < interval[1]:
+            count += 1
+        if count >= 2:
+            return False
+
+    contact_history[cur_routeid] = [start,end]
+    return True
+
+def reset(routeid):
+    if routeid in contact_history:
+        del contact_history[routeid]
+
+
 class S(BaseHTTPRequestHandler):
     def _set_headers(self):
         self.send_response(200)
-        self.send_header("Content-type", "text/html")
+        self.send_header("Content-type", "application/json")
         self.end_headers()
 
     def _html(self, message):
@@ -81,41 +104,44 @@ class S(BaseHTTPRequestHandler):
         query = parse_qs(parsed.query)
         print(self.path, self.headers)
         routeid = self.headers['token']
-        segment = parsed.path[1:] #strip leading '/'
-        
-        #if redisc.exists(segment):
-        #    print('segment', segment, 'exists')
-        #    self.send_header(segment, 'exists')
-        #else:
-        #    print('segment', segment, ' not found')
-        #    self.send_header(segment, 'not exists')
-        #fullpath = os.path.join(os.getcwd(),segment) #can't use os.path.join if latter string is absolute
-        
-        #if not os.path.isfile(fullpath):
-        #    logging.warning("{} not found".format(segment))
-        #    self.wfile.write(self._html("Given segment not a path"))
-        #else:
-        #    res = ex.submit(update_metadata_task, routeid, segment)
-        #    logging.info("Received download | route: {}, segment {}".format(routeid, fullpath))
-        #    self.wfile.write(self.getContent(fullpath))
+
         str_data = {}
-        if redisc.exists(segment):
-            print('segment', segment, 'exists')
-            data = redisc.hgetall(segment)
-            print('metadata is ', data)
-            for d in data:
-                str_data[str(d)] = str(data[d])
-                self.send_header(d, data[d])
-            self.send_header(segment, 'exists')
-            res = ex.submit(update_metadata_task, routeid, segment)
- 
+        ## seg query list
+        if 'reset' in query:
+            reset(routeid)
+            str_data["error"] = {"msg":f"reset success"}
+
+        elif 'key' in query:
+            key = query['key']
+            start_time = query['start_time'][0]
+            end_time = query['end_time'][0]
+            if can_make_contact(routeid, start_time, end_time):
+                res = redisc.keys(f"{key[0]}*")
+                if len(res) > 0:
+                    dec_res = [v.decode() for v in res] 
+                    str_data['segments'] = dec_res
+            else:
+                str_data["error"] = {"msg":f"node busy"}
+
         else:
-            print('segment', segment, ' not found')
-            self.send_header(segment, 'not exists')
+            segment = parsed.path[1:] #strip leading '/'
+            segment = query['segment'][0]
+
+            if redisc.exists(segment):
+                print('segment', segment, 'exists')
+                data = redisc.hgetall(segment)
+                print('metadata is ', data)
+                for d in list(data.keys()):
+                    str_data[d.decode()] = data[d].decode()
+                res = update_metadata_task(routeid, segment)
+            else:
+                print('segment', segment, ' not found')
+                str_data["error"] = {"msg":f"{segment} - not exists"}
+        
         self.end_headers()
         self.send_response(200) 
-        
-        self.wfile.write(self._html(json.dumps(str_data)))
+        response = bytes(json.dumps(str_data), 'utf-8')
+        self.wfile.write(response)
 
     def do_HEAD(self):
         self._set_headers()

@@ -22,7 +22,7 @@ class EdgeDeliveryMonitor:
 
         self.exitThread = False
         self.node_id = nodeId
-        self.clockServerAddr = "localhost:8383"
+        self.clockServerAddr = serverAddress.split(':')[0] + ":8383"
         self.cur_time = 0
         self.time_incr = 1
         self.sync_threshold = 5
@@ -55,7 +55,7 @@ class EdgeDeliveryMonitor:
     def makeRequest(self):
         missedSegmentsByRoute = self.metadataManager.getOverdueSegments(self.cur_time)
         if len(missedSegmentsByRoute) == 0:
-            logger.debug("No Segments missed")
+            #logger.debug("No Segments missed")
             return None
         for route in missedSegmentsByRoute:
             logger.info(f" Route={route} | Missed Segment count={len(missedSegmentsByRoute[route].segments)} | time={self.cur_time}")
