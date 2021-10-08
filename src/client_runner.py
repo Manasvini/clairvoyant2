@@ -26,7 +26,7 @@ def populate_videos():
     startup_nodes = [{"host":"127.0.0.1", "port":"7000"}]
     rc = RedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 
-    videos = ['v' + str(i) for i in range(1, 11)]
+    videos = ['v' + str(i) for i in range(1, 210)]
     segments = {v: [] for v in videos}
     video_seg_data = {}
     for v in videos:
@@ -46,7 +46,7 @@ def get_edge_ips(configFile):
 def get_node_pos(configFile):
     with open(configFile) as fh:
         config = json.load(fh)
-    return "../eval/enode_positions/" + config['nodePosFile']
+    return  '../'+ config['nodePosFile']
 
     
 
@@ -78,7 +78,7 @@ def create_simulation(users, address,  video_seg_data, outputfile, models, opts)
     clients = []
     time_incr = 1
     time_scale = 60.0
-    simulation_max_steps = 30000 
+    simulation_max_steps = 1000000 
     edge_ips = get_edge_ips(config)
     logger.info(f"Edge IPs - {edge_ips}")
 
@@ -178,7 +178,8 @@ if __name__ == '__main__':
         else:
             files = [os.path.join(traj_dir,f) for f in os.listdir(traj_dir) if os.path.isfile(os.path.join(traj_dir, f))] 
             users = random.sample(files, opts.n)
-    
+            logger.info('picked %s users', len(users))
+            print(users)
     if len(users) == 0:
         logger.warning('no user trajectories found!')
 

@@ -15,7 +15,7 @@ import genprotos.clairvoyant_pb2 as clairvoyant_pb2
 
 parent_logger = logging.getLogger("cloud")
 logger = parent_logger.getChild('downloadmgr')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARNING)
 
 class Bench2Mode(str, Enum):
     NOCACHE = "nocache"             # everything from cdn
@@ -54,14 +54,14 @@ class DownloadManager:
         filename = f'/home/cvuser/clairvoyant2/results/bench2/{self.mode}_results.csv'
         with open(filename, 'w') as fh:
             csvwriter = csv.writer(fh, delimiter=',')
-            csvwriter.writerow(['user_id', 'cdn', 'edge'])
+            csvwriter.writerow(['user_id', 'cdn', 'edge', 'local'])
         
     def findOptimalSource(self, segment_id, node_id, neighbors=None):
         return 'http://ftp.itec.aau.at/DASHDataset2014'
 
     def get_model_dist(self, dists, distance):
         idx = bisect.bisect_left(dists, distance)
-
+        logger.info('distance = %s idx = %s pts=%s', distance, idx, len(dists))
         if idx > len(dists) - 1:
             return dists[len(dists)-1]
 
@@ -119,10 +119,12 @@ class DownloadManager:
         node_id = node.node_id
         contact_points = node.contact_points
         model = self.mmWaveModels[node_id]
+        logger.info("num models= %s ", len(self.mmWaveModels))
         dl_map = model.get()
         if model is None:
             logger.warning('Empty Model!')
         distances = sorted(list(dl_map.keys()))
+        print(node.node_id, dl_map)
         totalBits = 0
 
         last_distance = -1
@@ -265,12 +267,13 @@ class DownloadManager:
             csvwriter = csv.writer(fh, delimiter=',')
             cdn = 0
             edge = 0
-
+            local = 0
             for node_id, seg_info_list in assignments.items():
 
                 for seg_info in seg_info_list:
                     seg_id = seg_info.segment.segment_id
-
+                    if seg_id in self.segment_map and node_id in self.segment_map[seg_id]:
+                        local += seg_info.segment.segment_size
                     if self.mode == Bench2Mode.LOCAL:
                         if (seg_id in self.segment_map and
                                 node_id in self.segment_map[seg_id]):
@@ -326,7 +329,7 @@ class DownloadManager:
                         self.node_segcount_map[node_id] = set()
                     self.node_segcount_map[node_id].add(seg_id)
 
-            csvwriter.writerow([token_id, cdn, edge])
+            csvwriter.writerow([token_id, cdn, edge, local])
             out_dict = {k.split('_')[1]:len(v) for k,v in self.node_segcount_map.items()}
             ak = [k.split('_')[1] for k in assignments.keys()]
             debug.write(f"{str(out_dict)}, {ak}\n")

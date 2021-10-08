@@ -9,7 +9,7 @@ import genprotos.clairvoyant_meta_pb2_grpc as clairvoyant_meta_pb2_grpc
 
 parent_logger = logging.getLogger("cloud")
 logger = parent_logger.getChild('metadata')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARNING)
 
 class CloudMetadataClient:
     def __init__(self, address):

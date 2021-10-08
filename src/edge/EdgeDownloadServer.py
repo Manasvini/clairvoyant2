@@ -17,7 +17,7 @@ from monitoring.client import MonitoringClient
 
 logging.basicConfig()
 logger = logging.getLogger("edge")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARNING)
 
 class EdgeDownloadServer(clairvoyant_pb2_grpc.EdgeServerServicer):
     def __init__(self, filename):

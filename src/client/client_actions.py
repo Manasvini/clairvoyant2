@@ -33,6 +33,7 @@ class Client:
         self.playback = 0
         self.urls = []
         self.edge_node_positions = pd.read_csv(edgenodes_file)
+        print(self.edge_node_positions)
         self.default_url = 'http://ftp.itec.aau.at/DASHDataset2014'
         self.edge_node_positions[['lat_rad_A', 'lon_rad_A']] = np.radians(self.edge_node_positions.loc[:,['y','x']])
         self.traj_df[['lat_rad', 'lon_rad']] = np.radians(self.traj_df.loc[:,['y','x']])
@@ -76,6 +77,9 @@ class Client:
         
         self.bench_info = None
 
+        self.maxEdgeBytesPossible = 0
+    def get_max_edge_bytes(self):
+        return self.maxEdgeBytesPossible
 
     def set_benchmark_info(self, info):
         self.bench_info = info
@@ -251,16 +255,20 @@ class Client:
             params = {"segment":segment}
 
         resp = self.session.get(url, params=params)
-        time.sleep(0.01)
-
-        return resp.json()
-
+        time.sleep(0.001)
+        #import pdb;
+        #pdb.set_trace()
+        
+        if '{}' not in resp.text:
+            return resp.json()
+        return {}
 
     def complete_edge_actions(self):
 
         #add last_dist (TODO: experiment with this)
         bits = self.get_download_speed(self.last_dist, self.last_node)
         self.availBits += bits
+        self.maxEdgeBytesPossible += bits/8
         logger.debug(f"Accumulate for dist={self.last_dist}, time=1, bits={bits}")
         logger.info(f"availableBytes to download for node {self.last_node} = {self.availBits/8}")
         totalBytes = self.availBits / 8
@@ -295,7 +303,7 @@ class Client:
 
                 return major, minor
 
-            import pdb; pdb.set_trace()
+            #import pdb; pdb.set_trace()
             to_download = list(sorted(to_download, key=sorter))
         
 
@@ -345,7 +353,7 @@ class Client:
             and at that time edge contact is also checked.
             """
             # Implies a cloud delivery
-            while len(self.buffer) <= len(self.urls) and self.playback+30 >= len(self.buffer):
+            while len(self.buffer) < len(self.urls) and self.playback+30 >= len(self.buffer):
                 """
                 the while loop to catch up to playback with cloud downloads.
                 I know, it doesn't make sense for playback to cross buffer. 
@@ -364,7 +372,7 @@ class Client:
                 self.buffer_set.add(filepath)
                 self.count[0] += 1
                 #if self.count[0]%100 == 0:
-                import pdb; pdb.set_trace()
+                #import pdb; pdb.set_trace()
                 logger.debug(f"client={self.token} | counts - cloud: {self.count[0]} | edge: {self.count[1]} | time: {self.traj_df.iloc[self.idx]['time']}")
 
         else:
@@ -378,7 +386,7 @@ class Client:
 
                 #need this to inform edge server of when i am asking for content
                 self.start_contact_time = timestamp
-
+                self.end_contact_time = timestamp           
             elif self.last_node != node_id: # no cloud gap between 2 edge nodes
                 #need this to inform edge server of when i am asking for content
                 self.end_contact_time = timestamp
@@ -387,7 +395,7 @@ class Client:
                 self.last_node = node_id
                 self.last_dist = dist
                 self.time_of_last_dist = dist
-
+    
             else: # accumulate bytes as long as you are in contact with node.
                 #TODO: need to handle special cases like single point of contact with node
                 # or last point of contact
@@ -430,7 +438,7 @@ class Simulation:
             #if self.cur_time % self.segment_duration == 0:
    
     def save_to_file(self):
-        output = [{'id': client.getId(), 'edge':client.get_edge_delivery(), 'cloud':client.get_cloud_delivery()} for client in self.clients]
+        output = [{'id': client.getId(), 'edge':client.get_edge_delivery(), 'cloud':client.get_cloud_delivery(), 'maxEdge':client.get_max_edge_bytes()} for client in self.clients]
         with open(self.outputfile, 'w') as ofh:
             json.dump(output, ofh, indent=2)
 

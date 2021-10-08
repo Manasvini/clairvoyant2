@@ -21,7 +21,7 @@ from threading import Thread
 
 logging.basicConfig()
 logger = logging.getLogger("cloud")
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.WARNING)
 
 class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
     def __init__(self, filename):

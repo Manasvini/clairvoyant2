@@ -10,7 +10,7 @@ import genprotos.clock_pb2_grpc as clock_pb2_grpc
 
 parent_logger = logging.getLogger("edge")
 logger = parent_logger.getChild("deliverymonitory")
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.WARNING)
 
 class EdgeDeliveryMonitor:
     def __init__(self, timeScale, serverAddress, nodeId, intervalSeconds, metadataManager):

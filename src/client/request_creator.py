@@ -5,7 +5,7 @@ import time
 import pandas as pd
 import logging
 from random import randrange
-
+import numpy as np
 import genprotos.clairvoyant_pb2 as clairvoyant_pb2
 import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
 import grpc
@@ -22,8 +22,12 @@ def get_point(val1, val2, val3, val4):
     
 def create_request(df, request_timestamp, dont_random=False):
     req = clairvoyant_pb2.VideoRequest()
-
-    req.video_id = 'v' + str(1 + randrange(10))
+    while True:
+        vid_id = np.random.zipf(1.1)
+        if vid_id < 200:
+            break
+    vid_id += 1
+    req.video_id = 'v' + str(vid_id)
     if dont_random:
         req.video_id = 'v1'
         
