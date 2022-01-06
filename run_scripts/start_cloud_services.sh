@@ -13,14 +13,14 @@ sleep 15
 echo "adding nodes"
 cd ~/clairvoyant2
 
-python3 eval/add_nodes.py -n $num_nodes -p "192.168.160." -s 22 -i 0 -f "eval/enode_positions/monaco_traffic_lights.csv"
+python3 eval/add_nodes.py -n $num_nodes -p "192.168.160." -s 22 -i 0 -f "eval/enode_positions/17min_user0/5nodes_17min.csv"
 
 cd $curdir
-pkill clairvoyant
+#pkill clairvoyant
 bash scripts/start_meta_svr.sh > ./logs/meta_svr.out 2>&1 &
 
-cd metadata/scripts
-#bash video_creator.sh ../../build/metadata/scripts/data-uploader 210 bbb_1080p.csv
+cd scripts
+bash ./video_creator.sh ../build/metadata/scripts/data-uploader 5 bbb.csv
 #
 pkill python3
 cd ~/clairvoyant2
