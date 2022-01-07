@@ -6,9 +6,9 @@ fi
 
 for ((i=1;i<=num_edge;i++)); do
   ssh ${machine_prefix}${i} bash <<EOF 
-pid=\$(ps -ax | grep "python3 src/edge_runner.py" | head -n 1 | awk '{print \$1}')
+pid=\$(lsof -t -i:50056 | head -n 1 | awk '{print \$1}')
 echo \$pid
-kill \$pid
+kill  \$pid
 EOF
-  echo "Killed cv$i"
+  echo "Killed ${machine_prefix}$i"
   done
