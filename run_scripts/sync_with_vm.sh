@@ -1,4 +1,5 @@
 num_vms=$1
+machine_prefix=$2
 if [ -z $num_vms ]; then
   num_vms=10
 fi
@@ -13,7 +14,7 @@ for ((i=0;i<=num_vms;i++)); do
         --exclude="*pycache*"\
         --exclude="results"\
         --exclude="localenv"\
-        $HOME/clairvoyant2 cv2$i:~/
+        $HOME/clairvoyant2 ${machine_prefix}${i}:~/
 done
 
 #echo "restart content-servers"

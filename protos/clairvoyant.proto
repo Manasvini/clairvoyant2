@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package clairvoyant;
-
+option go_package = "github.gatech.edu/cs-epl/clairvoyant2/src/client_go/clairvoyant";
 //Edge Service interface
 message NodeInfo {
   string node_id = 1;

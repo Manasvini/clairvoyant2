@@ -20,7 +20,7 @@ cd $curdir
 bash scripts/start_meta_svr.sh > ./logs/meta_svr.out 2>&1 &
 
 cd scripts
-bash ./video_creator.sh ../build/metadata/scripts/data-uploader 5 bbb.csv
+bash ./video_creator.sh ../build/metadata/scripts/data-uploader 200 bbb.csv
 #
 pkill python3
 cd ~/clairvoyant2

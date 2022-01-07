@@ -1,7 +1,7 @@
 syntax = "proto3";
  
 package clairvoyantmeta;
- 
+option go_package="github.gatech.edu/cs-epl/clairvoyant2/src/client_go/clairvoyantmeta"; 
 message Segment{
     string segmentId = 1;
     double popularity = 2;

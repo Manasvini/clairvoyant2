@@ -19,7 +19,7 @@ from client.clock import CVClock, ClockEndException
 dist = sklearn.neighbors.DistanceMetric.get_metric('haversine')
 
 logger = logging.getLogger("client")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 LTE_SPEED = 4e7 #40Mbps
 
@@ -27,13 +27,13 @@ class Client:
     def __init__(self, filename, edgenodes_file, address, video_meta, time_scale, time_incr, models, edge_ips):
 
         self.video_meta = video_meta
+        print(filename)
         self.traj_df = pd.read_csv(filename)
 
         self.idx = 0
         self.playback = 0
         self.urls = []
         self.edge_node_positions = pd.read_csv(edgenodes_file)
-        print(self.edge_node_positions)
         self.default_url = 'http://ftp.itec.aau.at/DASHDataset2014'
         self.edge_node_positions[['lat_rad_A', 'lon_rad_A']] = np.radians(self.edge_node_positions.loc[:,['y','x']])
         self.traj_df[['lat_rad', 'lon_rad']] = np.radians(self.traj_df.loc[:,['y','x']])
@@ -88,6 +88,7 @@ class Client:
         self.traj_df['time'] += offset
 
     def make_request(self, request_timestamp):
+        print(self.id)
         if self.bench_info == "bench2":
             request = request_creator.create_request(self.traj_df, request_timestamp, dont_random=True)
         else:
@@ -119,7 +120,7 @@ class Client:
             return
 
         if self.cv_resp == False and \
-                int(cur_time) >=  max(0, int(self.traj_df.iloc[0]['time']) - 100):
+                int(cur_time) >=  max(0, int(self.traj_df.iloc[0]['time']) - 1000):
             # Make a request only only after you are 1000 seconds before travel
             logger.debug("current_time: {}, journey_start_time: {}"
                     .format(cur_time, self.traj_df.iloc[0]['time']))
@@ -130,9 +131,9 @@ class Client:
 
             logger.info(f"client={self.token},  request duration={(end - start)}")
 
-            if self.bench_info == "bench2":
-                self.is_complete = True
-                return
+            #if self.bench_info == "bench2":
+            #self.is_complete = True
+            #return
 
          
         if self.idx < len(self.traj_df) and \
@@ -253,8 +254,11 @@ class Client:
         else:
             #logger.debug(f"request to segment={segment}")
             params = {"segment":segment}
-
-        resp = self.session.get(url, params=params)
+        try:
+            resp = self.session.get(url, params=params)
+            logger.debug(f"got response: {resp.json()}")
+        except Exception as ex:
+            pass
         time.sleep(0.001)
         #import pdb;
         #pdb.set_trace()
@@ -264,11 +268,10 @@ class Client:
         return {}
 
     def complete_edge_actions(self):
-
+        
         #add last_dist (TODO: experiment with this)
         bits = self.get_download_speed(self.last_dist, self.last_node)
         self.availBits += bits
-        self.maxEdgeBytesPossible += bits/8
         logger.debug(f"Accumulate for dist={self.last_dist}, time=1, bits={bits}")
         logger.info(f"availableBytes to download for node {self.last_node} = {self.availBits/8}")
         totalBytes = self.availBits / 8
@@ -339,7 +342,7 @@ class Client:
 
     def get_segments(self, timestamp):
         node_id, act_dist = self.get_distance_from_nearest_edge_node()
-        
+        logger.debug(f"client={self.token} buffer= {len(self.buffer)}") 
         if node_id == -1:
             # Complete any pending tasks of the last valid edge
             if self.last_node != -1:
@@ -376,6 +379,7 @@ class Client:
                 logger.debug(f"client={self.token} | counts - cloud: {self.count[0]} | edge: {self.count[1]} | time: {self.traj_df.iloc[self.idx]['time']}")
 
         else:
+            logger.debug("Currently in contact with node %s", node_id)
             #if node_id != 0:
             dist = self.model_map[node_id].get_model_dist(act_dist)
             if self.last_node == -1: #first time node encounter after gap
@@ -408,7 +412,7 @@ class Client:
                         bits = self.get_download_speed(self.last_dist, self.last_node)*point_contact_time
 
                     self.availBits += bits
-
+                    self.maxEdgeBytesPossible += bits/8 
                     logger.debug(f"Accumulate for traj_i={self.idx}, dist={self.last_dist}, time={point_contact_time}, bits={bits}")
                     self.last_dist = dist
                     self.time_of_last_dist = timestamp
@@ -458,7 +462,7 @@ class Simulation:
         start = time.time()
         clock = CVClock(time_incr=self.time_incr, end_of_time=num_steps)
         while self.cur_time < num_steps:
-            time.sleep(0.01)
+            #time.sleep(0.01)
             self.cur_time = clock.advance()
             self.simulate_step()
             if self.cur_time % 100 == 0:
