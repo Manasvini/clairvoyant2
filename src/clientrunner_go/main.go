@@ -5,8 +5,12 @@ import (
     "github.gatech.edu/cs-epl/clairvoyant2/src/client_go/cvclient"
     "time"
     "strconv"
-//    "sync"
-)
+    pb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
+    "google.golang.org/grpc"
+    //    "sync"
+    "log"
+    "context"
+  )
 func areAllClientsDone(clients []cvclient.Client) bool {
   for _, client := range clients {
     if !client.IsDone(){
@@ -15,6 +19,28 @@ func areAllClientsDone(clients []cvclient.Client) bool {
   }
   return true
 }
+
+func advanceClock() (int64) {
+  conn, err := grpc.Dial("0.0.0.0:8383", grpc.WithInsecure())
+  if err != nil{
+    log.Fatalf("Could not connect to clock server")
+  }
+  defer conn.Close()
+  clockClient := pb.NewClockServerClient(conn)
+  ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+  defer cancel()
+  req := pb.AdvanceClock{}
+  resp, err := clockClient.HandleAdvanceClock(ctx, &req)
+  if err != nil{
+    fmt.Println(err)
+  } else{
+      if resp != nil {
+        return resp.CurTime
+      }
+  }
+  return -1
+}
+
 
 func main() {
   var video cvclient.Video
@@ -27,23 +53,31 @@ func main() {
    var trajectory cvclient.Trajectory
     trajectory.LoadFromFile("../../eval/enode_positions/17min_user0/user0_17min.csv")
     client :=  cvclient.NewClient("c" + strconv.Itoa(i), &trajectory, edgeNodes, video, urls)
-    client.RegisterWithCloud("0.0.0.0:60050", 0)
+    //client.RegisterWithCloud("0.0.0.0:60050", 0)
     clients = append(clients, client)
   }
   start := time.Now()
-  j := 0
   for {
+    timestamp := advanceClock()
     //wg := new(sync.WaitGroup)
+    if timestamp % 100 == 0 {
+      fmt.Printf("timestamp is now %d\n", timestamp)
+    }
     for _, client := range clients {
 //      wg.Add(1)
-       client.Move()
-       client.FetchSegments(j)
+       if int64(client.GetStartTime()) < int64(timestamp) + int64(100)  && !client.IsRegistered(){
+          client.RegisterWithCloud("0.0.0.0:60050", float64(timestamp))
+       }
+       if int64(client.GetStartTime()) < timestamp {
+          client.Move()
+          client.FetchSegments(timestamp)
+       }
     }
     //wg.Wait()
     if areAllClientsDone(clients) {
       break
     }
-    j = j + 1
   }
   fmt.Printf("\nelapsed = %s", time.Since(start))
+  clients[0].PrintStats()
 }

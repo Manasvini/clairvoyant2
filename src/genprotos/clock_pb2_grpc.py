@@ -2,8 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from . import clock_pb2 as clock__pb2
-
+from . import clock_pb2 as clock__pb2 
 
 class ClockServerStub(object):
     """Missing associated documentation comment in .proto file."""
@@ -19,6 +18,11 @@ class ClockServerStub(object):
                 request_serializer=clock__pb2.SyncRequest.SerializeToString,
                 response_deserializer=clock__pb2.SyncResponse.FromString,
                 )
+        self.HandleAdvanceClock = channel.unary_unary(
+                '/clairvoyant.ClockServer/HandleAdvanceClock',
+                request_serializer=clock__pb2.AdvanceClock.SerializeToString,
+                response_deserializer=clock__pb2.SyncResponse.FromString,
+                )
 
 
 class ClockServerServicer(object):
@@ -30,12 +34,23 @@ class ClockServerServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def HandleAdvanceClock(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ClockServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'HandleSyncRequest': grpc.unary_unary_rpc_method_handler(
                     servicer.HandleSyncRequest,
                     request_deserializer=clock__pb2.SyncRequest.FromString,
+                    response_serializer=clock__pb2.SyncResponse.SerializeToString,
+            ),
+            'HandleAdvanceClock': grpc.unary_unary_rpc_method_handler(
+                    servicer.HandleAdvanceClock,
+                    request_deserializer=clock__pb2.AdvanceClock.FromString,
                     response_serializer=clock__pb2.SyncResponse.SerializeToString,
             ),
     }
@@ -61,6 +76,23 @@ class ClockServer(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/clairvoyant.ClockServer/HandleSyncRequest',
             clock__pb2.SyncRequest.SerializeToString,
+            clock__pb2.SyncResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def HandleAdvanceClock(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/clairvoyant.ClockServer/HandleAdvanceClock',
+            clock__pb2.AdvanceClock.SerializeToString,
             clock__pb2.SyncResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

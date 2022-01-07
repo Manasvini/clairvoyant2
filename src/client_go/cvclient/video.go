@@ -38,8 +38,8 @@ func (video *Video) LoadFromFile(filename string, videoId string) {
 			}
 		}
     vsize, err := strconv.ParseFloat(rec[1], 64)
-		segment := VideoSegment{id:rec[0], size:vsize}
-		segments[rec[1]] = segment
+		segment := VideoSegment{id: videoId + "_" + rec[0], size:vsize}
+		segments[videoId + "_" + rec[0]] = segment
 	}
 	video.segments = segments
   video.videoId = videoId

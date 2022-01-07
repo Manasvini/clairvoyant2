@@ -49,8 +49,8 @@ func (trajectory *Trajectory) LoadFromFile(filename string) {
     // csv row: userid, time,x,y,z,velcoity, we're taking x, y, velocity, time
     curlat, err := strconv.ParseFloat(rec[0], 64)
     curlon, err := strconv.ParseFloat(rec[1], 64)
-    speed, err := strconv.ParseFloat(rec[3], 64)
-    timestamp, err := strconv.ParseFloat(rec[2], 64)
+    speed, err := strconv.ParseFloat(rec[4], 64)
+    timestamp, err := strconv.ParseFloat(rec[3], 64)
     point := Point{lat:curlat, lon:curlon, speed:speed, timestamp:timestamp}
 		trajectory.points = append(trajectory.points, point)
 	}

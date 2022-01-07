@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ClockServerClient interface {
 	HandleSyncRequest(ctx context.Context, in *SyncRequest, opts ...grpc.CallOption) (*SyncResponse, error)
+	HandleAdvanceClock(ctx context.Context, in *AdvanceClock, opts ...grpc.CallOption) (*SyncResponse, error)
 }
 
 type clockServerClient struct {
@@ -38,11 +39,21 @@ func (c *clockServerClient) HandleSyncRequest(ctx context.Context, in *SyncReque
 	return out, nil
 }
 
+func (c *clockServerClient) HandleAdvanceClock(ctx context.Context, in *AdvanceClock, opts ...grpc.CallOption) (*SyncResponse, error) {
+	out := new(SyncResponse)
+	err := c.cc.Invoke(ctx, "/clairvoyant.ClockServer/HandleAdvanceClock", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ClockServerServer is the server API for ClockServer service.
 // All implementations must embed UnimplementedClockServerServer
 // for forward compatibility
 type ClockServerServer interface {
 	HandleSyncRequest(context.Context, *SyncRequest) (*SyncResponse, error)
+	HandleAdvanceClock(context.Context, *AdvanceClock) (*SyncResponse, error)
 	mustEmbedUnimplementedClockServerServer()
 }
 
@@ -52,6 +63,9 @@ type UnimplementedClockServerServer struct {
 
 func (UnimplementedClockServerServer) HandleSyncRequest(context.Context, *SyncRequest) (*SyncResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HandleSyncRequest not implemented")
+}
+func (UnimplementedClockServerServer) HandleAdvanceClock(context.Context, *AdvanceClock) (*SyncResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HandleAdvanceClock not implemented")
 }
 func (UnimplementedClockServerServer) mustEmbedUnimplementedClockServerServer() {}
 
@@ -84,6 +98,24 @@ func _ClockServer_HandleSyncRequest_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClockServer_HandleAdvanceClock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdvanceClock)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClockServerServer).HandleAdvanceClock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/clairvoyant.ClockServer/HandleAdvanceClock",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClockServerServer).HandleAdvanceClock(ctx, req.(*AdvanceClock))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ClockServer_ServiceDesc is the grpc.ServiceDesc for ClockServer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -94,6 +126,10 @@ var ClockServer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "HandleSyncRequest",
 			Handler:    _ClockServer_HandleSyncRequest_Handler,
+		},
+		{
+			MethodName: "HandleAdvanceClock",
+			Handler:    _ClockServer_HandleAdvanceClock_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

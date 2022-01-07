@@ -65,7 +65,7 @@ func getCoord(p Point) (haversine.Coord){
   return haversine.Coord{Lat:p.lat, Lon:p.lon}
 }
 
-func (edgeNodes *EdgeNodes) GetNearestEdgeNode(point Point)(*EdgeNode, float64) {
+func (edgeNodes *EdgeNodes) GetNearestEdgeNode(point Point)(EdgeNode, float64) {
   _, minDist  := haversine.Distance(getCoord(edgeNodes.nodes[0].location), getCoord(point))
   minDistNode := edgeNodes.nodes[0]
   for _, edge := range  edgeNodes.nodes[1:] {
@@ -76,7 +76,7 @@ func (edgeNodes *EdgeNodes) GetNearestEdgeNode(point Point)(*EdgeNode, float64) 
     }
   }
   // haversine returns distance in miles and km. convert km to m
-  return &minDistNode, minDist * 1000
+  return minDistNode, minDist * 1000
 }
 
 func loadModel(filename string) []DistBW {

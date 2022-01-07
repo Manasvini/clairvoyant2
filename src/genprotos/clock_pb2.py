@@ -17,9 +17,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='clock.proto',
   package='clairvoyant',
   syntax='proto3',
-  serialized_options=None,
+  serialized_options=b'Z?github.gatech.edu/cs-epl/clairvoyant2/src/client_go/clairvoyant',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0b\x63lock.proto\x12\x0b\x63lairvoyant\"\x1e\n\x0bSyncRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\t\" \n\x0cSyncResponse\x12\x10\n\x08\x63ur_time\x18\x02 \x01(\x03\x32W\n\x0b\x43lockServer\x12H\n\x11HandleSyncRequest\x12\x18.clairvoyant.SyncRequest\x1a\x19.clairvoyant.SyncResponseb\x06proto3'
+  serialized_pb=b'\n\x0b\x63lock.proto\x12\x0b\x63lairvoyant\"\x1e\n\x0bSyncRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\t\" \n\x0cSyncResponse\x12\x10\n\x08\x63ur_time\x18\x02 \x01(\x03\"\x0e\n\x0c\x41\x64vanceClock2\xa3\x01\n\x0b\x43lockServer\x12H\n\x11HandleSyncRequest\x12\x18.clairvoyant.SyncRequest\x1a\x19.clairvoyant.SyncResponse\x12J\n\x12HandleAdvanceClock\x12\x19.clairvoyant.AdvanceClock\x1a\x19.clairvoyant.SyncResponseBAZ?github.gatech.edu/cs-epl/clairvoyant2/src/client_go/clairvoyantb\x06proto3'
 )
 
 
@@ -88,8 +88,34 @@ _SYNCRESPONSE = _descriptor.Descriptor(
   serialized_end=92,
 )
 
+
+_ADVANCECLOCK = _descriptor.Descriptor(
+  name='AdvanceClock',
+  full_name='clairvoyant.AdvanceClock',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=94,
+  serialized_end=108,
+)
+
 DESCRIPTOR.message_types_by_name['SyncRequest'] = _SYNCREQUEST
 DESCRIPTOR.message_types_by_name['SyncResponse'] = _SYNCRESPONSE
+DESCRIPTOR.message_types_by_name['AdvanceClock'] = _ADVANCECLOCK
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 SyncRequest = _reflection.GeneratedProtocolMessageType('SyncRequest', (_message.Message,), {
@@ -106,7 +132,15 @@ SyncResponse = _reflection.GeneratedProtocolMessageType('SyncResponse', (_messag
   })
 _sym_db.RegisterMessage(SyncResponse)
 
+AdvanceClock = _reflection.GeneratedProtocolMessageType('AdvanceClock', (_message.Message,), {
+  'DESCRIPTOR' : _ADVANCECLOCK,
+  '__module__' : 'clock_pb2'
+  # @@protoc_insertion_point(class_scope:clairvoyant.AdvanceClock)
+  })
+_sym_db.RegisterMessage(AdvanceClock)
 
+
+DESCRIPTOR._options = None
 
 _CLOCKSERVER = _descriptor.ServiceDescriptor(
   name='ClockServer',
@@ -115,8 +149,8 @@ _CLOCKSERVER = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=94,
-  serialized_end=181,
+  serialized_start=111,
+  serialized_end=274,
   methods=[
   _descriptor.MethodDescriptor(
     name='HandleSyncRequest',
@@ -124,6 +158,16 @@ _CLOCKSERVER = _descriptor.ServiceDescriptor(
     index=0,
     containing_service=None,
     input_type=_SYNCREQUEST,
+    output_type=_SYNCRESPONSE,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='HandleAdvanceClock',
+    full_name='clairvoyant.ClockServer.HandleAdvanceClock',
+    index=1,
+    containing_service=None,
+    input_type=_ADVANCECLOCK,
     output_type=_SYNCRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,

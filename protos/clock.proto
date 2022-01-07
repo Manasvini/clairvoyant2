@@ -9,8 +9,11 @@ message SyncRequest {
 message SyncResponse {
   int64 cur_time = 2;
 }
+message AdvanceClock {
+}
 
 service ClockServer {
   rpc HandleSyncRequest (SyncRequest) returns (SyncResponse);
+  rpc HandleAdvanceClock (AdvanceClock) returns (SyncResponse);
 }
 
