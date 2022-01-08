@@ -24,8 +24,10 @@ func (trajectory *Trajectory) HasEnded() bool {
 }
 
 func (trajectory *Trajectory) Advance() {
-  if len(trajectory.points) > trajectory.curIdx {
-    trajectory.curIdx += 1
+  if len(trajectory.points)  > trajectory.curIdx + 4{
+    trajectory.curIdx += 4
+  } else {
+    trajectory.curIdx = len(trajectory.points)
   }
 }
 
@@ -51,11 +53,11 @@ func (trajectory *Trajectory) LoadFromFile(filename string) {
     curlat, err := strconv.ParseFloat(rec[2], 64)
     curlon, err := strconv.ParseFloat(rec[3], 64)
     speed, err := strconv.ParseFloat(rec[5], 64)
-    timestamp, err := strconv.ParseFloat(rec[2], 64)
+    timestamp, err := strconv.ParseFloat(rec[1], 64)
     point := Point{lat:curlat, lon:curlon, speed:speed, timestamp:timestamp}
 		trajectory.points = append(trajectory.points, point)
 	}
-	glog.Infof("Got %d points in traj\n", len(trajectory.points))
+	glog.Infof("Got %d points in traj first=%f\n", len(trajectory.points), trajectory.points[0].timestamp)
 }
 
 

@@ -52,6 +52,7 @@ func (client *Client) Id() string{
 }
 
 func NewClient(id string, traj *Trajectory, eNodes EdgeNodes, video Video, urls []string) (Client) {
+  glog.Infof("Client %s has %d points in journey\n", id, len(traj.points))
   newStats := &DlStats{pendingBytes:0, receivedBytesCloud:0, receivedBytesEdge: 0}
   buffer := &Buffer{playback:0, completedUrls:make([]string, 0), allUrls: urls}
   dlInfo := &CurrentDownloadInfo{availableBits: 0, startContact:0, endContact:0, timeOfLastContact:0, bufferedData:make(map[string]bool), lastConnectedEdgeNode:nil}
@@ -350,6 +351,9 @@ func (client *Client) FetchSegments(timestamp int64) {
       glog.Warningf("something fishy going on with %s\n", client.id)
     }
   }
+  if float64(timestamp) > client.trajectory.points[0].timestamp {
+    client.buffer.playback += 1
+  }
 }
 
 func (client *Client) GetStartTime() float64 {
@@ -371,6 +375,7 @@ func (client *Client) Move()/*wg *sync.WaitGroup)*/ {
     return
   }
   client.trajectory.Advance()
+
   if client.trajectory.curIdx % 100 == 0 {
     glog.Infof("Client at idx %d\n", client.trajectory.curIdx)
   }

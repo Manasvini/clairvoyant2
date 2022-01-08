@@ -100,9 +100,16 @@ func main() {
   urls := make([]string, 0)
   clients := make([]cvclient.Client, 0)
   glog.Infof("Make %d clients", *numUsers)
-  trajectories := getFilesInDir(*trajectoryDir)
+  //trajectories := getFilesInDir(*trajectoryDir)
+  //i := 0
+
+  trajectories := make([]string, 0)
+  trajectories = append(trajectories, "../../eval/user_trajectories/user681.csv")
+  trajectories = append(trajectories, "../../eval/user_trajectories/user3972.csv")
+  glog.Infof("files= %s, %s\n", trajectories[0], trajectories[1])
   i := 0
   for _, f := range trajectories {
+    fmt.Println(f)
     trajectory := cvclient.Trajectory{}
     video := cvclient.Video{}
 
