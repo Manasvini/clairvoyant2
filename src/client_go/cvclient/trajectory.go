@@ -6,6 +6,7 @@ import (
 	"io"
 	"strconv"
 	"os"
+  "github.com/golang/glog"
 )
 
 type Trajectory struct {
@@ -54,7 +55,7 @@ func (trajectory *Trajectory) LoadFromFile(filename string) {
     point := Point{lat:curlat, lon:curlon, speed:speed, timestamp:timestamp}
 		trajectory.points = append(trajectory.points, point)
 	}
-	fmt.Printf("Got %d points in traj\n", len(trajectory.points))
+	glog.Infof("Got %d points in traj\n", len(trajectory.points))
 }
 
 

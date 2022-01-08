@@ -8,8 +8,11 @@ import (
     pb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
     "google.golang.org/grpc"
     //    "sync"
-    "log"
     "context"
+    "flag"
+    "math/rand"
+    "io/ioutil"
+    "github.com/golang/glog"
   )
 func areAllClientsDone(clients []cvclient.Client) bool {
   for _, client := range clients {
@@ -23,7 +26,7 @@ func areAllClientsDone(clients []cvclient.Client) bool {
 func advanceClock() (int64) {
   conn, err := grpc.Dial("0.0.0.0:8383", grpc.WithInsecure())
   if err != nil{
-    log.Fatalf("Could not connect to clock server")
+    panic("Could not connect to clock server")
   }
   defer conn.Close()
   clockClient := pb.NewClockServerClient(conn)
@@ -41,32 +44,91 @@ func advanceClock() (int64) {
   return -1
 }
 
+func getFilesInDir(dirName string)([]string){
+  files, err := ioutil.ReadDir(dirName)
+  if err != nil {
+    panic(err)
+  }
+  fileNames := make([]string, 0)
+  for _, file := range files {
+    if file.IsDir(){
+      continue
+    }
+    fileNames = append(fileNames, dirName + "/" + file.Name())
+  }
+  return fileNames
+}
 
+/*func initLogger()(*zap.Logger){
+	rawJSON := []byte(`{
+	  "level": "error",
+	  "encoding": "json",
+	  "outputPaths": ["/tmp/cvclientlogs"],
+	  "errorOutputPaths": ["stderr"],
+	  "encoderConfig": {
+	    "messageKey": "message",
+	    "levelKey": "level",
+	    "levelEncoder": "lowercase"
+	  }
+	}`)
+
+	var cfg zap.Config
+	if err := json.Unmarshal(rawJSON, &cfg); err != nil {
+		panic(err)
+	}
+	logger, err := cfg.Build()
+	if err != nil {
+		panic(err)
+	}
+	return logger
+}
+*/
 func main() {
-  var video cvclient.Video
-  video.LoadFromFile("bbb.csv", "v4")
-  var edgeNodes cvclient.EdgeNodes
-  edgeNodes.LoadFromFile("5nodes_17min.csv")
+
+//  defer glog.Flush() // flushes buffer, if any
+  glog.Infof("Init app..")
+  numUsers := flag.Int("n", 1 /*default*/,  "number of users default=1")
+  trajectoryDir := flag.String("t", "./", "directory containing user trajectories")
+  serverAddr := flag.String("a", "0.0.0.0:60050", "cloud server address")
+  //outputFile := flag.String("o", "./output.json", "output file name")
+  edgeNodesFile := flag.String("e", "./5nodes_17min.csv", "file with x,y,id,ip,model for all edge nodes")
+  numVideos := flag.Int("i", 20, "number of videos")
+  videoFile := flag.String("f", "./bbb.csv", "video segments file")
+  flag.Parse()
+  fmt.Printf("Making flags, num users = %d traj dir = %s, server addr = %s, edge nodes file = %s, numVideos = %d, videoFile = %s\n", *numUsers, *trajectoryDir, *serverAddr, *edgeNodesFile, *numVideos, *videoFile)
+  edgeNodes := cvclient.EdgeNodes{}
+  edgeNodes.LoadFromFile(*edgeNodesFile)
   urls := make([]string, 0)
   clients := make([]cvclient.Client, 0)
-  for i :=0; i < 1; i++ {
-   var trajectory cvclient.Trajectory
-    trajectory.LoadFromFile("../../eval/enode_positions/17min_user0/user0_17min.csv")
+  glog.Infof("Make %d clients", numUsers)
+  trajectories := getFilesInDir(*trajectoryDir)
+  i := 0
+  for _, f := range trajectories {
+    trajectory := cvclient.Trajectory{}
+    video := cvclient.Video{}
+    videoId := "v" + strconv.Itoa(rand.Intn(*numVideos))
+    video.LoadFromFile(*videoFile, videoId)
+    trajectory.LoadFromFile(f)
+    fmt.Printf("file = %s video is %s\n", f, videoId)
+      //"../../eval/enode_positions/17min_user0/user0_17min.csv")
     client :=  cvclient.NewClient("c" + strconv.Itoa(i), &trajectory, edgeNodes, video, urls)
-    //client.RegisterWithCloud("0.0.0.0:60050", 0)
     clients = append(clients, client)
+    i += 1
+    if i == *numUsers {
+      break
+    }
   }
   start := time.Now()
   for {
     timestamp := advanceClock()
     //wg := new(sync.WaitGroup)
     if timestamp % 100 == 0 {
-      fmt.Printf("timestamp is now %d\n", timestamp)
+      glog.Infof("timestamp is now %d\n", timestamp)
     }
     for _, client := range clients {
 //      wg.Add(1)
        if int64(client.GetStartTime()) < int64(timestamp) + int64(100)  && !client.IsRegistered(){
-          client.RegisterWithCloud("0.0.0.0:60050", float64(timestamp))
+          client.RegisterWithCloud(*serverAddr, float64(timestamp))
        }
        if int64(client.GetStartTime()) < timestamp {
           client.Move()
@@ -78,6 +140,8 @@ func main() {
       break
     }
   }
-  fmt.Printf("\nelapsed = %s", time.Since(start))
-  clients[0].PrintStats()
+  fmt.Printf("\nelapsed = %s\n", time.Since(start))
+  for _, c := range clients {
+    c.PrintStats()
+  }
 }

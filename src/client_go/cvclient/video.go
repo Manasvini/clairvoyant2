@@ -6,6 +6,7 @@ import (
 	"io"
 	"strconv"
 	"os"
+  "github.com/golang/glog"
 )
 
 type VideoSegment struct {
@@ -43,6 +44,7 @@ func (video *Video) LoadFromFile(filename string, videoId string) {
 	}
 	video.segments = segments
   video.videoId = videoId
+  glog.Infof("have %d segments\n", len(video.segments))
 }
 
 

@@ -8,6 +8,7 @@ import (
 	"os"
   "github.com/umahmood/haversine"
   "sort"
+  "github.com/golang/glog"
 )
 
 type DistBW struct {
@@ -20,7 +21,6 @@ type EdgeNode struct {
   ip string
   location Point
   model []DistBW
-
 }
 
 
@@ -138,7 +138,7 @@ func (edgeNodes *EdgeNodes) LoadFromFile(filename string) {
 
 		edgeNodes.nodes = append(edgeNodes.nodes, node)
 	}
-	fmt.Printf("Got %d edge nodes\n", len(edgeNodes.nodes))
+	glog.Infof("Got %d edge nodes\n", len(edgeNodes.nodes))
 }
 
 

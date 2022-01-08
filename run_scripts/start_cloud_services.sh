@@ -20,7 +20,7 @@ cd $curdir
 bash scripts/start_meta_svr.sh > ./logs/meta_svr.out 2>&1 &
 
 cd scripts
-bash ./video_creator.sh ../build/metadata/scripts/data-uploader 200 bbb.csv
+bash ./video_creator.sh ../build/metadata/scripts/data-uploader 20 bbb.csv
 #
 pkill python3
 cd ~/clairvoyant2
@@ -30,3 +30,4 @@ mkdir -p logs
 #python3 src/CVCloudServer.py -a 0.0.0.0:50059 -c conf/${num_nodes}node_cloudConfig.json  > logs/cloudserver.log 2>&1 &
 python3 src/cloud_runner.py -a 0.0.0.0:60050 -c $conf  > logs/cloud.log 2>&1 &
 #python3 scripts/start_client_runner.sh
+python3 src/clock_runner.py -s 0 -i 1 &
