@@ -6,3 +6,4 @@ eval/user_trajectories
 localenv
 gen_conf
 results/
+*log*

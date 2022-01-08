@@ -292,7 +292,7 @@ func (client *Client) FetchSegments(timestamp int64) {
         break
       }
       // sufficient data downloaded such that there isn't a stall
-      if client.buffer.playback + 30 /* 30 sec buffer ahead */  >= len(client.buffer.completedUrls) {
+      if client.buffer.playback + 30 /* 30 sec buffer ahead */  <= len(client.buffer.completedUrls) {
         break
       }
       nextUrl :=  client.buffer.allUrls[len(client.buffer.completedUrls)]
@@ -367,11 +367,11 @@ func (client *Client) PrintStats() {
 
 func (client *Client) Move()/*wg *sync.WaitGroup)*/ {
  // defer wg.Done()
+  if client.trajectory.HasEnded() {
+    return
+  }
   client.trajectory.Advance()
   if client.trajectory.curIdx % 100 == 0 {
     glog.Infof("Client at idx %d\n", client.trajectory.curIdx)
-  }
-  if client.trajectory.HasEnded() {
-    glog.Infof("Client %s finished at time %s\n", client.id, time.Now().String())
   }
 }

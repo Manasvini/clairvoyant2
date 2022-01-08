@@ -85,8 +85,7 @@ func getFilesInDir(dirName string)([]string){
 */
 func main() {
 
-//  defer glog.Flush() // flushes buffer, if any
-  glog.Infof("Init app..")
+  defer glog.Flush() // flushes buffer, if any
   numUsers := flag.Int("n", 1 /*default*/,  "number of users default=1")
   trajectoryDir := flag.String("t", "./", "directory containing user trajectories")
   serverAddr := flag.String("a", "0.0.0.0:60050", "cloud server address")
@@ -100,24 +99,26 @@ func main() {
   edgeNodes.LoadFromFile(*edgeNodesFile)
   urls := make([]string, 0)
   clients := make([]cvclient.Client, 0)
-  glog.Infof("Make %d clients", numUsers)
+  glog.Infof("Make %d clients", *numUsers)
   trajectories := getFilesInDir(*trajectoryDir)
   i := 0
   for _, f := range trajectories {
     trajectory := cvclient.Trajectory{}
     video := cvclient.Video{}
-    videoId := "v" + strconv.Itoa(rand.Intn(*numVideos))
+
+    videoId := "v" + strconv.Itoa(rand.Intn(*numVideos - 1) + 1)
     video.LoadFromFile(*videoFile, videoId)
     trajectory.LoadFromFile(f)
-    fmt.Printf("file = %s video is %s\n", f, videoId)
+    glog.Infof("file = %s video is %s\n", f, videoId)
       //"../../eval/enode_positions/17min_user0/user0_17min.csv")
     client :=  cvclient.NewClient("c" + strconv.Itoa(i), &trajectory, edgeNodes, video, urls)
     clients = append(clients, client)
     i += 1
-    if i == *numUsers {
+    if i  == *numUsers    {
       break
     }
   }
+  glog.Infof("Created %d clients\n", len(clients))
   start := time.Now()
   for {
     timestamp := advanceClock()
@@ -137,8 +138,9 @@ func main() {
     }
     //wg.Wait()
     if areAllClientsDone(clients) {
-      break
+     break
     }
+
   }
   fmt.Printf("\nelapsed = %s\n", time.Since(start))
   for _, c := range clients {
