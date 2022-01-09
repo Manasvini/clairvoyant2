@@ -3,9 +3,12 @@ This document walks through the setup for getting the golang client runner to wo
 ## Setup  
 __step 1__: Install golang  
 Follow the instructions [here](https://go.dev/doc/install). Additionally you can add `export PATH=$PATH:/usr/local/go/bin` to ~/.bashrc to make your life easier.  
+  
 __step 2__: Install protoc and related packages for golang  
 Follow instructions listed in the [grpc website](https://grpc.io/docs/languages/go/quickstart/). Again, make sure you add `export PATH="$PATH:$(go env GOPATH)/bin"` to ~/.bashrc.  
+  
 __step 3__: Pull the `client_go` branch of this repo.  
+  
 __step4__: Try to run the client  
 Start the client runner like so:  
 ```shell  
@@ -19,14 +22,14 @@ $ go run . -log_dir="." -t ../../eval/user_trajectories/ -e input/5node_17min.cs
 ``` 
 The command starts client runner with 500 users, 20 videos and 5 nodes.  
 ## Edge Node Format  
-The python client runner takes in separate arguments for the model directory, edge node positions and edge ids/ips. All of these inputs are combined into one file for golang client runner. An example is in 5node\_17min.csv.  
+The python client runner takes in separate arguments for the model directory, edge node positions and edge ids/ips. All of these inputs are combined into one file for golang client runner. An example is in `input/5node_17min.csv`.  
 ## Other gotchas  
 Here are a few issues I ran into while developing the client.  
 ### CSV parsing   
 CSV parsing in golang is not as intuitive as python. You have to declare the mapping of column indices to the data they represent. Change client\_go/cvclient/trajectory.go if you run into errors like "invalid lat/long"  being thrown from clairvoyantedge-meta.   
 ### Modifying protos/adding modules to client\_go    
 #### New Module Creation  
-If you're adding a new module, e.g, client_go/util, first you need to declare the source for the module like this:  
+If you're adding a new module, e.g, client\_go/util, first you need to declare the source for the module like this:  
 ```shell  
 $ cd client_go/util  
 $ go mod init github.gatech.edu/cs-epl/clairvoyant2/client_go/util  
