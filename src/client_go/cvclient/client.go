@@ -77,7 +77,7 @@ func (client *Client) RegisterWithCloud(serverAddr string, startTime float64){
   defer conn.Close()
   c := pb.NewCVServerClient(conn)
 
-  ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
+  ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
   defer cancel()
   resp, err := c.HandleCVRequest(ctx, cvreq)
   if err != nil{
@@ -258,6 +258,7 @@ func (client *Client) IsCloudRequestNecessary(segment string) bool {
 }
 
 func (client *Client) FetchSegments(timestamp int64) {
+  client.Move()
   if client.trajectory.HasEnded(){
     return
   }
@@ -305,6 +306,7 @@ func (client *Client) FetchSegments(timestamp int64) {
       }
       // need to get data from cloud now
       val, exists := client.videoInfo.segments[filepath]
+      //glog.Infof("clietn %s segment is %s\n", client.id, filepath)
       if !exists {
         panic("segment not found in client video...")
       }

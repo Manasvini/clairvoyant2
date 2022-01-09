@@ -7,7 +7,7 @@ import (
     "strconv"
     pb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
     "google.golang.org/grpc"
-    //    "sync"
+    "sync"
     "context"
     "flag"
     "math/rand"
@@ -71,8 +71,8 @@ func main() {
   videoFile := flag.String("f", "./bbb.csv", "video segments file")
   flag.Parse()
   fmt.Printf("Making flags, num users = %d traj dir = %s, server addr = %s, edge nodes file = %s, numVideos = %d, videoFile = %s\n", *numUsers, *trajectoryDir, *serverAddr, *edgeNodesFile, *numVideos, *videoFile)
-  edgeNodes := cvclient.EdgeNodes{}
-  edgeNodes.LoadFromFile(*edgeNodesFile)
+  //edgeNodes := cvclient.EdgeNodes{}
+  //edgeNodes.LoadFromFile(*edgeNodesFile)
   urls := make([]string, 0)
   clients := make([]cvclient.Client, 0)
   glog.Infof("Make %d clients", *numUsers)
@@ -82,11 +82,13 @@ func main() {
   for _, f := range trajectories {
     fmt.Println(f)
     trajectory := cvclient.Trajectory{}
+    trajectory.LoadFromFile(f)
     video := cvclient.Video{}
+    edgeNodes := cvclient.EdgeNodes{}
+    edgeNodes.LoadFromFile(*edgeNodesFile)
 
     videoId := "v" + strconv.Itoa(rand.Intn(*numVideos - 2) + 2)
     video.LoadFromFile(*videoFile, videoId)
-    trajectory.LoadFromFile(f)
     glog.Infof("file = %s video is %s\n", f, videoId)
       //"../../eval/enode_positions/17min_user0/user0_17min.csv")
     client :=  cvclient.NewClient("c" + strconv.Itoa(i), &trajectory, edgeNodes, video, urls)
@@ -99,26 +101,28 @@ func main() {
   glog.Infof("Created %d clients\n", len(clients))
   start := time.Now()
   for {
+
     timestamp := advanceClock()
-    //wg := new(sync.WaitGroup)
     if timestamp % 100 == 0 {
       glog.Infof("timestamp is now %d\n", timestamp)
     }
+    wg := new(sync.WaitGroup)
     for _, client := range clients {
-//      wg.Add(1)
        if int64(client.GetStartTime()) < int64(timestamp) + int64(100)  && !client.IsRegistered(){
           client.RegisterWithCloud(*serverAddr, float64(timestamp))
        }
        if int64(client.GetStartTime()) < timestamp {
-          client.Move()
-          client.FetchSegments(timestamp)
+          wg.Add(1)
+          go func(timestamp int64, client cvclient.Client) {
+            defer wg.Done()
+            client.FetchSegments(timestamp)
+          }(timestamp, client)
        }
     }
-    //wg.Wait()
+    wg.Wait()
     if areAllClientsDone(clients) {
-     break
+      break
     }
-
   }
   fmt.Printf("\nelapsed = %s\n", time.Since(start))
   for _, c := range clients {
