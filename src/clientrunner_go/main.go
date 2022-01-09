@@ -59,30 +59,6 @@ func getFilesInDir(dirName string)([]string){
   return fileNames
 }
 
-/*func initLogger()(*zap.Logger){
-	rawJSON := []byte(`{
-	  "level": "error",
-	  "encoding": "json",
-	  "outputPaths": ["/tmp/cvclientlogs"],
-	  "errorOutputPaths": ["stderr"],
-	  "encoderConfig": {
-	    "messageKey": "message",
-	    "levelKey": "level",
-	    "levelEncoder": "lowercase"
-	  }
-	}`)
-
-	var cfg zap.Config
-	if err := json.Unmarshal(rawJSON, &cfg); err != nil {
-		panic(err)
-	}
-	logger, err := cfg.Build()
-	if err != nil {
-		panic(err)
-	}
-	return logger
-}
-*/
 func main() {
 
   defer glog.Flush() // flushes buffer, if any
@@ -100,12 +76,7 @@ func main() {
   urls := make([]string, 0)
   clients := make([]cvclient.Client, 0)
   glog.Infof("Make %d clients", *numUsers)
-  //trajectories := getFilesInDir(*trajectoryDir)
-  //i := 0
-
-  trajectories := make([]string, 0)
-  trajectories = append(trajectories, "../../eval/user_trajectories/user681.csv")
-  trajectories = append(trajectories, "../../eval/user_trajectories/user3972.csv")
+  trajectories := getFilesInDir(*trajectoryDir)
   glog.Infof("files= %s, %s\n", trajectories[0], trajectories[1])
   i := 0
   for _, f := range trajectories {
@@ -113,7 +84,7 @@ func main() {
     trajectory := cvclient.Trajectory{}
     video := cvclient.Video{}
 
-    videoId := "v" + strconv.Itoa(rand.Intn(*numVideos - 1) + 1)
+    videoId := "v" + strconv.Itoa(rand.Intn(*numVideos - 2) + 2)
     video.LoadFromFile(*videoFile, videoId)
     trajectory.LoadFromFile(f)
     glog.Infof("file = %s video is %s\n", f, videoId)

@@ -69,7 +69,7 @@ func (client *Client) RegisterWithCloud(serverAddr string, startTime float64){
   req := pb.VideoRequest{VideoId:client.videoInfo.videoId, Route:route}
 
   cvreq := &pb.CVRequest{Request:&pb.CVRequest_Videorequest{&req}}
-  glog.Info("make req to cloud server at " + serverAddr)
+  glog.Infof("client %s make req to cloud server at %s for video %s", client.id, serverAddr, client.videoInfo.videoId)
   conn, err := grpc.Dial(serverAddr, grpc.WithInsecure())
   if err != nil {
     glog.Fatalf("did not connect to " + serverAddr )
@@ -84,7 +84,7 @@ func (client *Client) RegisterWithCloud(serverAddr string, startTime float64){
     glog.Error(err)
   }else {
     if resp.GetVideoreply() != nil{
-      glog.Infof("Got %d urls in reply\n", len(resp.GetVideoreply().Urls))
+      glog.Infof("clinet %s Got %d urls in reply\n", client.id, len(resp.GetVideoreply().Urls))
       client.buffer.allUrls = resp.GetVideoreply().Urls
     } else{
       glog.Errorf("client %s got invalid response for video request", client.id)
