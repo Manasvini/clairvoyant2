@@ -66,9 +66,9 @@ func main() {
   trajectoryDir := flag.String("t", "./", "directory containing user trajectories")
   serverAddr := flag.String("a", "0.0.0.0:60050", "cloud server address")
   //outputFile := flag.String("o", "./output.json", "output file name")
-  edgeNodesFile := flag.String("e", "./5nodes_17min.csv", "file with x,y,id,ip,model for all edge nodes")
+  edgeNodesFile := flag.String("e", "./input/5nodes_17min.csv", "file with x,y,id,ip,model for all edge nodes")
   numVideos := flag.Int("i", 20, "number of videos")
-  videoFile := flag.String("f", "./bbb.csv", "video segments file")
+  videoFile := flag.String("f", "./input/bbb.csv", "video segments file")
   flag.Parse()
   fmt.Printf("Making flags, num users = %d traj dir = %s, server addr = %s, edge nodes file = %s, numVideos = %d, videoFile = %s\n", *numUsers, *trajectoryDir, *serverAddr, *edgeNodesFile, *numVideos, *videoFile)
   //edgeNodes := cvclient.EdgeNodes{}
