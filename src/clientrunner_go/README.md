@@ -1,4 +1,4 @@
-# Clienrunner in golang!  
+## Clienrunner in golang!  
 This document walks through the setup for getting the golang client runner to work. (It's at least 2x faster than the python client runner, probably a lot more).  
 ## Setup  
 __step 1__: Install golang  
