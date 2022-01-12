@@ -57,6 +57,7 @@ func getFilesInDir(dirName string)([]string){
     }
     fileNames = append(fileNames, dirName + "/" + file.Name())
   }
+  rand.Seed(time.Now().UnixNano())
   rand.Shuffle(len(fileNames), func(i, j int) {
       fileNames[i], fileNames[j] = fileNames[j], fileNames[i]
     })

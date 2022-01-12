@@ -77,7 +77,7 @@ func (client *Client) RegisterWithCloud(serverAddr string, startTime float64){
   defer conn.Close()
   c := pb.NewCVServerClient(conn)
 
-  ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+  ctx, cancel := context.WithTimeout(context.Background(), time.Second * 15)
   defer cancel()
   resp, err := c.HandleCVRequest(ctx, cvreq)
   if err != nil{
@@ -226,7 +226,7 @@ func (client *Client) pretendDownload(edgeNode EdgeNode, segments []string, tota
 func (client *Client) MakeEdgeRequest(edgeNode EdgeNode, bw float64) {
   if  &edgeNode != nil {
     client.dlInfo.availableBits += int(bw) // bps
-    glog.Infof("client %s can download %f bits from %s\n", client.id, bw, edgeNode.id)
+    glog.Infof("client %s can download %d bits from %s\n", client.id, client.dlInfo.availableBits, edgeNode.id)
     totalBytes := client.dlInfo.availableBits / 8
     segments := client.getAvailableSegments(edgeNode)
     segmentsToDownload := make([]string, 0)

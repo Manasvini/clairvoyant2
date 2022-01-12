@@ -19,7 +19,8 @@ cd ~/clairvoyant2
 python3 eval/add_nodes.py -n $num_nodes -p "192.168.160." -s 22 -i 0 -f $node_pos
 
 cd $curdir
-#pkill clairvoyant
+pkill clairvoyant
+sleep 5
 bash scripts/start_meta_svr.sh > ./logs/meta_svr.out 2>&1 &
 
 cd scripts
