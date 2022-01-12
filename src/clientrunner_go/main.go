@@ -13,6 +13,7 @@ import (
     "math/rand"
     "io/ioutil"
     "github.com/golang/glog"
+    "os"
   )
 func areAllClientsDone(clients []cvclient.Client) bool {
   for _, client := range clients {
@@ -56,6 +57,9 @@ func getFilesInDir(dirName string)([]string){
     }
     fileNames = append(fileNames, dirName + "/" + file.Name())
   }
+  rand.Shuffle(len(fileNames), func(i, j int) {
+      fileNames[i], fileNames[j] = fileNames[j], fileNames[i]
+    })
   return fileNames
 }
 
@@ -69,6 +73,7 @@ func main() {
   edgeNodesFile := flag.String("e", "./input/5nodes_17min.csv", "file with x,y,id,ip,model for all edge nodes")
   numVideos := flag.Int("i", 20, "number of videos")
   videoFile := flag.String("f", "./input/bbb.csv", "video segments file")
+  ofilename := flag.String("o", "output.txt", "output file name")
   flag.Parse()
   fmt.Printf("Making flags, num users = %d traj dir = %s, server addr = %s, edge nodes file = %s, numVideos = %d, videoFile = %s\n", *numUsers, *trajectoryDir, *serverAddr, *edgeNodesFile, *numVideos, *videoFile)
   //edgeNodes := cvclient.EdgeNodes{}
@@ -125,7 +130,19 @@ func main() {
     }
   }
   fmt.Printf("\nelapsed = %s\n", time.Since(start))
+  f, err := os.Create(*ofilename)
+  if err != nil {
+    panic(err)
+  }
+  _, err = f.WriteString("id,receivedBytesCloud,receivedBytesEdge\n")
+  if err != nil{
+    panic(err)
+  }
   for _, c := range clients {
-    c.PrintStats()
+    line := c.PrintStats()
+    _, err = f.WriteString(line)
+    if err != nil{
+      panic(err)
+    }
   }
 }

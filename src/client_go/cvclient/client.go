@@ -224,7 +224,7 @@ func (client *Client) pretendDownload(edgeNode EdgeNode, segments []string, tota
 }
 
 func (client *Client) MakeEdgeRequest(edgeNode EdgeNode, bw float64) {
-  if bw > 0 && &edgeNode != nil {
+  if  &edgeNode != nil {
     client.dlInfo.availableBits += int(bw) // bps
     glog.Infof("client %s can download %f bits from %s\n", client.id, bw, edgeNode.id)
     totalBytes := client.dlInfo.availableBits / 8
@@ -366,8 +366,8 @@ func (client *Client) IsRegistered() bool {
   return len(client.buffer.allUrls) > 0
 }
 
-func (client *Client) PrintStats() {
-  fmt.Println("Client id ", client.id, " Bytes received from cloud = ", client.stats.receivedBytesCloud, " bytes received from edge",  client.stats.receivedBytesEdge)
+func (client *Client) PrintStats()(string) {
+  return fmt.Sprintf( "%s,%d,%d\n",client.id, client.stats.receivedBytesCloud, client.stats.receivedBytesEdge)
 
 }
 
