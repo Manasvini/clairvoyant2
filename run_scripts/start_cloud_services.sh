@@ -3,6 +3,7 @@ num_nodes=$1
 conf=$2
 node_pos=$3
 num_videos=$4
+segments_file=$5
 cd
 cd clairvoyantedge-metadata
 
@@ -24,7 +25,8 @@ sleep 5
 bash scripts/start_meta_svr.sh > ./logs/meta_svr.out 2>&1 &
 
 cd scripts
-bash ./video_creator.sh ../build/metadata/scripts/data-uploader $4 bbb.csv
+echo "num videos = " $num_videos " video file =  " $segments_file
+bash ./video_creator.sh ../build/metadata/scripts/data-uploader $num_videos $segments_file
 #
 pkill python3
 cd ~/clairvoyant2

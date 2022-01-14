@@ -45,6 +45,7 @@ type Client struct {
   buffer *Buffer
   dlInfo *CurrentDownloadInfo
   id string
+  token int64
 }
 
 func (client *Client) Id() string{
@@ -66,7 +67,7 @@ func (client *Client) RegisterWithCloud(serverAddr string, startTime float64){
     points = append(points, &pb.Coordinate{X: p.lat, Y:p.lon, Speed: p.speed, Time: p.timestamp})
   }
   route := &pb.Route{Points:points}
-  req := pb.VideoRequest{VideoId:client.videoInfo.videoId, Route:route}
+  req := pb.VideoRequest{VideoId:client.videoInfo.videoId, Route:route, Timestamp:int64(startTime)}
 
   cvreq := &pb.CVRequest{Request:&pb.CVRequest_Videorequest{&req}}
   glog.Infof("client %s make req to cloud server at %s for video %s", client.id, serverAddr, client.videoInfo.videoId)
@@ -84,9 +85,12 @@ func (client *Client) RegisterWithCloud(serverAddr string, startTime float64){
     glog.Error(err)
   }else {
     if resp.GetVideoreply() != nil{
-      glog.Infof("clinet %s Got %d urls in reply\n", client.id, len(resp.GetVideoreply().Urls))
+      glog.Infof("clinet %s Got %d urls in reply token is %d\n", client.id, len(resp.GetVideoreply().Urls), resp.GetVideoreply().TokenId)
       client.buffer.allUrls = resp.GetVideoreply().Urls
-    } else{
+      client.token = resp.GetVideoreply().TokenId
+      glog.Infof("clinet %s Got %d urls in reply token is %d\n", client.id, len(resp.GetVideoreply().Urls), client.token)
+
+      } else{
       glog.Errorf("client %s got invalid response for video request", client.id)
     }
   }
@@ -143,7 +147,7 @@ func (client *Client) doGet(edgeNode EdgeNode, lastSegment string, shouldResetCo
     parts := strings.Split(filepath, "/")
     key := ""
     for _, part := range parts {
-      if strings.Contains(part, "BigBuckBunny") {
+      if strings.Contains(part, "BigBuckBunny") || strings.Contains(part, "bbb"){
         key = part
         break
       }
@@ -180,8 +184,10 @@ func (client *Client) getAvailableSegments(edgeNode EdgeNode)[]string {
   if exists {
     var segments []string
     segments = val
-    glog.Infof("got %d segments", len(segments))
+    glog.Infof("Client %s got %d segments from %s\n", client.id, len(segments), edgeNode.id)
     return segments
+  } else{
+    glog.Infof("client %s did not get any segments from %s\n", client.id, edgeNode.id)
   }
   return nil
 }
@@ -260,6 +266,12 @@ func (client *Client) IsCloudRequestNecessary(segment string) bool {
 func (client *Client) FetchSegments(timestamp int64) {
   client.Move()
   if client.trajectory.HasEnded(){
+     if client.dlInfo.lastConnectedEdgeNode != nil {
+      lastBw := client.GetEdgeBandwidth(*(client.dlInfo.lastConnectedEdgeNode), client.dlInfo.lastEdgeNodeDistance)
+   glog.Infof("Client %s about to stop. Will finish edge actions with node %s\n", client.id, client.dlInfo.lastConnectedEdgeNode.id)
+      client.MakeEdgeRequest(*(client.dlInfo.lastConnectedEdgeNode), float64(lastBw))
+      client.dlInfo.lastConnectedEdgeNode = nil
+    }
     return
   }
   edgeNode, distance := client.edgeNodes.GetNearestEdgeNode(client.trajectory.points[client.trajectory.curIdx])
@@ -277,7 +289,6 @@ func (client *Client) FetchSegments(timestamp int64) {
   lastBw := 0.0
   if client.dlInfo.lastConnectedEdgeNode != nil {
     lastBw = client.GetEdgeBandwidth(*(client.dlInfo.lastConnectedEdgeNode), client.dlInfo.lastEdgeNodeDistance)
-    glog.Infof("for client %s last edge node = %s bw = %f\n", client.id, client.dlInfo.lastConnectedEdgeNode.id, lastBw)
   }
   if edgeNodePtr == nil {
     if timestamp % 100 == 0 {
@@ -316,7 +327,6 @@ func (client *Client) FetchSegments(timestamp int64) {
       client.dlInfo.bufferedData[filepath] = true
     }
   } else {
-    glog.Infof("Will maybe contact edge nodes at time %d\n", timestamp)
     if client.dlInfo.lastConnectedEdgeNode == nil {
       glog.Infof("New request, will just set contact with node %s\n", edgeNode.id)
       client.dlInfo.availableBits = int(bw)
@@ -367,7 +377,7 @@ func (client *Client) IsRegistered() bool {
 }
 
 func (client *Client) PrintStats()(string) {
-  return fmt.Sprintf( "%s,%d,%d\n",client.id, client.stats.receivedBytesCloud, client.stats.receivedBytesEdge)
+  return fmt.Sprintf( "%d,%s,%d,%d\n",client.token, client.id, client.stats.receivedBytesCloud, client.stats.receivedBytesEdge)
 
 }
 

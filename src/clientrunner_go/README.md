@@ -18,7 +18,7 @@ $ go run . -log_dir="."
 If you come across errors complaining about modules that need to be download, just do `go get <module name>` for the modules that it's complaining about.  
 The above commands will start the client runner with the defaults (listed in main.go). Here's an example working command:  
 ```shell  
-$ go run . -log_dir="." -t ../../eval/user_trajectories/ -e input/5node_17min.csv -i 20 -n 500    
+$ go run . -log_dir="." -t ../../eval/user_trajectories/ -e input/5node_17min.csv -i 20 -n 500 -f ../../eval/video/bbb.csv   
 ``` 
 The command starts client runner with 500 users, 20 videos and 5 nodes.  
 ## Edge Node Format  

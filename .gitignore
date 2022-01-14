@@ -7,3 +7,6 @@ localenv
 gen_conf
 results/
 *log*
+*ERROR*
+*INFO*
+*WARN*

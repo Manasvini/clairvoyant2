@@ -86,18 +86,19 @@ func main() {
   glog.Infof("files= %s, %s\n", trajectories[0], trajectories[1])
   i := 0
   r := rand.New(rand.NewSource(time.Now().UnixNano()))
-  zipf := rand.NewZipf(r, 1.1, 1,  uint64(*numVideos))
+  zipf := rand.NewZipf(r, 1.1, 1,  uint64(*numVideos) - 1 )
+  edgeNodes := cvclient.EdgeNodes{}
+  edgeNodes.LoadFromFile(*edgeNodesFile)
+
 
   for _, f := range trajectories {
     fmt.Println(f)
     trajectory := cvclient.Trajectory{}
     trajectory.LoadFromFile(f)
     video := cvclient.Video{}
-    edgeNodes := cvclient.EdgeNodes{}
-    edgeNodes.LoadFromFile(*edgeNodesFile)
 
     //videoId := "v" + strconv.Itoa(rand.Intn(*numVideos - 2) + 2)
-    videoId := "v" + strconv.Itoa(int(zipf.Uint64() + 1))
+    videoId := "v" + strconv.Itoa(int(zipf.Uint64() + 2))
     video.LoadFromFile(*videoFile, videoId)
     glog.Infof("file = %s video is %s\n", f, videoId)
       //"../../eval/enode_positions/17min_user0/user0_17min.csv")
@@ -139,7 +140,7 @@ func main() {
   if err != nil {
     panic(err)
   }
-  _, err = f.WriteString("id,receivedBytesCloud,receivedBytesEdge\n")
+  _, err = f.WriteString("token,id,receivedBytesCloud,receivedBytesEdge\n")
   if err != nil{
     panic(err)
   }
