@@ -1,12 +1,13 @@
 {
-	"numTrials":3,
+	"numTrials":1,
 	"numEdgeNodes":20,
 	"cloudConfig":"conf/20node_monacoCloudConfig.json",
 	"edgePositions":"eval/monaco_traffic_lights_20.csv",
 	"cloudServerName":"cv0",
 	"machinePrefix":"cv",
-	"numUsers":2500,
+	"numUsers":1,
 	"edgeInfoFile":"input/monaco_traffic_lights_20.csv",
-	"outputDir":"../../results/enhancements/",
-	"trajectoriesDir":"../../eval/20nodes_out/"
+	"outputDir":"../../results/enhancements/bbb_900",
+	"trajectoriesDir":"../../eval/20nodes_out/",
+	"segmentFile":"~/clairvoyant2/eval/videos/bbb_900segs.csv"
 }
