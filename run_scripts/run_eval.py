@@ -52,6 +52,7 @@ def start_clients(conf):
 
 def main():
     conf = read_config(sys.argv[1])
+    #example conf script in eval folder 10node_conf.json
     num_trials = conf['numTrials']
     start = time.time()
     for i in range(num_trials):
