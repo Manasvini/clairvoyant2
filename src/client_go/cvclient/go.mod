@@ -5,6 +5,7 @@ go 1.17
 replace github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant => ../clairvoyant
 
 require (
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/umahmood/haversine v0.0.0-20151105152445-808ab04add26
 	github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant v0.0.0-00010101000000-000000000000
 	google.golang.org/grpc v1.43.0

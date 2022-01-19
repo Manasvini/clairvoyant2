@@ -1,5 +1,5 @@
 {
-    "modelFile":"models/model1.csv",
+    "modelFile":"../../models/model1.csv",
     "missedDeliveryThreshold":10,
     "timeScale":60,
     "redisHost": "127.0.0.1",
@@ -12,5 +12,10 @@
 
     },
     "monServerAddress": "localhost:8192",
-    "monInterval": 5
+    "monInterval": 5,
+    "contentServerAddress": "localhost:8080",
+    "contentServerMaxClients": 2,
+    "edgeServerAddress": "localhost:60051",
+    "cacheSize" : 500,
+    "cacheType" : "lru"
 }

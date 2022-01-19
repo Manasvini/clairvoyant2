@@ -5,6 +5,7 @@ import (
     "google.golang.org/grpc"
     "context"
     pb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
+    cpb "github.gatech.edu/cs-epl/clairvoyant2/edge_go/contentserver"
 //    "sync"
     "math"
     "io/ioutil"
@@ -130,7 +131,35 @@ func (client *Client) getFilepath(url string) string{
   return string(tmp[filepathIdx:])
 }
 
-func (client *Client) doGet(edgeNode EdgeNode, lastSegment string, shouldResetContact bool) string {
+func (client *Client) doGetGRPC(edgeNode EdgeNode, lastSegment string, shouldResetContact bool) []string {
+  address := edgeNode.ip + ":" + "8000"
+  conn, err := grpc.Dial(address, grpc.WithInsecure())
+  defer conn.Close()
+  contentClient := cpb.NewContentClient(conn)
+
+  segmentRequest := cpb.SegmentRequest{
+      SegmentId : lastSegment,
+      StartTime : client.dlInfo.startContact,
+      EndTime : client.dlInfo.endContact,
+      Remove : shouldResetContact,
+    }
+
+  ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+  defer cancel()
+  resp, err := contentClient.GetSegment(ctx, &segmentRequest)
+  if err == nil{
+    return resp.GetSegments()
+  }
+  glog.Error(err)
+  return  nil
+}
+
+//NOTE: Changing to grpc based content server!
+func (client *Client) doGet(edgeNode EdgeNode, lastSegment string, shouldResetContact bool) []string {
+  return client.doGetGRPC(edgeNode, lastSegment, shouldResetContact)
+}
+
+func (client *Client) doGetNormal(edgeNode EdgeNode, lastSegment string, shouldResetContact bool) []string {
   ip := edgeNode.ip
   port := "8000"
   url := "http://" + ip + ":" + port
@@ -166,35 +195,40 @@ func (client *Client) doGet(edgeNode EdgeNode, lastSegment string, shouldResetCo
   resp, err := httpclient.Do(req)
   if err != nil {
     glog.Info(err)
-    return ""
+    return nil
   }
   defer resp.Body.Close()
   respBody, _ := ioutil.ReadAll(resp.Body)
   if strings.Contains(string(respBody), "{}") {
-    return ""
+    return nil
   }
-  return string(respBody)
+
+  respBodyStr := string(respBody)
+  if strings.Contains(respBodyStr, "segments"){
+    //this is first request
+    var segmentInfo map[string][]string
+    json.Unmarshal([]byte(respBodyStr), &segmentInfo)
+    if val, exists := segmentInfo["segments"]; exists {
+      return val
+    }
+    return nil
+  } else {
+    return []string{respBodyStr}
+  }
 }
 
 func (client *Client) getAvailableSegments(edgeNode EdgeNode)[]string {
-  response:= client.doGet(edgeNode, "", false)
-  var segmentInfo map[string][]string
-  json.Unmarshal([]byte(response), &segmentInfo)
-  val, exists := segmentInfo["segments"]
-  if exists {
-    var segments []string
-    segments = val
+  segments:= client.doGet(edgeNode, "", false)
+
+  if len(segments) > 0 {
     glog.Infof("Client %s got %d segments from %s\n", client.id, len(segments), edgeNode.id)
     return segments
-  } else{
-    glog.Infof("client %s did not get any segments from %s\n", client.id, edgeNode.id)
   }
+
+  glog.Infof("client %s did not get any segments from %s\n", client.id, edgeNode.id)
   return nil
 }
 
-func (client *Client) getSegment(edgeNode EdgeNode, segment string) string {
-  return client.doGet(edgeNode, segment, false)
-}
 
 func (client *Client) disconnectFromCurrentEdgeNode(edgeNode EdgeNode){
   _ = client.doGet(edgeNode, "", true)
@@ -214,8 +248,8 @@ func (client *Client) pretendDownload(edgeNode EdgeNode, segments []string, tota
     }
     fileSize := val.size
     if int(fileSize) < bytesAvailable {
-      response := client.doGet(edgeNode, curSegment, false)
-      if response != "" {
+      segments := client.doGet(edgeNode, curSegment, false)
+      if len(segments) > 0 {
         bytesAvailable -= int(fileSize)
         client.dlInfo.bufferedData[curSegment] = true
         client.stats.receivedBytesEdge += int(fileSize)
