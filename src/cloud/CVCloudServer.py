@@ -30,16 +30,40 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
             self.configDict = json.load(fh)
         logger.info('cloud config = {}'.format(json.dumps(self.configDict, indent=2)))
         self.metaClient = CloudMetadataClient(self.configDict['metaServerAddress'])
-        self.mmWaveModels = self.getModels(self.configDict['nodeIds'])
+
+        # BEGIN Config File simplification: Simplified config, but minimal code change
+        # TODO: eliminate this when go-ify cloud
+        nodeIds = [node["id"] for node in self.configDict["edgeNodes"]]
+        nodeDaemonIps = [node["ip"] + ":" + node["edgeDaemon"] for node in self.configDict["edgeNodes"]]
+        nodeMap = {node["id"]:node for node in self.configDict["edgeNodes"]}
+        downloadSourcesOldFormat = {}
+        for node in self.configDict["edgeNodes"]:
+            with open(self.configDict["downloadSourceFile"]) as fh:
+                newSources = json.load(fh)
+
+                perNodeDict = {}
+                for rec in sources:
+                    if rec["src_id"] == "default":
+                        key=self.configDict["defaultSource"]
+                    else:
+                        node = nodeMap[rec["src_id"]]
+                        key=node["ip"] + ":" + node["contentServer"]
+                        
+                    perNodeDict[key] = rec["bandwidth"]
+                downloadSourcesOldFormat[node["id"]] = perNodeDict
+        # END Config File simplification: Simplified config, but minimal code change
+
+        self.mmWaveModels = self.getModels(nodeIds)
         mode = None
         if 'mode' in self.configDict:
             mode=self.configDict['mode']
 
-        self.dlManager = DownloadManager(self.configDict['nodeIds'],
-                self.configDict['downloadSources'], 
+        
+        self.dlManager = DownloadManager(nodeIds,
+                downloadSourcesOldFormat,
                 self.configDict['timeScale'],
                 self.mmWaveModels, 
-                DownloadDispatcher(self.configDict['nodeIps'], None),
+                DownloadDispatcher(nodeDaemonIps, None),
                 mode)
 
         monServer = MonitoringServer(address=self.configDict['monServerAddress'], \
