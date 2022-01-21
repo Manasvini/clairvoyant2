@@ -10,9 +10,7 @@ class EdgeNetworkModel:
     def update(self, model_dict, ts): #uses the mutex for proper nw_dict update
         self.mutex.acquire()
         for key,value in model_dict.items():
-            nkey = float(key)
-            nvalue = float(value)
-            self.nw_dict[nkey] = nvalue
+            self.nw_dict[key] = value
         self.timestamp = ts
         self.mutex.release()
 

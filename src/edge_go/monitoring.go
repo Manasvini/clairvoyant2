@@ -18,6 +18,7 @@ type BwInfo struct {
   Sdev float64 `json:"sdev"`
 }
 
+
 func parseModelFile(modelFile string) map[string]BwInfo {
   csvfile, err := os.Open(modelFile)
   if err != nil {
@@ -72,28 +73,41 @@ func NewMonitoringClient(modelFile string,
   return &client
 }
 
-func (mclient *MonitoringClient) sendHTTP() {
-  glog.Info("inside http!")
-  modelbstr,err := json.Marshal(mclient.model_dict)
-  postBody, _ := json.Marshal(map[string]string{
-    "nodeid": mclient.nodeId,
-    "model": string(modelbstr),
-  })
-  if err != nil {
-    fmt.Println(err)
+func (mclient *MonitoringClient) getCurrentBw() map[string]float64{
+  distBwMap := map[string]float64{}
+  for dist,info := range mclient.model_dict{
+    distBwMap[dist] = info.Mean
   }
+  return distBwMap
+}
+
+func (mclient *MonitoringClient) sendHTTP() {
+
+  postBody := struct {
+    NodeId string `json:"nodeid"`
+    Model map[string]float64 `json:"model"`
+  }{
+    NodeId : mclient.nodeId,
+    Model : mclient.getCurrentBw(),
+  }
+
+  postBodyStr, err := json.Marshal(postBody)
+  if err != nil {
+    glog.Error(err)
+  }
+  //glog.Infof("postBody=%s", postBodyStr)
 
   //fmt.Println(string(modelbstr))
   //for k,v := range mclient.model_dict {
   //  fmt.Println(k, "value is", v.Mean, " and ", v.Sdev)
   //}
 
-  responseBody := bytes.NewBuffer(postBody)
+  responseBody := bytes.NewBuffer(postBodyStr)
   resp, err := http.Post(fmt.Sprintf("%s/post", mclient.url),
                          "application/json", responseBody)
   if err != nil {
     glog.Fatalf("Unable to Post %v", err)
   }
   defer resp.Body.Close()
-  glog.Infof("status %s", resp.StatusCode)
+  glog.Infof("status=%d", resp.StatusCode)
 }

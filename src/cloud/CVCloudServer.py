@@ -38,15 +38,17 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
         nodeMap = {node["id"]:node for node in self.configDict["edgeNodes"]}
         downloadSourcesOldFormat = {}
         for node in self.configDict["edgeNodes"]:
-            with open(self.configDict["downloadSourceFile"]) as fh:
-                newSources = json.load(fh)
+            with open(node["downloadSourceFile"]) as fh:
+                sources = json.load(fh)
 
                 perNodeDict = {}
                 for rec in sources:
                     if rec["src_id"] == "default":
                         key=self.configDict["defaultSource"]
                     else:
-                        node = nodeMap[rec["src_id"]]
+                        if rec["src_id"] not in nodeMap:
+                            continue
+                        nodeObj = nodeMap[rec["src_id"]]
                         key=node["ip"] + ":" + node["contentServer"]
                         
                     perNodeDict[key] = rec["bandwidth"]

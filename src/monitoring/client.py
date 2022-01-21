@@ -57,6 +57,7 @@ class MonitoringClient(Thread):
             payload = {}
             payload['nodeid'] = self.node_id
             payload['model'] = dict_to_send
+            print(payload)
 
             r = requests.post(self.url, json=payload)
             logger.debug("POST response: {}".format(r.status_code))
@@ -101,7 +102,7 @@ if __name__ == "__main__":
 
     modelfile = path.abspath(args.modelfile)
     logger.debug("Modelfile : {}".format(modelfile))
-    mon_client = MonitoringClient(modelfile, args.interval, args.address)
+    mon_client = MonitoringClient(modelfile, args.interval, args.address, 'node_0')
     mon_client.start()
     try:
         mon_client.join()
