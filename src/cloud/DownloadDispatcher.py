@@ -7,7 +7,7 @@ import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
 
 parent_logger = logging.getLogger("cloud")
 logger = parent_logger.getChild('dwnlddispatch')
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.INFO)
 
 class DownloadDispatcher:
     def __init__(self, edge_ip_map, callback):

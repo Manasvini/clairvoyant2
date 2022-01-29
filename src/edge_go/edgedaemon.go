@@ -8,7 +8,7 @@ import (
   "net"
 )
 
-type EdgeDaemon struct {
+type EdgeServer struct {
   pb.UnimplementedEdgeServerServer
   config EdgeConfig
   address string
@@ -17,7 +17,7 @@ type EdgeDaemon struct {
 }
 
 
-func (daemon *EdgeDaemon) HandleDownloadRequest(ctx context.Context,
+func (server *EdgeServer) HandleDownloadRequest(ctx context.Context,
     req *pb.DownloadRequest) (*pb.DownloadReply, error) {
   glog.Infof("req token=%d, arrival_time=%d, num_segments=%d", req.TokenId,
       req.ArrivalTime, len(req.Segments))
@@ -32,7 +32,7 @@ func (daemon *EdgeDaemon) HandleDownloadRequest(ctx context.Context,
     doneChannel : dc,
   }
 
-  daemon.metamgr.routeAddChannel <- routeInfo
+  server.metamgr.routeAddChannel <- routeInfo
   glog.Infof("Route Add message sent. Awaiting evictions")
 
   reply.SegmentIds = <-routeInfo.doneChannel
@@ -40,17 +40,17 @@ func (daemon *EdgeDaemon) HandleDownloadRequest(ctx context.Context,
   return reply, nil
 }
 
-func (daemon *EdgeDaemon) start() {
-  lis, err := net.Listen("tcp", daemon.address)
+func (server *EdgeServer) start() {
+  lis, err := net.Listen("tcp", server.address)
   if err != nil {
-    glog.Fatalf("EdgeDaemon failed to listen: %v", err)
+    glog.Fatalf("EdgeServer failed to listen: %v", err)
   }
 
   //start grpc Edge Server to listen from cloud
   go func(){
-    daemon.grpcServer = grpc.NewServer()
-    pb.RegisterEdgeServerServer(daemon.grpcServer, daemon)
+    server.grpcServer = grpc.NewServer()
+    pb.RegisterEdgeServerServer(server.grpcServer, server)
     glog.Infof("Starting EdgeServerServer")
-    daemon.grpcServer.Serve(lis)
+    server.grpcServer.Serve(lis)
   }()
 }

@@ -7,7 +7,7 @@
       {
         "id":"node_0", 
         "ip":"localhost",
-        "edgeDaemon":51052,
+        "edgeDaemon":50056,
         "contentServer":8000,
         "downloadSourceFile": "conf/download_source_info.json"
       }
