@@ -34,7 +34,7 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
         # BEGIN Config File simplification: Simplified config, but minimal code change
         # TODO: eliminate this when go-ify cloud
         nodeIds = [node["id"] for node in self.configDict["edgeNodes"]]
-        nodeDaemonIps = [node["ip"] + ":" + node["edgeDaemon"] for node in self.configDict["edgeNodes"]]
+        nodeDaemonIps = [node["ip"] + ":" + str(node["edgeDaemon"]) for node in self.configDict["edgeNodes"]]
         nodeMap = {node["id"]:node for node in self.configDict["edgeNodes"]}
         downloadSourcesOldFormat = {}
         for node in self.configDict["edgeNodes"]:
@@ -49,7 +49,7 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
                         if rec["src_id"] not in nodeMap:
                             continue
                         nodeObj = nodeMap[rec["src_id"]]
-                        key=node["ip"] + ":" + node["contentServer"]
+                        key=node["ip"] + ":" + str(node["contentServer"])
                         
                     perNodeDict[key] = rec["bandwidth"]
                 downloadSourcesOldFormat[node["id"]] = perNodeDict

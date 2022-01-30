@@ -60,6 +60,7 @@ class DownloadManager:
         return 'http://ftp.itec.aau.at/DASHDataset2014'
 
     def get_model_dist(self, dists, distance):
+        print(dists, distance, type(distance))
         idx = bisect.bisect_left(dists, distance)
         logger.info('distance = %s idx = %s pts=%s', distance, idx, len(dists))
         if idx > len(dists) - 1:
