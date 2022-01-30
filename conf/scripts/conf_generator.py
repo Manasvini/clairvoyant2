@@ -18,10 +18,14 @@ try:
         outfile = os.path.join(args.gen_path, 'edgeConfig{}.json'.format(i))
         with open(outfile, 'w') as fw:
             obj['nodeId'] = "node_{}".format(i)
-            obj['modelFile'] = f"models/{df[1][i]}"
-            obj['serverAddress'] = "192.168.160.42:60050"
-            obj['monServerAddress'] = "192.168.160.42:8192"
-            obj['nodeAddress'] = "0.0.0.0:50056"
+            obj['modelFile'] = f"../../models/{df[1][i]}"
+            obj['serverAddress'] = "192.168.160.21:60050"
+            obj['monServerAddress'] = "192.168.160.21:8192"
+            obj["contentServerAddress"] = "0.0.0.0:8000"
+            obj["contentServerMaxClients"] = 2
+            obj["edgeServerAddress"] = "0.0.0.0:50056"
+            obj["cacheSize"] = 500
+            obj["cacheType"] = "lru"
             fw.write(json.dumps(obj, indent=2))
 except Exception as e:
     print(e.trace())

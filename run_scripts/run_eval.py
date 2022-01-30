@@ -26,7 +26,7 @@ def start_cloud(conf):
 def start_edge(conf):
     numEdgeNodes = conf['numEdgeNodes']
     machinePrefix = conf['machinePrefix']
-    result = subprocess.run(['bash', 'run_scripts/start-edge-svrs.sh',\
+    result = subprocess.run(['bash', 'run_scripts/start-edge-go-svrs.sh',\
                             str(numEdgeNodes), str(machinePrefix)],\
                             shell=False, \
                             check=False)

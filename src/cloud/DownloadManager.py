@@ -57,7 +57,7 @@ class DownloadManager:
             csvwriter.writerow(['user_id', 'cdn', 'edge', 'local'])
         
     def findOptimalSource(self, segment_id, node_id, neighbors=None):
-        return 'http://ftp.itec.aau.at/DASHDataset2014'
+        return 'http://ftp.itec.aau.at/DASHDataset2014/'
 
     def get_model_dist(self, dists, distance):
         print(dists, distance, type(distance))
@@ -396,7 +396,7 @@ class DownloadManager:
         assignments = result["assignments"]
         if assignments is None:
             raise ValueError('assignments is none')
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         self.sendAssignments(assignments, token_id)
         return assignments
   

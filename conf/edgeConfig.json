@@ -6,16 +6,16 @@
     "redisPort": 6379,
     "nodeId": "node_0",
     "intervalSeconds":1,
-    "serverAddress":"localhost:60050",
+    "serverAddress":"192.168.160.22:60050",
     "downloadSources":{
         "http://ftp.itec.aau.at/DASHDataset2014": 100000000
 
     },
-    "monServerAddress": "localhost:8192",
+    "monServerAddress": "192.168.160.22:8192",
     "monInterval": 5,
-    "contentServerAddress": "localhost:8000",
+    "contentServerAddress": "0.0.0.0:8000",
     "contentServerMaxClients": 2,
-    "edgeServerAddress": "localhost:50056",
+    "edgeServerAddress": "0.0.0.0:50056",
     "cacheSize" : 500,
     "cacheType" : "lru"
 }

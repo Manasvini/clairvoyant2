@@ -5,7 +5,7 @@
 	"edgePositions":"eval/monaco_traffic_lights_10_new.csv",
 	"cloudServerName":"cv0",
 	"machinePrefix":"cv",
-	"numUsers":10,
+	"numUsers":1,
 	"edgeInfoFile":"input/monaco_traffic_lights_10_new.csv",
 	"outputDir":"../../results/enhancements/",
 	"trajectoriesDir":"../../eval/routes/",

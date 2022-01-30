@@ -36,7 +36,7 @@ func newMetadataManager(size int, cachetype string) (*MetadataManager) {
       EvictedFunc(metamgr.evictionHandler).ARC().Build()
   }
   metamgr.routeAddChannel = make(chan RouteInfo, 10) //can accept at most 10 simultaneous routeAdd requests
-
+  metamgr.routes = make(map[int64]RouteInfo, 0)
   go metamgr.handleAddRoute()
 
   glog.Infof("initialized metadamanager of size = %d, type = %s", size, cachetype)
@@ -56,8 +56,11 @@ func (metamgr *MetadataManager) getSegments(routeId int64) []string {
   segmentIDs := []string{}
   if rinfo, ok := metamgr.routes[routeId]; ok {
     for _,segment := range rinfo.request.Segments{
+      glog.Infof("Add segment %s for route %d", segment.SegmentId, routeId)
       segmentIDs = append(segmentIDs, segment.SegmentId)
     }
+  } else{
+    glog.Errorf("Route %d not found", routeId)
   }
   return segmentIDs
 }
@@ -65,8 +68,9 @@ func (metamgr *MetadataManager) getSegments(routeId int64) []string {
 func (metamgr *MetadataManager) handleAddRoute() {
   for routeInfo := range metamgr.routeAddChannel {
     metamgr.evicted = nil
-    if _, ok := metamgr.routes[routeInfo.request.TokenId]; ok {
+    if _, ok := metamgr.routes[routeInfo.request.TokenId]; !ok {
       metamgr.routes[routeInfo.request.TokenId] = routeInfo
+      glog.Infof("Added route %d with %d segments", routeInfo.request.TokenId, len(routeInfo.request.Segments))
       metamgr.addSegments(routeInfo.request.Segments)
     } else {
       toAdd := []*pb.Segment{}

@@ -4,7 +4,7 @@ if [ -z $num_vms ]; then
   num_vms=10
 fi
 
-for ((i=1;i<=num_vms;i++)); do
+for ((i=0;i<=num_vms;i++)); do
 
   #rsync -avz --exclude ".git" --exclude "*.sw*" \
   #      --exclude="conf" \

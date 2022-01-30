@@ -152,6 +152,7 @@ func (client *Client) getFilepath(url string) string{
   }
   tmp := []rune(url)[httpIdx:]
   filepathIdx := strings.Index(string(tmp), "/")
+  glog.Errorf("idx is %d, url is %s filepath is %s", filepathIdx, tmp, tmp[filepathIdx:])
   return string(tmp[filepathIdx:])
 }
 
@@ -162,6 +163,7 @@ func (client *Client) doGetGRPC(edgeNode EdgeNode, lastSegment string, shouldRes
   contentClient := cpb.NewContentClient(conn)
 
   segmentRequest := cpb.SegmentRequest{
+      RouteId: *client.token,
       SegmentId : lastSegment,
       StartTime : client.dlInfo.startContact,
       EndTime : client.dlInfo.endContact,
@@ -277,7 +279,7 @@ func (client *Client) pretendDownload(edgeNode EdgeNode, segments []string, tota
     if int64(fileSize) < bytesAvailable {
       segments := client.doGet(edgeNode, curSegment, false)
       if len(segments) > 0 {
-        bytesAvailable -= int(fileSize)
+        bytesAvailable -= int64(fileSize)
         client.dlInfo.bufferedData[curSegment] = true
         client.stats.receivedBytesEdge += int(fileSize)
         bytesDl += int64(fileSize)
@@ -390,6 +392,7 @@ func (client *Client) FetchSegments(timestamp int64) {
       // need to get data from cloud now
       val, exists := client.videoInfo.segments[filepath]
       if !exists {
+	glog.Errorf("segment %s not found in video of client %s", filepath, client.id);
         panic("segment not found in client video...")
       }
       filesize := val.size

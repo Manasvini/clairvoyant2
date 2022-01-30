@@ -91,7 +91,7 @@ func main() {
   edgeNodes.LoadFromFile(*edgeNodesFile)
 
 
-  trajectories = []string{"../../eval/routes/user2150.csv"}
+  //trajectories = []string{"../../eval/routes/user2150.csv"}
   for _, f := range trajectories {
     fmt.Println(f)
     trajectory := cvclient.Trajectory{}

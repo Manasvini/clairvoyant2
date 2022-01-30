@@ -33,7 +33,7 @@ func (server *EdgeServer) HandleDownloadRequest(ctx context.Context,
   }
 
   server.metamgr.routeAddChannel <- routeInfo
-  glog.Infof("Route Add message sent. Awaiting evictions")
+  glog.Infof("Route Add message sent fo %d. Awaiting evictions", routeInfo.request.TokenId)
 
   reply.SegmentIds = <-routeInfo.doneChannel
   glog.Infof("Sending evicted segments")
