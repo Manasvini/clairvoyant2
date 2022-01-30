@@ -13,9 +13,9 @@
     },
     "monServerAddress": "localhost:8192",
     "monInterval": 5,
-    "contentServerAddress": "localhost:8080",
+    "contentServerAddress": "localhost:8000",
     "contentServerMaxClients": 2,
-    "edgeServerAddress": "localhost:60051",
+    "edgeServerAddress": "localhost:50056",
     "cacheSize" : 500,
     "cacheType" : "lru"
 }

@@ -10,11 +10,12 @@ for ((i=1;i<=num_vms;i++)); do
   #      --exclude="conf" \
   #      $HOME/clairvoyant2 cv2$i:~/
 
-  rsync -avz --exclude ".git" --exclude "*.sw*" \
-        --exclude="conf" \
-	--exclude="*pycache*"\
-        --exclude="results"\
-        --exclude="localenv"\
+  rsync -avz --exclude ".git" \
+             --exclude "*.sw*" \
+             --exclude="/clairvoyant2/conf" \
+             --exclude="*pycache*"\
+             --exclude="results"\
+             --exclude="localenv"\
         $HOME/clairvoyant2 ${machine_prefix}${i}:~/
 done
 

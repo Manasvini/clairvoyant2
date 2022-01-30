@@ -9,14 +9,14 @@ import (
   "time"
 )
 
-func startEdgeDaemon(config EdgeConfig, metamgr *MetadataManager) (*EdgeDaemon) {
-  edgeDaemon := &EdgeDaemon{
+func startEdgeServer(config EdgeConfig, metamgr *MetadataManager) (*EdgeServer) {
+  edgeServer := &EdgeServer{
     config : config,
     address : config.EdgeServerAddress,
     metamgr : metamgr,
   }
-  edgeDaemon.start()
-  return edgeDaemon
+  edgeServer.start()
+  return edgeServer
 }
 
 func startContentServer(config EdgeConfig, metamgr *MetadataManager) (*ContentServer) {
@@ -47,18 +47,18 @@ func waitForUserExit() {
   <-schan
 }
 
-func initEdgeRoutines(address string, configFile string) {
+func initEdgeRoutines(configFile string) {
 
   config := parseConfig(configFile)
   metamgr := newMetadataManager(config.CacheSize, config.CacheType)
 
   startMonitoring(config)
-  edaemon := startEdgeDaemon(config, metamgr)
+  eserver := startEdgeServer(config, metamgr)
   cserver := startContentServer(config, metamgr)
   //dmonitor :=startDeliverMonitor(config, metamgr, &wg, ctx)
 
   waitForUserExit()
-  edaemon.grpcServer.GracefulStop()
+  eserver.grpcServer.GracefulStop()
   cserver.grpcServer.GracefulStop()
 }
 
@@ -69,11 +69,10 @@ func main() {
 
   //parse arguments
   configFile := flag.String("config", "../conf/edge_config.json" /*default*/,  "Edge Config file")
-  edgeDaemonAddress := flag.String("address", "0.0.0.0:60050", "Edge Daemon address listening for download assignments from the cloud")
 
   flag.Set("logtostderr", "true")
   flag.Parse()
-  glog.Infof("Loaded flags. config = %s, edgeDaemon = %s", *configFile, *edgeDaemonAddress)
+  glog.Infof("Loaded flags. config = %s", *configFile)
 
-  initEdgeRoutines(*edgeDaemonAddress, *configFile)
+  initEdgeRoutines(*configFile)
 }

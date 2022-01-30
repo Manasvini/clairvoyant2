@@ -15,7 +15,7 @@ import genprotos.clairvoyant_pb2 as clairvoyant_pb2
 
 parent_logger = logging.getLogger("cloud")
 logger = parent_logger.getChild('downloadmgr')
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.DEBUG)
 
 class Bench2Mode(str, Enum):
     NOCACHE = "nocache"             # everything from cdn
@@ -396,6 +396,7 @@ class DownloadManager:
         assignments = result["assignments"]
         if assignments is None:
             raise ValueError('assignments is none')
+        import pdb; pdb.set_trace()
         self.sendAssignments(assignments, token_id)
         return assignments
   
