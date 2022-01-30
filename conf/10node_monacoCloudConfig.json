@@ -2,7 +2,7 @@
   "modelMap":"models/model_map.csv",
   "modelDir":"models/",
   "mode": "all2all",
-  "nodePosFile":"eval/monaco_traffic_lights_10.csv",
+  "nodePosFile":"eval/monaco_traffic_lights_10_new.csv",
   "timeScale":60,
   "metaServerAddress": "localhost:50051",
   "monServerAddress": "0.0.0.0",

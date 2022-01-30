@@ -137,6 +137,8 @@ func main() {
   }
   fmt.Printf("\nelapsed = %s\n", time.Since(start))
   f, err := os.Create(*ofilename)
+  ef, err := os.Create(*ofilename+ ".edge")
+  cf, err := os.Create(*ofilename +".contact")
   if err != nil {
     panic(err)
   }
@@ -144,11 +146,26 @@ func main() {
   if err != nil{
     panic(err)
   }
+  _, err = ef.WriteString("client,edgenode,timestamp,bytes\n")
+  _, err = cf.WriteString("client,edgenode,timestamp,bytes\n")
   for _, c := range clients {
     line := c.PrintStats()
     _, err = f.WriteString(line)
     if err != nil{
       panic(err)
     }
+    for _, dlLog := range c.GetDlLogs(){
+      _, err = ef.WriteString(dlLog + "\n")
+      if err != nil{
+        panic(err)
+      }
+    }
+    for _, dlLog := range c.GetContactLogs(){
+      _, err = cf.WriteString(dlLog + "\n")
+      if err != nil{
+        panic(err)
+      }
+    }
+
   }
 }

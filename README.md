@@ -1,22 +1,11 @@
-### Running the code  
-At the project root directory, start the edge and cloud servers as follows:  
-Start cloud server  
+### Running the code
+
+> Check the configuration eval/conf/10node_conf.json
+ 
+Then run the following in the cosmos staging from the project root.
+
 ```shell
-$ python3 src/CVCloudServer.py -a localhost:50058 -c conf/cloudConfig.json  
+python3 run_scripts/run_eval.sh eval/conf/10node_conf.json 
 ```
-Start edge server 
- ```shell
-$ python3 src/EdgeDownloadServer.py -a localhost:50056 -c conf/edgeConfig.json  
-```  
-To test the setup, use the test client like so:  
-```shell  
-$ python3 src/CVCloudClient.py  
-```
-If the metadata server is not up, start it as usual from clairvoyanedge-comm/ repo on port 50051
-```shell  
-$ cd clairvoyantedge-comm/ && bash scripts/start_meta_svr.sh  
-```  
-Start evaluation on cloud server 
-```shell   
-$ cd clairvoyant2/ && python3 client_runner.py -a localhost:50058 -f ../eval/user_trajectories/ -d ../models/ -m ../models/model_map.csv -c ../conf/cloudConfig.json -i 0  
-```
+
+Check the logs (.csv and .csv.edge) in the output directory mentioned in the configuration file.
