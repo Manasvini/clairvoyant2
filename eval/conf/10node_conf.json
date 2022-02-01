@@ -5,9 +5,9 @@
 	"edgePositions":"eval/monaco_traffic_lights_10_new.csv",
 	"cloudServerName":"cv0",
 	"machinePrefix":"cv",
-	"numUsers":1,
+	"numUsers":200,
 	"edgeInfoFile":"input/monaco_traffic_lights_10_new.csv",
-	"outputDir":"../../results/enhancements/",
+	"outputDir":"../../results/enhancements/edge_go_50gig_lru",
 	"trajectoriesDir":"../../eval/routes/",
 	"segmentFile":"~/clairvoyant2/eval/videos/bbb_2ksegs.csv"
 }

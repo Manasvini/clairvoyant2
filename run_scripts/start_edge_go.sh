@@ -7,4 +7,5 @@
 PATH=$PATH:/usr/local/go/bin
 echo "pwd is $PWD"
 cd src/edge_go
-/usr/local/go/bin/go run . -config ../../conf/edgeConfig.json > ../../logs.edge.out 2>&1 & 
+rm edge_go.*
+/usr/local/go/bin/go run . -config ../../conf/edgeConfig.json  -log_dir ./ > ../../logs.edge.out 2>&1 & 

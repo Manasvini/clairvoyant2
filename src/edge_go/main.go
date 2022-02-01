@@ -50,7 +50,7 @@ func waitForUserExit() {
 func initEdgeRoutines(configFile string) {
 
   config := parseConfig(configFile)
-  metamgr := newMetadataManager(config.CacheSize, config.CacheType)
+  metamgr := newMetadataManager(int64(config.CacheSize), config.CacheType)
 
   startMonitoring(config)
   eserver := startEdgeServer(config, metamgr)
@@ -70,7 +70,7 @@ func main() {
   //parse arguments
   configFile := flag.String("config", "../conf/edge_config.json" /*default*/,  "Edge Config file")
 
-  flag.Set("logtostderr", "true")
+  //flag.Set("logtostderr", "true")
   flag.Parse()
   glog.Infof("Loaded flags. config = %s", *configFile)
 

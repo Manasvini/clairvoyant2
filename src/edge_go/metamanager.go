@@ -2,7 +2,6 @@ package main
 
 import (
   "github.com/golang/glog"
-  "github.com/bluele/gcache"
   pb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
 )
 
@@ -12,7 +11,7 @@ type RouteInfo struct {
 }
 
 type MetadataManager struct {
-  SegmentCache gcache.Cache
+  SegmentCache *Cache
   routeAddChannel chan RouteInfo
   evicted []string
   routes map[int64]RouteInfo
@@ -22,18 +21,13 @@ func (metamgr *MetadataManager) evictionHandler(key, value interface{}) {
   metamgr.evicted = append(metamgr.evicted, key.(string))
 }
 
-func newMetadataManager(size int, cachetype string) (*MetadataManager) {
+func newMetadataManager(size int64, cachetype string) (*MetadataManager) {
   metamgr := &MetadataManager{}
   switch {
   case cachetype == "lru":
-    metamgr.SegmentCache = gcache.New(size).
-      EvictedFunc(metamgr.evictionHandler).LRU().Build()
+	  metamgr.SegmentCache = NewCache(size, "lru", metamgr.evictionHandler)
   case cachetype == "lfu":
-    metamgr.SegmentCache = gcache.New(size).
-      EvictedFunc(metamgr.evictionHandler).LFU().Build()
-  case cachetype == "arc":
-    metamgr.SegmentCache = gcache.New(size).
-      EvictedFunc(metamgr.evictionHandler).ARC().Build()
+	  metamgr.SegmentCache = NewCache(size, "lfu", metamgr.evictionHandler)
   }
   metamgr.routeAddChannel = make(chan RouteInfo, 10) //can accept at most 10 simultaneous routeAdd requests
   metamgr.routes = make(map[int64]RouteInfo, 0)
@@ -46,7 +40,7 @@ func newMetadataManager(size int, cachetype string) (*MetadataManager) {
 
 func (metamgr *MetadataManager) addSegments(segments []*pb.Segment) {
   for _, segment := range segments {
-    metamgr.SegmentCache.Set(segment.SegmentId, *segment)
+    metamgr.SegmentCache.AddSegment(*segment)
   }
 }
 
@@ -56,7 +50,6 @@ func (metamgr *MetadataManager) getSegments(routeId int64) []string {
   segmentIDs := []string{}
   if rinfo, ok := metamgr.routes[routeId]; ok {
     for _,segment := range rinfo.request.Segments{
-      glog.Infof("Add segment %s for route %d", segment.SegmentId, routeId)
       segmentIDs = append(segmentIDs, segment.SegmentId)
     }
   } else{
@@ -75,7 +68,7 @@ func (metamgr *MetadataManager) handleAddRoute() {
     } else {
       toAdd := []*pb.Segment{}
       for _,seg := range routeInfo.request.Segments {
-        if !metamgr.SegmentCache.Has(seg.SegmentId) {
+        if !metamgr.SegmentCache.HasSegment(seg.SegmentId) {
           toAdd = append(toAdd, seg)
         }
       }

@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/golang/glog"
-	cvpb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
+	//cvpb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
 	pb "github.gatech.edu/cs-epl/clairvoyant2/edge_go/contentserver"
 	"google.golang.org/grpc"
 )
@@ -60,13 +60,13 @@ func (server *ContentServer) GetSegment(ctx context.Context, req *pb.SegmentRequ
 		}
 	} else {
 		// this is a segment request
-		hasSegment := server.metamgr.SegmentCache.Has(req.SegmentId)
+		hasSegment := server.metamgr.SegmentCache.HasSegment(req.SegmentId)
 
 		if hasSegment {
 			//TODO:update delivery monitor
-			val, _ := server.metamgr.SegmentCache.Get(req.SegmentId)
+			segment, _ := server.metamgr.SegmentCache.GetSegment(req.SegmentId)
 			response.Status = "segment found"
-			response.Segments = append(response.Segments, val.(cvpb.Segment).SegmentId)
+			response.Segments = append(response.Segments, segment.SegmentId)
 		} else {
 			response.Status = "segment not found"
 		}

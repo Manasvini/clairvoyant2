@@ -170,7 +170,7 @@ func (client *Client) doGetGRPC(edgeNode EdgeNode, lastSegment string, shouldRes
       Remove : shouldResetContact,
     }
 
-  ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+  ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
   defer cancel()
   resp, err := contentClient.GetSegment(ctx, &segmentRequest)
   if err == nil{

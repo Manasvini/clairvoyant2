@@ -22,3 +22,5 @@ require (
 )
 
 replace github.gatech.edu/cs-epl/clairvoyant2/edge_go/contentserver => ../edge_go/contentserver
+
+replace github.com/bluele/gcache => ../gcache-master
