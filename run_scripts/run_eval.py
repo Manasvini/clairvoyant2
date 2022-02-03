@@ -10,7 +10,7 @@ def read_config(filename):
         conf = json.load(fh)
     return conf
 
-def start_cloud(conf):
+def start_cloud(conf, repopulate_db):
     numEdgeNodes = conf['numEdgeNodes']
     cloudConfig = conf['cloudConfig']
     edgePos = conf['edgePositions']
@@ -18,7 +18,12 @@ def start_cloud(conf):
     segmentFile = conf['segmentFile']
     result = subprocess.run(['ssh', conf['cloudServerName'], \
                             'cd clairvoyant2 && bash run_scripts/start_cloud_services.sh ' +\
-                             str(numEdgeNodes) + ' ' + cloudConfig + ' ' + edgePos + ' ' + str(numVideos) + ' ' + segmentFile], \
+                             str(numEdgeNodes) + ' ' + \
+                             cloudConfig + ' ' + \
+                             edgePos + ' ' +\
+                             str(numVideos) + ' ' +\
+                             segmentFile + ' ' \
+                             + repopulate_db], \
                              shell=False, \
                              check=False)
     print('cloud success=', result.returncode) 
@@ -57,8 +62,11 @@ def main():
     #example conf script in eval folder 10node_conf.json
     num_trials = conf['numTrials']
     start = time.time()
+    repopulate_db = 'yes'
     for i in range(num_trials):
-        start_cloud(conf)
+        start_cloud(conf, repopulate_db)
+        if repopulate_db == 'yes':
+            repopulate_db = 'no'
         start_edge(conf)
         time.sleep(10)
         start_clients(conf)

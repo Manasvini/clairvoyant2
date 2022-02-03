@@ -4,30 +4,38 @@ conf=$2
 node_pos=$3
 num_videos=$4
 segments_file=$5
+purge_redis=$6
 cd
 cd clairvoyantedge-metadata
-
 curdir=$(pwd)
-#pkill redis
-#rm -rf cluster/*
-bash scripts/start_redis_cluster.sh 3
 
-sleep 15
+if [ $purge_redis = "yes" ]; then
+	pkill redis
+	rm -rf cluster/*
+	bash scripts/start_redis_cluster.sh 3
 
-echo "adding nodes"
-cd ~/clairvoyant2
+	sleep 15
 
-python3 eval/add_nodes.py -n $num_nodes -p "192.168.160." -s 22 -i 0 -f $node_pos
+	echo "adding nodes"
+	cd ~/clairvoyant2
 
-cd $curdir
-pkill clairvoyant
-sleep 5
-bash scripts/start_meta_svr.sh > ./logs/meta_svr.out 2>&1 &
+	python3 eval/add_nodes.py -n $num_nodes -p "192.168.160." -s 22 -i 0 -f $node_pos
 
-cd scripts
-echo "num videos = " $num_videos " video file =  " $segments_file
-bash ./video_creator.sh ../build/metadata/scripts/data-uploader $num_videos $segments_file
-#
+	cd $curdir
+	pkill clairvoyant
+	sleep 5
+	bash scripts/start_meta_svr.sh > ./logs/meta_svr.out 2>&1 &
+
+	cd scripts
+	echo "num videos = " $num_videos " video file =  " $segments_file
+	bash ./video_creator.sh ../build/metadata/scripts/data-uploader $num_videos $segments_file
+else
+	cd $curdir
+	pkill clairvoyant
+	sleep 5
+	bash scripts/start_meta_svr.sh > ./logs/meta_svr.out 2>&1 &
+fi;
+
 pkill python3
 cd ~/clairvoyant2
 mkdir -p logs

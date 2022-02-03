@@ -4,7 +4,7 @@
   "mode": "all2all",
   "timeScale":60,
   "metaServerAddress": "localhost:50051",
-  "defaultSource":"http://ftp.itec.aau.at/DASHDataset2014",
+  "defaultSource":"http://ftp.itec.aau.at/DASHDataset2014/",
   "monServerAddress": "0.0.0.0",
   "monServerPort": 8192,
   "edgeNodes":[
