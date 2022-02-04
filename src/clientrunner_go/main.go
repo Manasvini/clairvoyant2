@@ -93,7 +93,15 @@ func main() {
 	edgeNodes.LoadFromFile(*edgeNodesFile)
 
 	trajectories = []string{"../../eval/enode_positions/microbenchmark/bench2/30users_new/user0.csv",
-		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user1.csv"}
+		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user1.csv",
+		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user2.csv",
+		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user3.csv",
+		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user4.csv",
+		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user5.csv",
+		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user6.csv",
+		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user7.csv",
+		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user8.csv",
+		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user9.csv"}
 	//trajectories = trajectories[:20]
 
 	for _, f := range trajectories {

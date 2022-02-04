@@ -5,7 +5,7 @@ import logging
 
 parent_logger = logging.getLogger("cloud")
 logger = parent_logger.getChild('edassignment')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 class SegmentInfo:
     def __init__(self):

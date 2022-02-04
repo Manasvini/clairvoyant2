@@ -2,11 +2,12 @@ package main
 
 import (
 	"flag"
-	"github.com/golang/glog"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/golang/glog"
 )
 
 func startEdgeServer(config EdgeConfig, metamgr *MetadataManager) *EdgeServer {
@@ -60,6 +61,7 @@ func initEdgeRoutines(configFile string) {
 	waitForUserExit()
 	eserver.grpcServer.GracefulStop()
 	cserver.grpcServer.GracefulStop()
+	metamgr.Close()
 }
 
 func main() {

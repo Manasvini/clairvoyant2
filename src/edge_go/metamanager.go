@@ -1,9 +1,27 @@
 package main
 
 import (
+	"context"
+	"strings"
+	"sync"
+	"time"
+
+	"encoding/json"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	"github.com/golang/glog"
 	pb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
+	cpb "github.gatech.edu/cs-epl/clairvoyant2/edge_go/contentserver"
+	"google.golang.org/grpc"
 )
+
+func check(err error) {
+	if err != nil {
+		glog.Fatal(err)
+	}
+}
 
 type RouteInfo struct {
 	request     pb.DownloadRequest
@@ -11,10 +29,13 @@ type RouteInfo struct {
 }
 
 type MetadataManager struct {
-	SegmentCache    *Cache
-	routeAddChannel chan RouteInfo
-	evicted         []string
-	routes          map[int64]RouteInfo
+	SegmentCache       *Cache
+	routeAddChannel    chan RouteInfo
+	downloadReqChannel chan pb.DownloadRequest
+	evicted            []string
+	routes             map[int64]RouteInfo
+	resultFile         string
+	wg                 sync.WaitGroup
 }
 
 func (metamgr *MetadataManager) evictionHandler(key, value interface{}) {
@@ -29,9 +50,29 @@ func newMetadataManager(size int64, cachetype string) *MetadataManager {
 	case cachetype == "lfu":
 		metamgr.SegmentCache = NewCache(size, "lfu", metamgr.evictionHandler)
 	}
-	metamgr.routeAddChannel = make(chan RouteInfo, 10) //can accept at most 10 simultaneous routeAdd requests
+	metamgr.routeAddChannel = make(chan RouteInfo, 10)             //can accept at most 10 simultaneous routeAdd requests
+	metamgr.downloadReqChannel = make(chan pb.DownloadRequest, 10) //can accept at most 10 simultaneous requests
 	metamgr.routes = make(map[int64]RouteInfo, 0)
 	go metamgr.handleAddRoute()
+
+	metamgr.wg.Add(1)
+	go func() {
+		metamgr.processDownloads()
+		metamgr.wg.Done()
+	}()
+
+	//TODO: take from config file
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		glog.Fatal(err)
+	}
+
+	resultDir := filepath.Join(homeDir, "clairvoyant2", "results")
+	err = os.MkdirAll(resultDir, 0755)
+	if err != nil {
+		glog.Fatal(err)
+	}
+	metamgr.resultFile = filepath.Join(resultDir, "bench2.json")
 
 	glog.Infof("initialized metadamanager of size = %d, type = %s", size, cachetype)
 
@@ -44,10 +85,102 @@ func (metamgr *MetadataManager) addSegments(segments []*pb.Segment) {
 	}
 }
 
-func (metamgr *MetadataManager) downloadFromSources(request pb.DownloadRequest) {
-	for segment, source := range request.SegmentSources {
-		glog.Infof("%s FROM %s", segment, source)
+func (metamgr *MetadataManager) getSegmentFromEdge(address string, segments []*pb.Segment, segmentIdxList []int, successTracker *[]bool) {
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {
+		glog.Error(err)
 	}
+
+	defer conn.Close()
+
+	contentClient := cpb.NewContentClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	for idx := range segmentIdxList {
+		segmentRequest := cpb.SegmentRequest{
+			RouteId:   -1,
+			SegmentId: segments[idx].SegmentId,
+			StartTime: 0,
+			EndTime:   0,
+			Remove:    false,
+			IsEdge:    true,
+		}
+		resp, err := contentClient.GetSegment(ctx, &segmentRequest)
+		if err == nil {
+
+			if len(resp.Segments) > 0 {
+				(*successTracker)[idx] = true
+			} else {
+				(*successTracker)[idx] = false
+			}
+		} else {
+			glog.Error(err)
+		}
+	}
+}
+
+func (metamgr *MetadataManager) Close() {
+	glog.Info("Closing Metamgr!")
+	close(metamgr.downloadReqChannel)
+	metamgr.wg.Wait()
+}
+
+func (metamgr *MetadataManager) processDownloads() {
+	cdnstr := "ftp" //TODO: make this more robust
+
+	var edgeAggDownload, cloudAggDownload, edgeSegCount, cloudSegCount int32
+
+	for request := range metamgr.downloadReqChannel {
+		nodeSegMap := map[string][]int{} //map from node_src_ip -> seg_idx list
+		numEdge := 0
+		successTracker := make([]bool, len(request.Segments))
+
+		for idx, segment := range request.Segments {
+			segmentId := segment.SegmentId
+			source := request.SegmentSources[segmentId]
+			if !strings.Contains(source, cdnstr) {
+				nodeSegMap[source] = append(nodeSegMap[source], idx)
+				numEdge++
+			} else {
+				cloudSegCount++
+				cloudAggDownload += segment.SegmentSize
+			}
+		}
+
+		glog.Infof("num_cloud=%d, num_edge=%d", len(request.SegmentSources)-numEdge, numEdge)
+
+		for source, segIdxList := range nodeSegMap {
+			metamgr.getSegmentFromEdge(source, request.Segments, segIdxList, &successTracker)
+		}
+
+		for idx, success := range successTracker {
+			if success {
+				edgeSegCount++
+				edgeAggDownload += request.Segments[idx].SegmentSize
+			} else {
+				cloudSegCount++
+				cloudAggDownload += request.Segments[idx].SegmentSize
+			}
+		}
+
+	}
+	jsonString, err := json.MarshalIndent(struct {
+		EdgeAggDownload  int32
+		CloudAggDownload int32
+		EdgeSegCount     int32
+		CloudSegCount    int32
+	}{
+		EdgeAggDownload:  edgeAggDownload,
+		CloudAggDownload: cloudAggDownload,
+		EdgeSegCount:     edgeSegCount,
+		CloudSegCount:    cloudSegCount,
+	}, "", "  ")
+	check(err)
+
+	err = ioutil.WriteFile(metamgr.resultFile, jsonString, 0644)
+	glog.Infof("Finished Writing File")
+	check(err)
 }
 
 func (metamgr *MetadataManager) getSegments(routeId int64) []string {
@@ -82,7 +215,7 @@ func (metamgr *MetadataManager) handleAddRoute() {
 				metamgr.addSegments(toAdd)
 			}
 		}
-		go metamgr.downloadFromSources(routeInfo.request)
+		metamgr.downloadReqChannel <- routeInfo.request
 		glog.Infof("len_evicted=%d", len(metamgr.evicted))
 		routeInfo.doneChannel <- metamgr.evicted
 	}

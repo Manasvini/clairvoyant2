@@ -41,10 +41,11 @@ print("Ready!")
 
 def signal_handler(sig, frame):
     print('You pressed Ctrl+C!')
-    clockproc.terminate()
-    cloudproc.terminate()
     stop_edge()
+    time.sleep(2)
+    cloudproc.terminate()
+    clockproc.terminate()
     sys.exit(0) 
 
 signal.signal(signal.SIGINT, signal_handler)
-cloudproc.communicate()
+signal.pause()

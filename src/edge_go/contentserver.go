@@ -63,10 +63,12 @@ func (server *ContentServer) GetSegment(ctx context.Context, req *pb.SegmentRequ
 		hasSegment := server.metamgr.SegmentCache.HasSegment(req.SegmentId)
 
 		if hasSegment {
-			//TODO:update delivery monitor
-			segment, _ := server.metamgr.SegmentCache.GetSegment(req.SegmentId)
+			if !req.IsEdge {
+				//TODO:update delivery monitor
+				server.metamgr.SegmentCache.GetSegment(req.SegmentId)
+			}
 			response.Status = "segment found"
-			response.Segments = append(response.Segments, segment.SegmentId)
+			response.Segments = append(response.Segments, req.SegmentId)
 		} else {
 			response.Status = "segment not found"
 		}

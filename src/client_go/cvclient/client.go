@@ -177,6 +177,7 @@ func (client *Client) doGetGRPC(edgeNode EdgeNode, lastSegment string, shouldRes
 		StartTime: client.dlInfo.startContact,
 		EndTime:   client.dlInfo.endContact,
 		Remove:    shouldResetContact,
+		IsEdge:    false,
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
