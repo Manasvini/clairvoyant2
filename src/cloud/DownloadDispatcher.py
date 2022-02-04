@@ -30,11 +30,11 @@ class DownloadDispatcher:
                 s.CopyFrom(segment)
             for s in segment_sources:
                 request.segment_sources[s] = segment_sources[s]
-            logger.info(f"node_id={edge_node_id}, num_segments={len(request.segments)}")
+            logger.info(f"node_id={edge_node_id},ip={ip}, num_segments={len(request.segments)}")
             response = stub.HandleDownloadRequest(request)
             #print(response)
             if self.callback is not None:
-                self.callback(response)
+                self.callback(edge_node_id, response)
             logging.info("Dl client received response for token %s: ", response.token_id)
 
 

@@ -3,6 +3,10 @@ import time
 import copy
 import logging
 
+parent_logger = logging.getLogger("cloud")
+logger = parent_logger.getChild('edassignment')
+logger.setLevel(logging.DEBUG)
+
 class SegmentInfo:
     def __init__(self):
         self.segment = None
@@ -48,7 +52,7 @@ class EdgeDownloadAssignment:
 
         segmentTime = (candidate.segment.segment_size * 8.0) / self.downloadSourceSpeeds[candidate.source]
         if max_dlc_time + segmentTime < candidate.arrival_time:
-            logging.debug("segment {} meets deadline".format(candidate.segment.segment_id))
+            logger.debug("segment {} meets deadline".format(candidate.segment.segment_id))
             candidate.expected_dlc_time = max_dlc_time + segmentTime
             self.assignments[candidate.segment.segment_id] = candidate
             add_success = True
@@ -85,7 +89,7 @@ class EdgeDownloadAssignment:
             if candidate.segment.segment_id not in self.assignments:
                 self.assignments[candidate.segment.segment_id] = candidate
                 #print('added to dl', candidate.segment.segment_id)
-                logging.info('edge node ' + self.node_id+ ' has' + str(len(self.assignments))+ ' in progress')
+                logger.info('edge node ' + self.node_id+ ' has' + str(len(self.assignments))+ ' in progress')
         finally:
             self.mutex.release()
     

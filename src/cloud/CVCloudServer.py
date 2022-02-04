@@ -35,6 +35,7 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
         # TODO: eliminate this when go-ify cloud
         nodeIds = [node["id"] for node in self.configDict["edgeNodes"]]
         nodeDaemonIps = {node["id"]:f'{node["ip"]}:{node["edgeDaemon"]}' for node in self.configDict["edgeNodes"]}
+        nodeDownloadIps = {node["id"]:f'{node["ip"]}:{node["contentServer"]}' for node in self.configDict["edgeNodes"]}
         nodeMap = {node["id"]:node for node in self.configDict["edgeNodes"]}
         downloadSourcesOldFormat = {}
         for node in self.configDict["edgeNodes"]:
@@ -49,7 +50,7 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
                         if rec["src_id"] not in nodeMap:
                             continue
                         nodeObj = nodeMap[rec["src_id"]]
-                        key=node["ip"] + ":" + str(node["contentServer"])
+                        key=nodeObj["ip"] + ":" + str(node["contentServer"])
                         
                     perNodeDict[key] = rec["bandwidth"]
                 downloadSourcesOldFormat[node["id"]] = perNodeDict
@@ -65,7 +66,9 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
                 downloadSourcesOldFormat,
                 self.configDict['timeScale'],
                 self.mmWaveModels, 
-                DownloadDispatcher(nodeDaemonIps, None),
+                nodeDaemonIps,
+                nodeDownloadIps,
+                self.configDict['defaultSource'],
                 mode)
 
         monServer = MonitoringServer(address=self.configDict['monServerAddress'], \

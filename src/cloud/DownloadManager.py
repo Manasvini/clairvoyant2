@@ -4,6 +4,7 @@ import bisect
 import asyncio
 import os
 import csv
+import random
 
 from enum import Enum
 
@@ -11,6 +12,9 @@ from cloud.EdgeDownloadAssignment import EdgeDownloadAssignment, SegmentInfo
 from shared.EdgeNetworkModel import EdgeNetworkModel
 from cloud.DownloadDispatcher import DownloadDispatcher
 import genprotos.clairvoyant_pb2 as clairvoyant_pb2
+import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
+
+from threading import Thread, Lock
 
 
 parent_logger = logging.getLogger("cloud")
@@ -25,6 +29,73 @@ class Bench2Mode(str, Enum):
                                     # possible, since you can't know what are nodes, 
                                     # until you finish atomic "add" 
     ALL_ROUTE_NBR = "allRouteNbr"   # use cache of every node of all routes going through cur node
+
+class Oracle:
+    def __init__(self, mode):
+        self.mode = mode
+        self.mutex = Lock() #for controlling state of segment_map and node_nbr_map
+        self.segment_map = {} #seg_id -> node_id_set
+        self.node_nbr_map = {} #node_id -> set of node neighbors so far
+
+    def update(self, node_id, response):
+        if len(response.segment_ids) == 0:
+            logger.debug("No evictions. nothing to do")
+            return
+
+        logger.debug("Received evicted segments. Updating State")
+        self.mutex.acquire()
+        for seg_id in response.segment_ids:
+            self.segment_map[seg_id].remove(node_id)
+        self.mutex.release()
+
+
+    def findOptimalSourceNode(self, seg_id, node_id, neighbors):
+        self.mutex.acquire()
+        src_node = None
+
+        # set initializations
+        if seg_id not in self.segment_map:
+            self.segment_map[seg_id] = set()
+
+        if node_id not in self.node_nbr_map:
+            self.node_nbr_map[node_id] = set()
+
+        # main logic
+        if node_id in self.segment_map[seg_id]:
+            logger.debug("assumed to exist in local cache")
+            src_node = node_id
+
+        elif self.mode == Bench2Mode.LOCAL:
+            src_node = node_id
+
+        elif self.mode == Bench2Mode.ALL2ALL:
+            if self.segment_map[seg_id]:
+                src_nodes = list(self.segment_map[seg_id])
+                src_node = random.choice(src_nodes)
+
+        elif self.mode == Bench2Mode.CUR_ROUTE_NBR:
+            src_nodes = []
+            for node in neighbhors:
+                if node in self.segment_map[seg_id]:
+                    src_nodes.append(node)
+            if src_nodes:
+                src_node = random.choice(src_nodes)
+                
+        elif self.mode == Bench2Mode.ALL_ROUTE_NBR:
+            self.node_nbr_map[node_id].update(neighbors)
+            src_nodes = []
+            for node in self.node_nbr_map[node_id]:
+                if node in self.segment_map[seg_id]:
+                    src_nodes.append(node)
+            if src_nodes:
+                src_node = random.choice(src_nodes)
+
+        if src_node:
+            logger.info("found a non cloud src={} for node={}".format(src_node, node_id))
+
+        self.segment_map[seg_id].add(node_id)
+        self.mutex.release()
+        return src_node
     
 
 class DownloadManager:
@@ -33,22 +104,25 @@ class DownloadManager:
             downloadSources, 
             timeScale,
             mmWaveModels, 
-            dispatcher, 
+            nodeDaemonIps, 
+            nodeDownloadIps, 
+            defaultSource,
             mode):
+        self.defaultSource = defaultSource
         self.downloadSources = downloadSources
         self.mmWaveModels = mmWaveModels
         self.edgeNodeAssignments = {node_id: EdgeDownloadAssignment(node_id, downloadSources[node_id], timeScale) for node_id in node_ids}
-        self.dispatcher = dispatcher    
-        self.routeInfos = {}
-        self.phase3 = True
-        self.max_client_per_node = 2
-
-        self.segment_map = {} #seg_id -> node_id_set
-        self.node_nbr_map = {} #node_id -> set of node neighbors so far
+        self.nodeDownloadIps = nodeDownloadIps
         if mode:
             self.mode = mode
         else:
             self.mode = Bench2Mode.NOCACHE
+        self.oracle = Oracle(mode)
+        self.dispatcher = DownloadDispatcher(nodeDaemonIps, self.oracle.update)
+        self.routeInfos = {}
+        self.phase3 = True
+        self.max_client_per_node = 2
+
         self.node_segcount_map = {}
 
         filename = f'/home/cvuser/clairvoyant2/results/bench2/{self.mode}_results.csv'
@@ -56,13 +130,11 @@ class DownloadManager:
             csvwriter = csv.writer(fh, delimiter=',')
             csvwriter.writerow(['user_id', 'cdn', 'edge', 'local'])
         
-    def findOptimalSource(self, segment_id, node_id, neighbors=None):
-        return 'http://ftp.itec.aau.at/DASHDataset2014/'
 
     def get_model_dist(self, dists, distance):
-        print(dists, distance, type(distance))
+        logger.debug("{}, {}, {}".format(dists, distance, type(distance)))
         idx = bisect.bisect_left(dists, distance)
-        logger.info('distance = %s idx = %s pts=%s', distance, idx, len(dists))
+        logger.debug('distance={} idx={} pts={}'.format(distance, idx, len(dists)))
         if idx > len(dists) - 1:
             return dists[len(dists)-1]
 
@@ -120,12 +192,12 @@ class DownloadManager:
         node_id = node.node_id
         contact_points = node.contact_points
         model = self.mmWaveModels[node_id]
-        logger.info("num models= %s ", len(self.mmWaveModels))
+        logger.debug("num models={}".format(len(self.mmWaveModels)))
         dl_map = model.get()
         if model is None:
             logger.warning('Empty Model!')
         distances = sorted(list(dl_map.keys()))
-        print(node.node_id, dl_map)
+        logger.debug(node.node_id, dl_map)
         totalBits = 0
 
         last_distance = -1
@@ -217,7 +289,13 @@ class DownloadManager:
 
                 candidate = SegmentInfo()
                 candidate.segment = segments[segmentIdx]
-                candidate.source = self.findOptimalSource(candidate.segment.segment_id, node.node_id)
+                candidate.source = self.defaultSource
+                src_node = self.oracle.findOptimalSourceNode(candidate.segment.segment_id, node.node_id,\
+                                                          [node.node_id for node in effectiveNodeInfos])
+
+                if src_node:
+                    candidate.source = self.nodeDownloadIps[src_node]
+
                 candidate.arrival_time = node.arrival_time
                 candidate.contact_time = node.contact_time
 
@@ -236,21 +314,21 @@ class DownloadManager:
                 self.routeInfos[token_id].append(node)
 
 
-        logger.debug('Assignments:')
+        logger.info('Assignments:')
         for nodeInfo in self.routeInfos[token_id]:
             node = nodeInfo.node_id
-            logger.debug("arrival={}, node:{}, num_segments:{}".format(nodeInfo.arrival_time, node,  len(assignments[node])))
+            logger.info("arrival={}, node:{}, num_segments:{}".format(nodeInfo.arrival_time, node,  len(assignments[node])))
 
         logger.info(f"routeInfos is tracking token={token_id}")
 
         #NOTE: simple matter of replacing findOptimalSource with this
-        self.updateDownloadSources(token_id, assignments)
-
+        #result["assignments"] = self.updateDownloadSources(token_id, assignments)
         result["assignments"] = assignments
-
         return result
 
-    def updateDownloadSources(self, token_id, assignment_info_list):
+
+
+    def updateDownloadSources(self, token_id, assignment_info_dict):
         """
         purely from benchmark 2 perspective, this will output what segmemts are downloaded
         from where.
@@ -259,10 +337,11 @@ class DownloadManager:
             return
 
         filename = f'/home/cvuser/clairvoyant2/results/bench2/{self.mode}_results.csv'
-
-        assignments = {k:v for k,v in assignment_info_list.items() if len(v)}
-
+        assignments = {k:v for k,v in assignment_info_dict.items() if len(v)}
         debug = open(f'debug_{self.mode}','a')
+
+        default_src = 'http://ftp.itec.aau.at/DASHDataset2014/'
+        src_node = None
 
         with open(filename, 'a') as fh:
             csvwriter = csv.writer(fh, delimiter=',')
@@ -273,31 +352,33 @@ class DownloadManager:
 
                 for seg_info in seg_info_list:
                     seg_id = seg_info.segment.segment_id
-                    if seg_id in self.segment_map and node_id in self.segment_map[seg_id]:
+                    
+                    if seg_id not in self.segment_map:
+                        self.segment_map[seg_id] = set()
+
+                    if node_id in self.segment_map[seg_id]:
+                        # NOTE: don't do anything if segment is available locally
                         local += seg_info.segment.segment_size
-                    if self.mode == Bench2Mode.LOCAL:
-                        if (seg_id in self.segment_map and
-                                node_id in self.segment_map[seg_id]):
-                            edge += seg_info.segment.segment_size
-                        else:
-                            cdn += seg_info.segment.segment_size
+                        edge += seg_info.segment.segment_size
 
                     elif self.mode == Bench2Mode.ALL2ALL:
-                        if seg_id in self.segment_map:
+                        if self.segment_map[seg_id]:
                             edge += seg_info.segment.segment_size
+                            src_nodes = self.segment_map[seg_id]
+                            src_node = random.choice(src_nodes)
                         else:
                             cdn += seg_info.segment.segment_size
 
                     elif self.mode == Bench2Mode.CUR_ROUTE_NBR:
-                        if seg_id in self.segment_map:
-                            found_nbr = False
+                        if self.segment_map[seg_id]:
+                            src_nodes = []
                             for node in list(assignments.keys()):
                                 if node in self.segment_map[seg_id]:
-                                    edge += seg_info.segment.segment_size
-                                    found_nbr = True
-                                    break
-
-                            if not found_nbr:
+                                    src_nodes.append(node)
+                            if src_nodes:
+                                edge += seg_info.segment.segment_size
+                                src_node = random.choice(src_nodes)
+                            else:
                                 cdn += seg_info.segment.segment_size
                         else:
                             cdn += seg_info.segment.segment_size
@@ -305,35 +386,41 @@ class DownloadManager:
                     elif self.mode == Bench2Mode.ALL_ROUTE_NBR:
                         if node_id not in self.node_nbr_map:
                             self.node_nbr_map[node_id] = set()
+
                         self.node_nbr_map[node_id].update(assignments.keys())
 
-                        if seg_id in self.segment_map:
-                            found_nbr = False
-
+                        if self.segment_map[seg_id]:
+                            src_nodes = []
                             for node in self.node_nbr_map[node_id]:
                                 if node in self.segment_map[seg_id]:
-                                    edge += seg_info.segment.segment_size
-                                    found_nbr = True
-                                    break
-
-                            if not found_nbr:
+                                    src_nodes.append(node)
+                            if src_nodes:
+                                edge += seg_info.segment.segment_size
+                                src_node = random.choice(src_nodes)
+                            else:
                                 cdn += seg_info.segment.segment_size
                         else:
                             cdn += seg_info.segment.segment_size
 
                     # In all cases you end up having the segment on the node
-                    if seg_id not in self.segment_map:
-                        self.segment_map[seg_id] = set()
                     self.segment_map[seg_id].add(node_id)
 
                     if node_id not in self.node_segcount_map:
                         self.node_segcount_map[node_id] = set()
                     self.node_segcount_map[node_id].add(seg_id)
+                    
+                    #update candidate sources
+                    if src_node:
+                        seg_info.source = self.nodeDownloadIps[src_node]
+                    else:
+                        seg_info.source = default_src
 
             csvwriter.writerow([token_id, cdn, edge, local])
             out_dict = {k.split('_')[1]:len(v) for k,v in self.node_segcount_map.items()}
             ak = [k.split('_')[1] for k in assignments.keys()]
             debug.write(f"{str(out_dict)}, {ak}\n")
+
+        return assignments
 
 
 
@@ -369,13 +456,15 @@ class DownloadManager:
 
         # Forward segments to next node alone
         segment_idx = 0
-        new_assignments = {node.node_id:[] for node in nodeInfos[next_node_idx:]}
-
+        # not sure why this was being done. Replace with line "new_assignments = {node.node_id:[]}'
+        # new_assignments = {node.node_id:[] for node in nodeInfos[next_node_idx:]}
         node = nodeInfos[next_node_idx]
+        new_assignments = {node.node_id:[]}
+
         while segment_idx < len(segments):
             candidate = SegmentInfo()
             candidate.segment = segments[segment_idx]
-            candidate.source = self.findOptimalSource(candidate.segment.segment_id, node.node_id)
+            candidate.source = self.nodeDownloadIps[node_id]
             candidate.arrival_time = node.arrival_time
             candidate.contact_time = node.contact_time
 
