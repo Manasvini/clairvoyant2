@@ -47,7 +47,7 @@ func advanceClock() int64 {
 	return -1
 }
 
-func getFilesInDir(dirName string) []string {
+func getFilesInDir(dirName string, isBench2 bool) []string {
 	files, err := ioutil.ReadDir(dirName)
 	if err != nil {
 		panic(err)
@@ -59,6 +59,10 @@ func getFilesInDir(dirName string) []string {
 		}
 		fileNames = append(fileNames, dirName+"/"+file.Name())
 	}
+	if isBench2 {
+		return fileNames
+	}
+
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(fileNames), func(i, j int) {
 		fileNames[i], fileNames[j] = fileNames[j], fileNames[i]
@@ -77,22 +81,26 @@ func main() {
 	numVideos := flag.Int("i", 20, "number of videos")
 	videoFile := flag.String("f", "./input/bbb.csv", "video segments file")
 	ofilename := flag.String("o", "output.txt", "output file name")
+	bench2 := flag.String("b", "no", "benchmark 2(yes/no)")
 	flag.Parse()
 	fmt.Printf("Making flags, num users = %d traj dir = %s, server addr = %s, edge nodes file = %s, numVideos = %d, videoFile = %s\n", *numUsers, *trajectoryDir, *serverAddr, *edgeNodesFile, *numVideos, *videoFile)
 	//edgeNodes := cvclient.EdgeNodes{}
 	//edgeNodes.LoadFromFile(*edgeNodesFile)
+	isBench2 := false
+	if *bench2 == "yes" {
+		isBench2 = true
+	}
 	urls := make([]string, 0)
 	clients := make([]cvclient.Client, 0)
 	glog.Infof("Make %d clients", *numUsers)
-	trajectories := getFilesInDir(*trajectoryDir)
+	trajectories := getFilesInDir(*trajectoryDir, isBench2)
 	glog.Infof("files= %s, %s\n", trajectories[0], trajectories[1])
 	i := 0
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	zipf := rand.NewZipf(r, 1.1, 1, uint64(*numVideos)-1)
 	edgeNodes := cvclient.EdgeNodes{}
 	edgeNodes.LoadFromFile(*edgeNodesFile)
-
-	trajectories = []string{"../../eval/enode_positions/microbenchmark/bench2/30users_new/user0.csv",
+	/*trajectories = []string{"../../eval/enode_positions/microbenchmark/bench2/30users_new/user0.csv",
 		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user1.csv",
 		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user2.csv",
 		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user3.csv",
@@ -103,7 +111,7 @@ func main() {
 		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user8.csv",
 		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user9.csv"}
 	//trajectories = trajectories[:20]
-
+	*/
 	for _, f := range trajectories {
 		fmt.Println(f)
 		trajectory := cvclient.Trajectory{}
