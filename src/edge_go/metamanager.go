@@ -86,6 +86,19 @@ func (metamgr *MetadataManager) addSegments(segments []*pb.Segment) {
 	}
 }
 
+func (metamgr *MetadataManager) UpdateSegmentDeliveryForRoute(segment string, route int64){
+
+}
+
+func (metamgr *MetadataManager) GetOverdueSegments() map[int64][]*pb.Segment{
+	// TODO report actual missed segments and not all segments. This is only for TESTINGGGGG
+	undeliveredSegments := make(map[int64][]*pb.Segment)
+	for route, routeInfo := range metamgr.routes {
+		undeliveredSegments[route] = routeInfo.request.Segments
+	}
+	return undeliveredSegments
+}
+
 func (metamgr *MetadataManager) getSegmentFromEdge(address string, segments []*pb.Segment, segmentIdxList []int, successTracker *[]bool) {
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {

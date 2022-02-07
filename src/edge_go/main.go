@@ -10,6 +10,12 @@ import (
 	"github.com/golang/glog"
 )
 
+func startDeliveryMonitor(config EdgeConfig, metamgr *MetadataManager) *DeliveryMonitor {
+	dm := NewDeliveryMonitor(config.ServerAddress, metamgr, config.NodeID, config.ClockServerAddr)
+	dm.Start()
+	return dm
+}
+
 func startEdgeServer(config EdgeConfig, metamgr *MetadataManager) *EdgeServer {
 	edgeServer := &EdgeServer{
 		config:  config,
@@ -52,12 +58,11 @@ func initEdgeRoutines(configFile string) {
 
 	config := parseConfig(configFile)
 	metamgr := newMetadataManager(int64(config.CacheSize), config.CacheType)
-
 	startMonitoring(config)
 	eserver := startEdgeServer(config, metamgr)
 	cserver := startContentServer(config, metamgr)
-	//dmonitor :=startDeliverMonitor(config, metamgr, &wg, ctx)
-
+	dmonitor := startDeliveryMonitor(config, metamgr)
+	defer dmonitor.Stop()
 	waitForUserExit()
 	eserver.grpcServer.GracefulStop()
 	cserver.grpcServer.GracefulStop()

@@ -17,5 +17,6 @@
     "contentServerMaxClients": 2,
     "edgeServerAddress": "0.0.0.0:50056",
     "cacheSize" : 500,
-    "cacheType" : "lru"
+    "cacheType" : "lru",
+    "clockServerAddr":"192.168.160.22:8383"
 }

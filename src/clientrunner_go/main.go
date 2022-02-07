@@ -149,7 +149,6 @@ func main() {
 				//clients[i].ExplicitClose = true
 
 			} else if !clients[i].IsDone() && int64(clients[i].GetStartTime()) < timestamp {
-
 				wg.Add(1)
 				go func(timestamp int64, client *cvclient.Client) {
 					defer wg.Done()

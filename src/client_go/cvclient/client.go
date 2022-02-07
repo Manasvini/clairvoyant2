@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"time"
-
+	"errors"
 	pb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
 	cpb "github.gatech.edu/cs-epl/clairvoyant2/edge_go/contentserver"
 	"google.golang.org/grpc"
@@ -110,7 +110,7 @@ func (client *Client) RegisterWithCloud(serverAddr string, startTime float64) {
 	defer conn.Close()
 	c := pb.NewCVServerClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 	resp, err := c.HandleCVRequest(ctx, cvreq)
 	if err != nil {
@@ -165,7 +165,7 @@ func (client *Client) getFilepath(url string) string {
 	return string(tmp[filepathIdx:])
 }
 
-func (client *Client) doGetGRPC(edgeNode EdgeNode, lastSegment string, shouldResetContact bool) []string {
+func (client *Client) doGetGRPC(edgeNode EdgeNode, lastSegment string, shouldResetContact bool) ([]string, error) {
 	address := edgeNode.ip + ":" + "8000"
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	defer conn.Close()
@@ -180,18 +180,26 @@ func (client *Client) doGetGRPC(edgeNode EdgeNode, lastSegment string, shouldRes
 		IsEdge:    false,
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	resp, err := contentClient.GetSegment(ctx, &segmentRequest)
-	if err == nil {
-		return resp.GetSegments()
+	if err != nil{
+		glog.Info(err)
+	}
+	if resp != nil {
+		glog.Infof("got status %s", resp.GetStatus())
+	}
+	if err == nil && resp != nil && resp.GetStatus() != "node busy" {
+		return resp.GetSegments(), err
+	} else if resp != nil && resp.GetStatus() == "node busy" {
+		return resp.GetSegments(), errors.New("node busy")
 	}
 	glog.Error(err)
-	return nil
+	return nil, err
 }
 
 //NOTE: Changing to grpc based content server!
-func (client *Client) doGet(edgeNode EdgeNode, lastSegment string, shouldResetContact bool) []string {
+func (client *Client) doGet(edgeNode EdgeNode, lastSegment string, shouldResetContact bool) ([]string, error) {
 	return client.doGetGRPC(edgeNode, lastSegment, shouldResetContact)
 }
 
@@ -255,19 +263,26 @@ func (client *Client) doGetNormal(edgeNode EdgeNode, lastSegment string, shouldR
 }
 
 func (client *Client) getAvailableSegments(edgeNode EdgeNode) []string {
-	segments := client.doGet(edgeNode, "", false)
-
+	segments, err := client.doGet(edgeNode, "", false)
+	if err != nil {
+		glog.Info(err)
+		glog.Infof("Client %s was unable to connect to %s because node was busy", client.id, edgeNode.id)
+		return nil
+	}
 	if len(segments) > 0 {
 		glog.Infof("Client %s got %d segments from %s\n", client.id, len(segments), edgeNode.id)
 		return segments
+	} else {
+		glog.Infof("client %s did not get any segments from %s\n", client.id, edgeNode.id)
+		return nil
 	}
-
-	glog.Infof("client %s did not get any segments from %s\n", client.id, edgeNode.id)
-	return nil
 }
 
 func (client *Client) disconnectFromCurrentEdgeNode(edgeNode EdgeNode) {
-	_ = client.doGet(edgeNode, "", true)
+	_, err := client.doGet(edgeNode, "", true)
+	if err != nil{
+		glog.Info(err)
+	}
 }
 
 func (client *Client) pretendDownload(edgeNode EdgeNode, segments []string, totalBytes int64) int64 {
@@ -286,7 +301,10 @@ func (client *Client) pretendDownload(edgeNode EdgeNode, segments []string, tota
 		}
 		fileSize := val.size
 		if int64(fileSize) < bytesAvailable {
-			segments := client.doGet(edgeNode, curSegment, false)
+			segments, err := client.doGet(edgeNode, curSegment, false)
+			if err != nil{
+				glog.Info(err)
+			}
 			if len(segments) > 0 {
 				bytesAvailable -= int64(fileSize)
 				client.dlInfo.bufferedData[curSegment] = true
@@ -327,7 +345,7 @@ func (client *Client) MakeEdgeRequest(edgeNode EdgeNode, bw float64) {
 			bytesDownloaded = client.pretendDownload(edgeNode, segmentsToDownload, totalBytes)
 		}
 	}
-	glog.Infof("client %s has %d urls so far", client.id, len(client.buffer.completedUrls))
+	glog.Infof("client %s has %d urls completed, and %d in buffer so far", client.id, len(client.buffer.completedUrls), len(client.dlInfo.bufferedData))
 	if len(client.buffer.allUrls) > len(client.buffer.completedUrls) {
 		client.stats.contactLogs = append(client.stats.contactLogs, client.dlInfo.tentativeLogs...)
 	}

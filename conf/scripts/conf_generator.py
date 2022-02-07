@@ -26,6 +26,7 @@ try:
             obj["edgeServerAddress"] = "0.0.0.0:50056"
             obj["cacheSize"] = 1000000000000
             obj["cacheType"] = "lru"
+            obj["clockServerAddr"] = "192.168.160.21:8383"
             fw.write(json.dumps(obj, indent=2))
 except Exception as e:
     print(e.trace())

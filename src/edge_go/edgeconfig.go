@@ -23,6 +23,7 @@ type EdgeConfig struct {
 	EdgeServerAddress       string   `json:"edgeServerAddress"`
 	CacheSize               int      `json:"cacheSize"`
 	CacheType               string   `json:"cacheType"`
+	ClockServerAddr		string	 `json:"clockServerAddr"`
 }
 
 func parseConfig(configFile string) EdgeConfig {
