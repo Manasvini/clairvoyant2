@@ -43,6 +43,7 @@ func (server *ContentServer) canMakeContact(routeId, start, end int64) bool {
 
 func (server *ContentServer) GetSegment(ctx context.Context, req *pb.SegmentRequest) (*pb.SegmentResponse, error) {
 	response := &pb.SegmentResponse{}
+	response.Status = "Success"
 	//glog.Infof("Got segment request for route %d", req.RouteId)
 	if req.Remove {
 		//this is a disconnect request

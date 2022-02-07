@@ -123,7 +123,7 @@ func main() {
 		video.LoadFromFile(*videoFile, videoId)
 		glog.Infof("file = %s video is %s\n", f, videoId)
 		//"../../eval/enode_positions/17min_user0/user0_17min.csv")
-		client := cvclient.NewClient("c"+strconv.Itoa(i), &trajectory, edgeNodes, video, urls)
+		client := cvclient.NewClient(f, &trajectory, edgeNodes, video, urls)
 		//client := cvclient.NewClient(f, &trajectory, edgeNodes, video, urls)
 		clients = append(clients, client)
 		i += 1
@@ -136,7 +136,7 @@ func main() {
 	for {
 
 		timestamp := advanceClock()
-		if timestamp%10000 == 0 {
+		if timestamp%1000 == 0 {
 			glog.Infof("timestamp is now %d\n", timestamp)
 		}
 
@@ -146,7 +146,7 @@ func main() {
 				clients[i].RegisterWithCloud(*serverAddr, float64(timestamp))
 
 				//For benchmark2
-				clients[i].ExplicitClose = true
+				//clients[i].ExplicitClose = true
 
 			} else if !clients[i].IsDone() && int64(clients[i].GetStartTime()) < timestamp {
 

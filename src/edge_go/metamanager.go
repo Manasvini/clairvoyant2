@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 	"time"
-
+	"strconv"
 	"encoding/json"
 	"io/ioutil"
 	"os"
@@ -35,6 +35,7 @@ type MetadataManager struct {
 	evicted            []string
 	routes             map[int64]RouteInfo
 	resultFile         string
+	resultDir	   string
 	wg                 sync.WaitGroup
 }
 
@@ -67,13 +68,13 @@ func newMetadataManager(size int64, cachetype string) *MetadataManager {
 		glog.Fatal(err)
 	}
 
-	resultDir := filepath.Join(homeDir, "clairvoyant2", "results")
+	resultDir := filepath.Join(homeDir, "clairvoyant2", "results_" + strconv.FormatInt(size, 10))
 	err = os.MkdirAll(resultDir, 0755)
 	if err != nil {
 		glog.Fatal(err)
 	}
 	metamgr.resultFile = filepath.Join(resultDir, "bench2.json")
-
+	metamgr.resultDir = resultDir
 	glog.Infof("initialized metadamanager of size = %d, type = %s", size, cachetype)
 
 	return metamgr
@@ -124,6 +125,7 @@ func (metamgr *MetadataManager) Close() {
 	glog.Info("Closing Metamgr!")
 	close(metamgr.downloadReqChannel)
 	metamgr.wg.Wait()
+	metamgr.SegmentCache.RecordStats(filepath.Join(metamgr.resultDir, "edgestats"))
 }
 
 func (metamgr *MetadataManager) processDownloads() {

@@ -45,7 +45,7 @@ def start_clients(conf):
     outputFile = conf['outputDir'] + "/" + str(numClients) + 'users' + str(conf['numEdgeNodes']) + 'nodes' + str(round(time.time() * 1000)) + '.csv'
     segmentFile = conf['segmentFile']
     cloudServer = conf['cloudServerName']
-    result = subprocess.run(['ssh', cloudServer, ' export PATH=$PATH:/usr/local/go/bin && cd clairvoyant2/src/clientrunner_go &&  rm clientrunner_go.* && go run . ' +\
+    result = subprocess.run(['ssh', cloudServer, ' export PATH=$PATH:/usr/local/go/bin && cd clairvoyant2/src/clientrunner_go &&  go run . ' +\
                             '-log_dir=\".\"'+\
                             ' -t ' + clientTrajectories + \
                             ' -i ' + str(numVideos) + \
