@@ -25,7 +25,7 @@ func check(err error) {
 
 type RouteInfo struct {
 	request     pb.DownloadRequest
-	doneChannel chan []string //to send evicted segments
+	doneChannel chan *pb.DownloadReply //to send evicted segments
 }
 
 type MetadataManager struct {
@@ -90,6 +90,16 @@ func (metamgr *MetadataManager) UpdateSegmentDeliveryForRoute(segment string, ro
 
 }
 
+func (metamgr *MetadataManager) IsStorageSpaceAvailable(segment *pb.Segment) bool {
+	/*if metamgr.SegmentCache.GetCurrentSize() + segment.SegmentSize < metamgr.SegmentCache.GetCapacity() {
+		return true
+	}
+	return false
+	*/
+
+	return true
+}
+
 func (metamgr *MetadataManager) GetOverdueSegments() map[int64][]*pb.Segment{
 	// TODO report actual missed segments and not all segments. This is only for TESTINGGGGG
 	undeliveredSegments := make(map[int64][]*pb.Segment)
@@ -150,7 +160,6 @@ func (metamgr *MetadataManager) processDownloads() {
 		nodeSegMap := map[string][]int{} //map from node_src_ip -> seg_idx list
 		numEdge := 0
 		successTracker := make([]bool, len(request.Segments))
-
 		for idx, segment := range request.Segments {
 			segmentId := segment.SegmentId
 			source := request.SegmentSources[segmentId]
@@ -218,20 +227,26 @@ func (metamgr *MetadataManager) handleAddRoute() {
 		if _, ok := metamgr.routes[routeInfo.request.TokenId]; !ok {
 			metamgr.routes[routeInfo.request.TokenId] = routeInfo
 			glog.Infof("Added route %d with %d segments", routeInfo.request.TokenId, len(routeInfo.request.Segments))
-			metamgr.addSegments(routeInfo.request.Segments)
-		} else {
-			toAdd := []*pb.Segment{}
-			for _, seg := range routeInfo.request.Segments {
-				if !metamgr.SegmentCache.HasSegment(seg.SegmentId) {
-					toAdd = append(toAdd, seg)
-				}
+			//metamgr.addSegments(routeInfo.request.Segments)
+		}
+		toAdd := []*pb.Segment{}
+		committedSegments := make([]string, 0)
+		for _, seg := range routeInfo.request.Segments {
+			if !metamgr.IsStorageSpaceAvailable(seg){
+				break
 			}
-			if len(toAdd) > 0 {
-				metamgr.addSegments(toAdd)
+			committedSegments = append(committedSegments, seg.SegmentId)
+			if !metamgr.SegmentCache.HasSegment(seg.SegmentId) {
+				toAdd = append(toAdd, seg)
 			}
 		}
+		if len(toAdd) > 0 {
+			metamgr.addSegments(toAdd)
+		}
+		dlReply := &pb.DownloadReply{TokenId: routeInfo.request.TokenId, SegmentIds: committedSegments, EvictedIds: metamgr.evicted}
 		metamgr.downloadReqChannel <- routeInfo.request
-		glog.Infof("len_evicted=%d", len(metamgr.evicted))
-		routeInfo.doneChannel <- metamgr.evicted
+		glog.Infof("len_evicted=%d, len_committed=%d", len(metamgr.evicted), len(committedSegments))
+
+		routeInfo.doneChannel <- dlReply
 	}
 }

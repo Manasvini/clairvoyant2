@@ -22,10 +22,10 @@ func (server *EdgeServer) HandleDownloadRequest(ctx context.Context,
 		req.ArrivalTime, len(req.Segments))
 
 	//return segments which require downloading
-	reply := &pb.DownloadReply{}
-	reply.TokenId = req.TokenId
+	//reply := &pb.DownloadReply{}
+	//reply.TokenId = req.TokenId
 
-	dc := make(chan []string)
+	dc := make(chan *pb.DownloadReply)
 	routeInfo := RouteInfo{
 		request:     *req,
 		doneChannel: dc,
@@ -34,8 +34,8 @@ func (server *EdgeServer) HandleDownloadRequest(ctx context.Context,
 	server.metamgr.routeAddChannel <- routeInfo
 	glog.Infof("Route Add message sent fo %d. Awaiting evictions", routeInfo.request.TokenId)
 
-	reply.SegmentIds = <-routeInfo.doneChannel
-	glog.Infof("Sending evicted segments")
+	reply := <-routeInfo.doneChannel
+	glog.Infof("Sending evicted and committed segments")
 	return reply, nil
 }
 

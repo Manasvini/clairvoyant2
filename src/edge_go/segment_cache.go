@@ -45,6 +45,14 @@ func NewCache(size int64, cachetype string, evictedFunc gcache.EvictedFunc) *Cac
 	return segCache
 }
 
+func (segmentCache *Cache) GetCapacity() int64 {
+	return segmentCache.size
+}
+
+func (segmentCache *Cache) GetCurrentSize() int64 {
+	return segmentCache.currentSize
+}
+
 func (segmentCache *Cache) RecordStats(filename string) {
 	ts := time.Now().Unix()
 	f, err := os.Create(fmt.Sprintf("%s_%d.cachesize.csv",filename , ts))

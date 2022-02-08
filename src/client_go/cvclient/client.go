@@ -505,7 +505,7 @@ func (client *Client) Move() {
 func (client *Client) getLogs(logs []DlLog) []string {
 	loglines := make([]string, 0)
 	for _, dlLog := range logs {
-		loglines = append(loglines, client.id+","+dlLog.edgeNode+","+strconv.FormatInt(dlLog.timestamp, 10)+","+strconv.FormatInt(dlLog.bytes, 10))
+		loglines = append(loglines, client.id+","+ strconv.FormatInt(*client.token, 10) + "," + dlLog.edgeNode+","+strconv.FormatInt(dlLog.timestamp, 10)+","+strconv.FormatInt(dlLog.bytes, 10))
 	}
 	return loglines
 

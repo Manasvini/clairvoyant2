@@ -71,7 +71,8 @@ message DownloadRequest {
 
 message DownloadReply {
   int64 token_id = 1;
-  repeated string segment_ids = 2;//evicted segments
+  repeated string segment_ids = 2;//committed segments
+  repeated string evicted_ids = 3; //evicted segments
 }
 
 message DownloadCompleteRequest {

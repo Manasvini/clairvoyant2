@@ -173,8 +173,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	_, err = ef.WriteString("client,edgenode,timestamp,bytes\n")
-	_, err = cf.WriteString("client,edgenode,timestamp,bytes\n")
+	_, err = ef.WriteString("client,token,edgenode,timestamp,bytes\n")
+	_, err = cf.WriteString("client,token,edgenode,timestamp,bytes\n")
 	for _, c := range clients {
 		line := c.PrintStats()
 		_, err = f.WriteString(line)
