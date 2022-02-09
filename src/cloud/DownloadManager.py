@@ -90,8 +90,8 @@ class Oracle:
             if src_nodes:
                 src_node = random.choice(src_nodes)
 
-        if src_node:
-            logger.info("found a non cloud src={} for node={}".format(src_node, node_id))
+        #if src_node:
+        #    logger.info("found a non cloud src={} for node={}".format(src_node, node_id))
 
         self.segment_map[seg_id].add(node_id)
         self.mutex.release()
@@ -176,8 +176,9 @@ class DownloadManager:
                 if curnode.arrival_time < end_time and \
                         (curnode.arrival_time + curnode.contact_time) > start_time:
                     count += 1
+                    logger.debug(f"Node {curnode.node_id} serving {route}")
                     if count >= self.max_client_per_node:
-                        logger.debug("scheduled max={count} clients. Can not use node")
+                        logger.debug(f"scheduled max={count} clients. Can not use node")
                         return True
 
         return False
@@ -281,6 +282,7 @@ class DownloadManager:
             assignedNode = False
             logger.debug(f"segmentIdx={segmentIdx}")
             sum_of_seg_sizes = 0
+            tentativeCandidates = []
             while segmentIdx < len(segments):
                 
                 if maxAvailDlBytes < segments[segmentIdx].segment_size:
@@ -298,20 +300,52 @@ class DownloadManager:
 
                 candidate.arrival_time = node.arrival_time
                 candidate.contact_time = node.contact_time
-
-                if self.edgeNodeAssignments[node.node_id].add(candidate, request_timestamp):
-                    assignments[node.node_id].append(candidate)
-                    maxAvailDlBytes -= segments[segmentIdx].segment_size
-                    sum_of_seg_sizes += segments[segmentIdx].segment_size
-                    assignedNode = True
-                else:
-                    logger.debug("assignments aborted at segment {}, node={}"\
-                            .format(segments[segmentIdx], node.node_id))
-                    break
+                tentativeCandidates.append(candidate)
+                maxAvailDlBytes -= segments[segmentIdx].segment_size 
+                #if self.edgeNodeAssignments[node.node_id].add(candidate, request_timestamp):
+                #    assignments[node.node_id].append(candidate)
+                #    maxAvailDlBytes -= segments[segmentIdx].segment_size
+                sum_of_seg_sizes += segments[segmentIdx].segment_size
+                #    assignedNode = True
+                #else:
+                #    logger.debug("assignments aborted at segment {}, node={}"\
+                #            .format(segments[segmentIdx], node.node_id))
+                #    break
                 segmentIdx += 1
+            possibleCandidates = self.edgeNodeAssignments[node.node_id].isDownloadPossible(node.arrival_time, tentativeCandidates)
+            logger.debug(f"segmentIdx={segmentIdx} node id={node.node_id} can accept possibly {len(possibleCandidates)}")
+            if len(possibleCandidates) > 0:
+                cur_assignments = {node.node_id:possibleCandidates}
+                logger.debug(f"sent assignments to node {node.node_id} for token {token_id}")
 
-            if assignedNode:
-                self.routeInfos[token_id].append(node)
+                responses = self.sendAssignments(cur_assignments, token_id)
+                logger.debug(f"Got {len(responses)} responses, {len(responses[0].segment_ids)} accepted from node {node.node_id}")
+                if len(responses) > 0:
+                    response = responses[0]
+                    numAssignedSegments = len(response.segment_ids)
+                    logger.debug(f"node id = {node.node_id} accepted {numAssignedSegments}, segmentIdx is at {segmentIdx}")
+                    if numAssignedSegments > 0:
+                        self.routeInfos[token_id].append(node)
+                        for i in range(numAssignedSegments-1, -1, -1):
+                            
+                            if self.edgeNodeAssignments[node.node_id].add(possibleCandidates[i], request_timestamp):
+                                assignments[node.node_id].append(possibleCandidates[i])
+                                #maxAvailDlBytes -= segments[segmentIdx - i - 1].segment_size
+                                #sum_of_seg_sizes += segments[segmentIdx - i - 1].segment_size
+                            else:
+                                logger.warn(f"i= {i} edge and cloud states drifting. Node {node.node_id} accepted more segments than cloud is believing it to be able to handle")
+                        segmentIdx -= (len(tentativeCandidates) - numAssignedSegments)
+                        logger.info(f"token = {token_id}, node={node.node_id} segmentidx= {segmentIdx}")
+                    else:
+                        segmentIdx -=len(tentativeCandidates)
+                else:
+                    segmentIdx -= len(tentativeCandidates)
+                #    assignedNode = True
+                #else:
+                #    logger.debug("assignments aborted at segment {}, node={}"\
+                # 
+            #if assignedNode:
+            #    self.routeInfos[token_id].append(node)
 
 
         logger.info('Assignments:')
@@ -425,7 +459,7 @@ class DownloadManager:
 
 
     def sendAssignments(self, assignments, token_id):
-        
+        responses = [] 
         for node_id in assignments:
             segments = [candidate.segment for candidate in assignments[node_id]]
             sources = {candidate.segment.segment_id: \
@@ -435,7 +469,8 @@ class DownloadManager:
                 continue
             response = self.dispatcher.makeRequest(token_id, node_id, segments, sources,\
                     assignments[node_id][0].arrival_time, assignments[node_id][0].contact_time) 
-          
+            responses.append(response)
+        return responses
     # For phase 3
     def handleMissedDelivery(self, token_id, node_id, segments, request_timestamp):
         if token_id not in self.routeInfos:
@@ -486,7 +521,7 @@ class DownloadManager:
         if assignments is None:
             raise ValueError('assignments is none')
         #import pdb; pdb.set_trace()
-        self.sendAssignments(assignments, token_id)
+        #self.sendAssignments(assignments, token_id)
         return assignments
   
      

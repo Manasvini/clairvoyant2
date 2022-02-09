@@ -28,6 +28,14 @@ def start_cloud(conf, repopulate_db):
                              check=False)
     print('cloud success=', result.returncode) 
 
+def stop_edge(conf):
+    numEdgeNodes = conf['numEdgeNodes']
+    machinePrefix = conf['machinePrefix']
+    result = subprocess.run(['bash', 'run_scripts/kill-edge-go-svrs.sh',\
+                            str(numEdgeNodes), str(machinePrefix)],\
+                            shell=False, \
+                            check=False)
+
 def start_edge(conf):
     numEdgeNodes = conf['numEdgeNodes']
     machinePrefix = conf['machinePrefix']
@@ -72,6 +80,6 @@ def main():
         start_clients(conf)
     end = time.time()
     print(num_trials, " trials took ", (end-start), " seconds")
-
+    stop_edge(conf)
 if __name__=='__main__':
     main()

@@ -103,9 +103,9 @@ func (metamgr *MetadataManager) IsStorageSpaceAvailable(segment *pb.Segment) boo
 func (metamgr *MetadataManager) GetOverdueSegments() map[int64][]*pb.Segment{
 	// TODO report actual missed segments and not all segments. This is only for TESTINGGGGG
 	undeliveredSegments := make(map[int64][]*pb.Segment)
-	for route, routeInfo := range metamgr.routes {
-		undeliveredSegments[route] = routeInfo.request.Segments
-	}
+	//for route, routeInfo := range metamgr.routes {
+	//	undeliveredSegments[route] = routeInfo.request.Segments
+	//}
 	return undeliveredSegments
 }
 
