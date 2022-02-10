@@ -11,11 +11,12 @@ import requests
 if __name__ == "__main__":
     from os import path
     sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
-    from EdgeNetworkModel import EdgeNetworkModel
+
+from shared.EdgeNetworkModel import EdgeNetworkModel
 
 logging.basicConfig()
 logger = logging.getLogger("monitoring")
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.WARNING)
 
 
 class MonitoringClient(Thread):
@@ -25,12 +26,14 @@ class MonitoringClient(Thread):
     Currently sends model updates.
 
     """
-    def __init__(self, model_file, interval, address):
+    def __init__(self, model_file, interval, address, node_id):
         self.model_dict = self.parse_model_file(model_file)
         self.interval = interval
         self.url = 'http://{}'.format(address)
         self.stopped = Event()
+        self.node_id = node_id
         Thread.__init__(self)
+        
 
     def parse_model_file(self, model_file):
         model_dict = {} # dist -> throughput, std dev
@@ -38,6 +41,7 @@ class MonitoringClient(Thread):
             reader = csv.reader(fh, delimiter=',')
             for row in reader:
                 model_dict[row[0]] = {"mean":float(row[1]), "sdev":float(row[2])}
+                
 
         return model_dict
 
@@ -48,10 +52,12 @@ class MonitoringClient(Thread):
             dict_to_send = {}
             for key,value in self.model_dict.items():
                 dict_to_send[key] = value['mean'] + random.uniform(-value['sdev'], value['sdev'])
+                dict_to_send[key] = value['mean']
 
             payload = {}
-            payload['nodeid'] = 'node_1'
+            payload['nodeid'] = self.node_id
             payload['model'] = dict_to_send
+            print(payload)
 
             r = requests.post(self.url, json=payload)
             logger.debug("POST response: {}".format(r.status_code))
@@ -96,7 +102,7 @@ if __name__ == "__main__":
 
     modelfile = path.abspath(args.modelfile)
     logger.debug("Modelfile : {}".format(modelfile))
-    mon_client = MonitoringClient(modelfile, args.interval, args.address)
+    mon_client = MonitoringClient(modelfile, args.interval, args.address, 'node_0')
     mon_client.start()
     try:
         mon_client.join()

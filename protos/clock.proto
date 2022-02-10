@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package clairvoyant;
+option go_package = "github.gatech.edu/cs-epl/clairvoyant2/src/client_go/clairvoyant";
+message SyncRequest {
+  string node_id = 1;
+}
+
+message SyncResponse {
+  int64 cur_time = 2;
+}
+message AdvanceClock {
+}
+
+service ClockServer {
+  rpc HandleSyncRequest (SyncRequest) returns (SyncResponse);
+  rpc HandleAdvanceClock (AdvanceClock) returns (SyncResponse);
+}
+

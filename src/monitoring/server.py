@@ -39,11 +39,11 @@ import threading
 if __name__ == "__main__":
     from os import path
     sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
-    from EdgeNetworkModel import EdgeNetworkModel
+from shared.EdgeNetworkModel import EdgeNetworkModel
 
 logging.basicConfig()
 logger = logging.getLogger("monitoring")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 class MonitoringHandler(BaseHTTPRequestHandler):
     def _set_headers(self):
@@ -87,6 +87,11 @@ class MonitoringHandler(BaseHTTPRequestHandler):
             content = f.read()
         return content
 
+    def log_message(self, format, *args):
+        with open('/tmp/monitoring_httpd.log', 'w') as fh:
+            fh.write("%s - - [%s] %s\n" % (self.address_string(), self.log_date_time_string(), format%args))
+
+
 """
 Ideally run this in a different thread.
 """
@@ -101,10 +106,13 @@ class MonitoringServer:
 
     def run(self): # TODO:potentially run this within the constructor 
         
-        httpd = self.server_class((self.address, self.port), MonitoringHandler)
-        httpd.edge_model_dict = self.edge_model_dict
+        self.httpd = self.server_class((self.address, self.port), MonitoringHandler)
+        self.httpd.edge_model_dict = self.edge_model_dict
         print("Starting Moniroring httpd server on {}:{}".format(self.address, self.port))
-        httpd.serve_forever()
+        self.httpd.serve_forever()
+
+    def shutdown(self):
+        self.httpd.shutdown()
 
 
 if __name__ == "__main__":

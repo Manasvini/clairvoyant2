@@ -1,16 +1,18 @@
 {
     "modelMap":"models/model_map.csv",
     "modelDir":"models/",
-    "timeScale":10,
+    "timeScale":60,
     "metaServerAddress": "localhost:50051",
-    "nodeIds": ["node_0"],
-    "downloadSources":{
-        "node_0":{
-            "http://ftp.itec.aau.at/DASHDataset2014": 100000000
-        }
-    },
-    "nodeIps":{
-        "node_0": "0.0.0.0:50056"
-    },
-    "defaultSource":"http://ftp.itec.aau.at/DASHDataset2014"
+    "edgeNodes":[
+      {
+        "id":"node_0", 
+        "ip":"localhost",
+        "edgeDaemon":50056,
+        "contentServer":8000,
+        "downloadSourceFile": "conf/download_source_info.json"
+      }
+    ], 
+    "defaultSource":"http://ftp.itec.aau.at/DASHDataset2014",
+    "monServerAddress": "localhost",
+    "monServerPort": 8192
 }

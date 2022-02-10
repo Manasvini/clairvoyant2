@@ -1,0 +1,23 @@
+syntax = "proto3";
+option go_package = "github.gatech.edu/cs-epl/clairvoyant2/src/edge_go/contentserver";
+
+package contentserver;
+
+
+service Content {
+  rpc getSegment(SegmentRequest) returns (SegmentResponse) {}
+}
+
+message SegmentRequest {
+  string segment_id = 1;
+  int64 start_time = 2;
+  int64 end_time = 3;
+  int64 route_id = 4;
+  bool remove = 5;
+  bool is_edge = 6;
+}
+
+message SegmentResponse {
+  string status = 1;
+  repeated string segments = 2;
+}

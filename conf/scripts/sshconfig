@@ -1,0 +1,55 @@
+Host cv0
+  Hostname 192.168.160.22
+  User cvuser
+  StrictHostKeyChecking no
+  IdentityFile /home/asarma31/.ssh/cvuser.priv
+Host cv1
+  Hostname 192.168.160.23
+  User cvuser
+  StrictHostKeyChecking no
+  IdentityFile /home/asarma31/.ssh/cvuser.priv
+Host cv2
+  Hostname 192.168.160.24
+  User cvuser
+  StrictHostKeyChecking no
+  IdentityFile /home/asarma31/.ssh/cvuser.priv
+Host cv3
+  Hostname 192.168.160.25
+  User cvuser
+  StrictHostKeyChecking no
+  IdentityFile /home/asarma31/.ssh/cvuser.priv
+Host cv4
+  Hostname 192.168.160.26
+  User cvuser
+  StrictHostKeyChecking no
+  IdentityFile /home/asarma31/.ssh/cvuser.priv
+Host cv5
+  Hostname 192.168.160.27
+  User cvuser
+  StrictHostKeyChecking no
+  IdentityFile /home/asarma31/.ssh/cvuser.priv
+Host cv6
+  Hostname 192.168.160.28
+  User cvuser
+  StrictHostKeyChecking no
+  IdentityFile /home/asarma31/.ssh/cvuser.priv
+Host cv7
+  Hostname 192.168.160.29
+  User cvuser
+  StrictHostKeyChecking no
+  IdentityFile /home/asarma31/.ssh/cvuser.priv
+Host cv8
+  Hostname 192.168.160.30
+  User cvuser
+  StrictHostKeyChecking no
+  IdentityFile /home/asarma31/.ssh/cvuser.priv
+Host cv9
+  Hostname 192.168.160.31
+  User cvuser
+  StrictHostKeyChecking no
+  IdentityFile /home/asarma31/.ssh/cvuser.priv
+Host cv10
+  Hostname 192.168.160.32
+  User cvuser
+  StrictHostKeyChecking no
+  IdentityFile /home/asarma31/.ssh/cvuser.priv
