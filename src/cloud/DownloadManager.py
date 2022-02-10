@@ -59,6 +59,7 @@ class Oracle:
 
     def set_seg_source(self, node_id, seg_id):
         self.mutex.acquire()
+        logger.debug(f"Updated source for segment {seg_id} to {node_id}")
         self.segment_map[seg_id] = set(node_id)
         self.mutex.release()
 
