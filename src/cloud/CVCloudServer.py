@@ -58,10 +58,16 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
 
         self.mmWaveModels = self.getModels(nodeIds)
         mode = None
+        bookKeeping = 'latest'
+        phase3 = True
         if 'mode' in self.configDict:
             mode=self.configDict['mode']
-
         
+        if 'bookKeeping' in self.configDict:
+            bookKeeping = self.configDict['bookKeeping']
+
+        if 'phase3' in self.configDict:
+            phase3 = self.configDict['phase3']
         self.dlManager = DownloadManager(nodeIds,
                 downloadSourcesOldFormat,
                 self.configDict['timeScale'],
@@ -69,7 +75,9 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
                 nodeDaemonIps,
                 nodeDownloadIps,
                 self.configDict['defaultSource'],
-                mode)
+                mode,
+                bookKeeping,
+                phase3)
 
         monServer = MonitoringServer(address=self.configDict['monServerAddress'], \
                 port=self.configDict['monServerPort'], edge_model_dict=self.mmWaveModels)

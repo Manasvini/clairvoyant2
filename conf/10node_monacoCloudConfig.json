@@ -2,9 +2,11 @@
   "modelMap":"models/model_map.csv",
   "modelDir":"models/",
   "mode": "all2all",
+  "bookKeeping":"tracking",
+  "phase3":true,
   "timeScale":60,
   "metaServerAddress": "0.0.0.0:50051",
-  "defaultSource":"http://ftp.itec.aau.at/DASHDataset2014",
+  "defaultSource":"http://ftp.itec.aau.at/DASHDataset2014/",
   "monServerAddress": "0.0.0.0",
   "monServerPort": 8192,
   "edgeNodes":[

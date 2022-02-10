@@ -19,7 +19,7 @@ from threading import Thread, Lock
 
 parent_logger = logging.getLogger("cloud")
 logger = parent_logger.getChild('downloadmgr')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 class Bench2Mode(str, Enum):
     NOCACHE = "nocache"             # everything from cdn
@@ -30,6 +30,11 @@ class Bench2Mode(str, Enum):
                                     # until you finish atomic "add" 
     ALL_ROUTE_NBR = "allRouteNbr"   # use cache of every node of all routes going through cur node
 
+class BookKeepingMode(str, Enum):
+    '''NOTE: both these approaches to bookkeeping by the cloud are best effort. After all, an edge node A could evict a segment JUST after the cloud has informed another edge node B that B could fetch that exact segment from A's cache. This will happen with either policy, so the bookkeeping is just an optimization in the face of the vagaries of caching'''
+    TRACKING = 'tracking'           # Cloud tracks evictions happening at the edge
+    RECENT   = 'recent'             # Cloud only keeps track of the most recent assignment which it knows from an edge node's commitment to downloading the segment
+   
 class Oracle:
     def __init__(self, mode):
         self.mode = mode
@@ -45,9 +50,17 @@ class Oracle:
         logger.debug("Received evicted segments. Updating State")
         self.mutex.acquire()
         for seg_id in response.segment_ids:
-            self.segment_map[seg_id].remove(node_id)
+            self.remove(node_id, seg_id)
         self.mutex.release()
 
+    def remove(self, node_id, seg_id):
+        if seg_id in self.segment_map[seg_id]:
+            self.segment_map[seg_id].remove(node_id)
+
+    def set_seg_source(self, node_id, seg_id):
+        self.mutex.acquire()
+        self.segment_map[seg_id] = set(node_id)
+        self.mutex.release()
 
     def findOptimalSourceNode(self, seg_id, node_id, neighbors):
         self.mutex.acquire()
@@ -107,25 +120,34 @@ class DownloadManager:
             nodeDaemonIps, 
             nodeDownloadIps, 
             defaultSource,
-            mode):
+            shareMode,
+            bookKeeping,
+            phase3):
         self.defaultSource = defaultSource
         self.downloadSources = downloadSources
         self.mmWaveModels = mmWaveModels
         self.edgeNodeAssignments = {node_id: EdgeDownloadAssignment(node_id, downloadSources[node_id], timeScale) for node_id in node_ids}
         self.nodeDownloadIps = nodeDownloadIps
-        if mode:
-            self.mode = mode
+        if shareMode:
+            self.shareMode = shareMode
         else:
-            self.mode = Bench2Mode.NOCACHE
-        self.oracle = Oracle(mode)
-        self.dispatcher = DownloadDispatcher(nodeDaemonIps, self.oracle.update)
+            self.shareMode = Bench2Mode.NOCACHE
+        self.oracle = Oracle(shareMode)
+        
         self.routeInfos = {}
-        self.phase3 = True
+        self.phase3 = phase3
         self.max_client_per_node = 2
-
+        self.bookKeeping = bookKeeping
         self.node_segcount_map = {}
 
-        filename = f'/home/cvuser/clairvoyant2/results/bench2/{self.mode}_results.csv'
+        dispatcherCb = None
+        # if we keep track of evictions at the edge node, the edge node, on each request will respond with a list of segments it has evicted so that the oracle can appropriately update its view of the edge
+        if self.bookKeeping == BookKeepingMode.TRACKING:
+            dispatcherCb = self.oracle.update     
+        
+        self.dispatcher = DownloadDispatcher(nodeDaemonIps, dispatcherCb)
+        
+        filename = f'/home/cvuser/clairvoyant2/results/bench2/{self.shareMode}_results.csv'
         with open(filename, 'w') as fh:
             csvwriter = csv.writer(fh, delimiter=',')
             csvwriter.writerow(['user_id', 'cdn', 'edge', 'local'])
@@ -151,7 +173,7 @@ class DownloadManager:
         dl_map = model.get()
         if model is None:
             print('model is None')
-        print(dl_map)
+        #print(dl_map)
         distances = sorted(list(dl_map.keys()))
         totalBits = 0
 
@@ -302,44 +324,48 @@ class DownloadManager:
                 candidate.contact_time = node.contact_time
                 tentativeCandidates.append(candidate)
                 maxAvailDlBytes -= segments[segmentIdx].segment_size 
-                #if self.edgeNodeAssignments[node.node_id].add(candidate, request_timestamp):
-                #    assignments[node.node_id].append(candidate)
-                #    maxAvailDlBytes -= segments[segmentIdx].segment_size
                 sum_of_seg_sizes += segments[segmentIdx].segment_size
-                #    assignedNode = True
-                #else:
-                #    logger.debug("assignments aborted at segment {}, node={}"\
-                #            .format(segments[segmentIdx], node.node_id))
-                #    break
                 segmentIdx += 1
+            # tentativeCandidates refers to the max no. of segments an edge node can deliver to the user within the user's contact time period. 
+            #We still need to check the edge node's schedule to see if it has enogh bandwidth to download that many segments. 
+            #If the backhaul links are busy, the edge node may not potentially be able to download all the tentative segments. This is reflected in possibleCandidates. Thus len(possibleCandidates) <= len(tentativeCandidates)  
             possibleCandidates = self.edgeNodeAssignments[node.node_id].isDownloadPossible(node.arrival_time, tentativeCandidates)
-            logger.debug(f"segmentIdx={segmentIdx} node id={node.node_id} can accept possibly {len(possibleCandidates)}")
+            logger.info(f"segmentIdx={segmentIdx} node id={node.node_id} can accept possibly {len(possibleCandidates)} out of {len(tentativeCandidates)} segments")
             if len(possibleCandidates) > 0:
                 cur_assignments = {node.node_id:possibleCandidates}
-                logger.debug(f"sent assignments to node {node.node_id} for token {token_id}")
+                logger.info(f"sent assignments to node {node.node_id} for token {token_id}")
 
+                # We send the assignments to the edge node and wait for its response. An edge node has limited storage and it could still be holding segments for other users who have not yet arrived, so it might not be able to make enough space for all the len(possibleCandidates) segments. 
+                # So len(response.segment_ids) <= len(possibleCandidates)
+                # When we update the oracle, we do so ONLY with the segments that the edge node has committed to downloading. 
                 responses = self.sendAssignments(cur_assignments, token_id)
-                logger.debug(f"Got {len(responses)} responses, {len(responses[0].segment_ids)} accepted from node {node.node_id}")
+                logger.info(f"Got {len(responses)} responses, {len(responses[0].segment_ids)} accepted from node {node.node_id}")
+                edgeAssignments = []
                 if len(responses) > 0:
                     response = responses[0]
                     numAssignedSegments = len(response.segment_ids)
                     logger.debug(f"node id = {node.node_id} accepted {numAssignedSegments}, segmentIdx is at {segmentIdx}")
                     if numAssignedSegments > 0:
-                        self.routeInfos[token_id].append(node)
-                        for i in range(numAssignedSegments-1, -1, -1):
+                        for i in range(numAssignedSegments):
                             
                             if self.edgeNodeAssignments[node.node_id].add(possibleCandidates[i], request_timestamp):
                                 assignments[node.node_id].append(possibleCandidates[i])
-                                #maxAvailDlBytes -= segments[segmentIdx - i - 1].segment_size
-                                #sum_of_seg_sizes += segments[segmentIdx - i - 1].segment_size
+
+                                # if we maintain record of only the most recent segment owner, we need to update the oracle with this info
+                                if self.bookKeeping == BookKeepingMode.RECENT:
+                                    self.oracle.set_seg_source(node.node_id, response.segment_ids[i])
                             else:
                                 logger.warn(f"i= {i} edge and cloud states drifting. Node {node.node_id} accepted more segments than cloud is believing it to be able to handle")
                         segmentIdx -= (len(tentativeCandidates) - numAssignedSegments)
+                        edgeAssignments = possibleCandidates[:numAssignedSegments]
                         logger.info(f"token = {token_id}, node={node.node_id} segmentidx= {segmentIdx}")
                     else:
                         segmentIdx -=len(tentativeCandidates)
                 else:
                     segmentIdx -= len(tentativeCandidates)
+                if len(edgeAssignments) > 0:
+                    assignments[node.node_id] = edgeAssignments
+                    self.routeInfos[token_id].append(node)
                 #    assignedNode = True
                 #else:
                 #    logger.debug("assignments aborted at segment {}, node={}"\
@@ -367,12 +393,12 @@ class DownloadManager:
         purely from benchmark 2 perspective, this will output what segmemts are downloaded
         from where.
         """
-        if self.mode == Bench2Mode.NOCACHE:
+        if self.shareMode == Bench2Mode.NOCACHE:
             return
 
-        filename = f'/home/cvuser/clairvoyant2/results/bench2/{self.mode}_results.csv'
+        filename = f'/home/cvuser/clairvoyant2/results/bench2/{self.shareMode}_results.csv'
         assignments = {k:v for k,v in assignment_info_dict.items() if len(v)}
-        debug = open(f'debug_{self.mode}','a')
+        debug = open(f'debug_{self.shareMode}','a')
 
         default_src = 'http://ftp.itec.aau.at/DASHDataset2014/'
         src_node = None
@@ -395,7 +421,7 @@ class DownloadManager:
                         local += seg_info.segment.segment_size
                         edge += seg_info.segment.segment_size
 
-                    elif self.mode == Bench2Mode.ALL2ALL:
+                    elif self.shareMode == Bench2Mode.ALL2ALL:
                         if self.segment_map[seg_id]:
                             edge += seg_info.segment.segment_size
                             src_nodes = self.segment_map[seg_id]
@@ -403,7 +429,7 @@ class DownloadManager:
                         else:
                             cdn += seg_info.segment.segment_size
 
-                    elif self.mode == Bench2Mode.CUR_ROUTE_NBR:
+                    elif self.shareMode == Bench2Mode.CUR_ROUTE_NBR:
                         if self.segment_map[seg_id]:
                             src_nodes = []
                             for node in list(assignments.keys()):
@@ -417,7 +443,7 @@ class DownloadManager:
                         else:
                             cdn += seg_info.segment.segment_size
 
-                    elif self.mode == Bench2Mode.ALL_ROUTE_NBR:
+                    elif self.shareMode == Bench2Mode.ALL_ROUTE_NBR:
                         if node_id not in self.node_nbr_map:
                             self.node_nbr_map[node_id] = set()
 
