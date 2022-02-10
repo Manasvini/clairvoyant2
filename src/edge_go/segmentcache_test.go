@@ -85,9 +85,12 @@ func setupSuite(tc TestCase) (*SegmentCache, cvpb.Segment, int64) {
 func TestCacheNotFull(t *testing.T) {
 	tc := TestCase{0, "cache not full"}
 	cache, seg, routeId := setupSuite(tc)
-	err := cache.AddSegment(seg, routeId)
+	evicted, err := cache.AddSegment(seg, routeId)
 	if err != nil {
 		t.Fatalf("tc %s failed, want=nil, got=%s", tc.name, err)
+	}
+	if evicted != nil {
+		t.Fatalf("tc %s failed, want=nil, got=%s", tc.name, evicted)
 	}
 	has := cache.HasSegment(seg.SegmentId)
 	if !has {
@@ -98,7 +101,7 @@ func TestCacheNotFull(t *testing.T) {
 func TestCacheFullWithNoEvictions(t *testing.T) {
 	tc := TestCase{1, "cache full, no evictions"}
 	cache, seg, routeId := setupSuite(tc)
-	err := cache.AddSegment(seg, routeId)
+	evicted, err := cache.AddSegment(seg, routeId)
 	if err == nil || !strings.Contains(err.Error(), "SegmentCache is full") {
 		var got string
 		if err == nil {
@@ -109,15 +112,29 @@ func TestCacheFullWithNoEvictions(t *testing.T) {
 
 		t.Fatalf("tc %s failed, want='SegmentCache is full', got=%s", tc.name, got)
 	}
+	if evicted != nil {
+		t.Fatalf("tc %s failed, want=nil, got=%s", tc.name, evicted)
+	}
 }
 
 func TestCacheFullWithEvictions(t *testing.T) {
 	tc := TestCase{2, "evictions, cache not full"}
 	cache, seg, routeId := setupSuite(tc)
-	err := cache.AddSegment(seg, routeId)
+	evicted, err := cache.AddSegment(seg, routeId)
 	if err != nil {
 		t.Fatalf("tc %s failed, want=nil, got=%s", tc.name, err)
 	}
+
+	if evicted == nil || evicted[0] != "test2" {
+		var got string
+		if evicted != nil {
+			got = evicted[0]
+		} else {
+			got = "nil"
+		}
+		t.Fatalf("tc %s failed, want=test2, got=%s", tc.name, got)
+	}
+
 	has := cache.HasSegment(seg.SegmentId)
 	if !has {
 		t.Fatalf("tc %s failed, want=true, got=%t", tc.name, has)
@@ -127,7 +144,7 @@ func TestCacheFullWithEvictions(t *testing.T) {
 func TestCacheFullWithEvictionsFail(t *testing.T) {
 	tc := TestCase{3, "evictions, cache still full"}
 	cache, seg, routeId := setupSuite(tc)
-	err := cache.AddSegment(seg, routeId)
+	evicted, err := cache.AddSegment(seg, routeId)
 	if err == nil || !strings.Contains(err.Error(), "SegmentCache is full") {
 		var got string
 		if err == nil {
@@ -137,6 +154,9 @@ func TestCacheFullWithEvictionsFail(t *testing.T) {
 		}
 
 		t.Fatalf("tc %s failed, want='SegmentCache is full', got=%s", tc.name, got)
+	}
+	if evicted != nil {
+		t.Fatalf("tc %s failed, want=nil, got=%s", tc.name, evicted)
 	}
 }
 

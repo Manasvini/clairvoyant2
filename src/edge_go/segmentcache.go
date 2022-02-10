@@ -16,7 +16,7 @@ const (
 
 type SegmentMetadata struct {
 	segmentId    string
-	segSize      int32
+	segSize      int64
 	routeIdSet   map[int64]bool
 	timestamp    int64 //for LRU
 	evictListIdx int   //can be -1 if not in list
@@ -25,8 +25,8 @@ type SegmentMetadata struct {
 type SegmentCache struct {
 	evictable        []string
 	segmentRouteMap  map[string]*SegmentMetadata
-	size             int32
-	currentSize      int32
+	size             int64
+	currentSize      int64
 	cachePolicy      string
 	mu               sync.Mutex
 	currentTimestamp int64
@@ -34,15 +34,15 @@ type SegmentCache struct {
 
 /*package internal functions*/
 
-func NewSegmentCache(size int32, cachetype string) *SegmentCache {
-	segSegmentCache := &SegmentCache{
+func NewSegmentCache(size int64, cachetype string) *SegmentCache {
+	segmentCache := &SegmentCache{
 		size:             size,
 		cachePolicy:      cachetype,
 		evictable:        make([]string, 0),
 		segmentRouteMap:  make(map[string]*SegmentMetadata),
 		currentTimestamp: 0,
 	}
-	return segSegmentCache
+	return segmentCache
 }
 
 func (cache *SegmentCache) curTS() int64 {
@@ -57,30 +57,42 @@ func (cache *SegmentCache) updateEvictable(segmentId string) {
 	}
 }
 
-func (cache *SegmentCache) pop() error {
+func (cache *SegmentCache) pop() (string, error) {
 	if len(cache.evictable) == 0 {
-		return errors.New("Nothing to evict")
+		return "", errors.New("Nothing to evict")
 	}
 	segId := cache.evictable[0]
 	cache.currentSize -= cache.segmentRouteMap[segId].segSize
 	delete(cache.segmentRouteMap, segId)
 	cache.evictable = cache.evictable[1:]
-	return nil
+	return segId, nil
 }
 
-func (cache *SegmentCache) isSegmentCacheFull(excess int32) bool {
+func (cache *SegmentCache) isSegmentCacheFull(excess int64) ([]string, bool) {
 
 	if (cache.currentSize + excess) <= cache.size {
-		return false
+		return nil, false
 	}
 
-	for (cache.currentSize + excess) > cache.size {
-		err := cache.pop()
-		if err != nil {
-			return true
-		}
+	//check if evicted list size can support excess
+	var evictSize int64
+	for _, segId := range cache.evictable {
+		evictSize += cache.segmentRouteMap[segId].segSize
 	}
-	return false
+	if (cache.currentSize - evictSize + excess) > cache.size {
+		return nil, true
+	}
+
+	evicted := []string{}
+	for (cache.currentSize + excess) > cache.size {
+		id, err := cache.pop()
+		if err != nil {
+			glog.Errorf("pop() did not find segments to evict")
+			return evicted, true
+		}
+		evicted = append(evicted, id)
+	}
+	return evicted, false
 }
 
 func insert(a []string, index int, value string) []string {
@@ -118,17 +130,32 @@ func (cache *SegmentCache) HasSegment(segmentId string) bool {
 	return ok
 }
 
-func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) error {
+func (cache *SegmentCache) DeliveredSegment(segmentId string, routeId int64) bool {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
-	if cache.isSegmentCacheFull(segment.SegmentSize) {
-		return errors.New("SegmentCache is full")
+	if segMeta, ok := cache.segmentRouteMap[segmentId]; !ok {
+		glog.Warningf("segment %s not in cache")
+		return true
+	} else if _, ok := segMeta.routeIdSet[routeId]; !ok {
+		return true
+	}
+	return false
+}
+
+func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]string, error) {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+	var evictedIds []string
+	var isFull bool
+
+	if evictedIds, isFull = cache.isSegmentCacheFull(int64(segment.SegmentSize)); isFull {
+		return nil, errors.New("SegmentCache is full")
 	}
 
 	if _, ok := cache.segmentRouteMap[segment.SegmentId]; !ok {
 		cache.segmentRouteMap[segment.SegmentId] = &SegmentMetadata{
 			segmentId:  segment.SegmentId,
-			segSize:    segment.SegmentSize,
+			segSize:    int64(segment.SegmentSize),
 			routeIdSet: map[int64]bool{routeId: true},
 		}
 	} else {
@@ -137,7 +164,7 @@ func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) error
 		cache.updateEvictable(segment.SegmentId)
 	}
 	cache.segmentRouteMap[segment.SegmentId].timestamp = cache.curTS()
-	return nil
+	return evictedIds, nil
 }
 
 func (cache *SegmentCache) UpdateSegmentStatus(segmentId string, routeId int64) {

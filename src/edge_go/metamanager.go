@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	"strings"
-	"sync"
-	"time"
-	"strconv"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
 
 	"github.com/golang/glog"
 	pb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
@@ -29,28 +30,23 @@ type RouteInfo struct {
 }
 
 type MetadataManager struct {
-	SegmentCache       *Cache
+	SegmentCache       *SegmentCache
 	routeAddChannel    chan RouteInfo
 	downloadReqChannel chan pb.DownloadRequest
 	evicted            []string
 	routes             map[int64]RouteInfo
 	resultFile         string
-	resultDir	   string
+	resultDir          string
 	wg                 sync.WaitGroup
-}
-
-func (metamgr *MetadataManager) evictionHandler(key, value interface{}) {
-	metamgr.evicted = append(metamgr.evicted, key.(string))
 }
 
 func newMetadataManager(size int64, cachetype string) *MetadataManager {
 	metamgr := &MetadataManager{}
 	switch {
 	case cachetype == "lru":
-		metamgr.SegmentCache = NewCache(size, "lru", metamgr.evictionHandler)
-	case cachetype == "lfu":
-		metamgr.SegmentCache = NewCache(size, "lfu", metamgr.evictionHandler)
+		metamgr.SegmentCache = NewSegmentCache(size, "lru")
 	}
+
 	metamgr.routeAddChannel = make(chan RouteInfo, 10)             //can accept at most 10 simultaneous routeAdd requests
 	metamgr.downloadReqChannel = make(chan pb.DownloadRequest, 10) //can accept at most 10 simultaneous requests
 	metamgr.routes = make(map[int64]RouteInfo, 0)
@@ -68,7 +64,7 @@ func newMetadataManager(size int64, cachetype string) *MetadataManager {
 		glog.Fatal(err)
 	}
 
-	resultDir := filepath.Join(homeDir, "clairvoyant2", "results_" + strconv.FormatInt(size, 10))
+	resultDir := filepath.Join(homeDir, "clairvoyant2", "results_"+strconv.FormatInt(size, 10))
 	err = os.MkdirAll(resultDir, 0755)
 	if err != nil {
 		glog.Fatal(err)
@@ -80,32 +76,55 @@ func newMetadataManager(size int64, cachetype string) *MetadataManager {
 	return metamgr
 }
 
-func (metamgr *MetadataManager) addSegments(segments []*pb.Segment) {
+func (metamgr *MetadataManager) addSegments(segments []*pb.Segment, routeId int64) []string {
+	var committed []string
 	for _, segment := range segments {
-		metamgr.SegmentCache.AddSegment(*segment)
+		evicted, err := metamgr.SegmentCache.AddSegment(*segment, routeId)
+		if err != nil {
+			break
+		}
+		committed = append(committed, segment.SegmentId)
+		metamgr.evicted = append(metamgr.evicted, evicted...)
 	}
+	return committed
 }
 
-func (metamgr *MetadataManager) UpdateSegmentDeliveryForRoute(segment string, route int64){
-
-}
-
-func (metamgr *MetadataManager) IsStorageSpaceAvailable(segment *pb.Segment) bool {
-	/*if metamgr.SegmentCache.GetCurrentSize() + segment.SegmentSize < metamgr.SegmentCache.GetCapacity() {
-		return true
-	}
-	return false
-	*/
-
-	return true
-}
-
-func (metamgr *MetadataManager) GetOverdueSegments() map[int64][]*pb.Segment{
+func (metamgr *MetadataManager) GetOverdueSegments(curTime int64, threshold int64) map[int64][]*pb.Segment {
 	// TODO report actual missed segments and not all segments. This is only for TESTINGGGGG
 	undeliveredSegments := make(map[int64][]*pb.Segment)
-	//for route, routeInfo := range metamgr.routes {
-	//	undeliveredSegments[route] = routeInfo.request.Segments
-	//}
+
+	for routeId, routeInfo := range metamgr.routes {
+		req := &(routeInfo.request)
+		deadline := float64(req.ArrivalTime) + req.ContactTime + float64(threshold)
+
+		if float64(curTime) > deadline {
+			// currently fetching overdue only if we cross the deadline for the route
+			glog.Infof("overdue segs, curTime=%d, contact=%f, arrival=%d, deadline=%f", curTime, req.ContactTime, req.ArrivalTime, deadline)
+
+			var unused, used []string
+			for _, segment := range req.Segments {
+
+				isDelivered := metamgr.SegmentCache.DeliveredSegment(segment.SegmentId, routeId)
+				if len(used) == 0 {
+					if isDelivered {
+						used = append(used, segment.SegmentId)
+					} else {
+						unused = append(unused, segment.SegmentId)
+					}
+				} else if isDelivered {
+					used = append(used, segment.SegmentId)
+				} else {
+					undeliveredSegments[routeId] = append(undeliveredSegments[routeId], segment)
+				}
+			}
+
+			glog.Infof("overdue calc - unused=%d, used=%d, missed=%d", len(unused), len(used), len(undeliveredSegments))
+
+			for _, segId := range unused {
+				metamgr.SegmentCache.UpdateSegmentStatus(segId, routeId)
+			}
+		}
+	}
 	return undeliveredSegments
 }
 
@@ -148,7 +167,7 @@ func (metamgr *MetadataManager) Close() {
 	glog.Info("Closing Metamgr!")
 	close(metamgr.downloadReqChannel)
 	metamgr.wg.Wait()
-	metamgr.SegmentCache.RecordStats(filepath.Join(metamgr.resultDir, "edgestats"))
+	//metamgr.SegmentCache.RecordStats(filepath.Join(metamgr.resultDir, "edgestats"))
 }
 
 func (metamgr *MetadataManager) processDownloads() {
@@ -207,7 +226,20 @@ func (metamgr *MetadataManager) processDownloads() {
 	check(err)
 }
 
-func (metamgr *MetadataManager) getSegments(routeId int64) []string {
+func (metamgr *MetadataManager) GetSegment(segmentId string, routeId int64, isEdge bool) error {
+	hasSegment := metamgr.SegmentCache.HasSegment(segmentId)
+	if !hasSegment {
+		return errors.New("segment not found")
+	}
+
+	if !isEdge {
+		metamgr.SegmentCache.UpdateSegmentStatus(segmentId, routeId)
+	}
+
+	return nil
+}
+
+func (metamgr *MetadataManager) GetSegments(routeId int64) []string {
 	//getsegments does not need to look at the cache. it's a given that when
 	// client asks for a route then corresponding segments must be there
 	segmentIDs := []string{}
@@ -224,24 +256,11 @@ func (metamgr *MetadataManager) getSegments(routeId int64) []string {
 func (metamgr *MetadataManager) handleAddRoute() {
 	for routeInfo := range metamgr.routeAddChannel {
 		metamgr.evicted = nil
+		var committedSegments []string
 		if _, ok := metamgr.routes[routeInfo.request.TokenId]; !ok {
 			metamgr.routes[routeInfo.request.TokenId] = routeInfo
 			glog.Infof("Added route %d with %d segments", routeInfo.request.TokenId, len(routeInfo.request.Segments))
-			//metamgr.addSegments(routeInfo.request.Segments)
-		}
-		toAdd := []*pb.Segment{}
-		committedSegments := make([]string, 0)
-		for _, seg := range routeInfo.request.Segments {
-			if !metamgr.IsStorageSpaceAvailable(seg){
-				break
-			}
-			committedSegments = append(committedSegments, seg.SegmentId)
-			if !metamgr.SegmentCache.HasSegment(seg.SegmentId) {
-				toAdd = append(toAdd, seg)
-			}
-		}
-		if len(toAdd) > 0 {
-			metamgr.addSegments(toAdd)
+			committedSegments = metamgr.addSegments(routeInfo.request.Segments, routeInfo.request.TokenId)
 		}
 		dlReply := &pb.DownloadReply{TokenId: routeInfo.request.TokenId, SegmentIds: committedSegments, EvictedIds: metamgr.evicted}
 		metamgr.downloadReqChannel <- routeInfo.request
