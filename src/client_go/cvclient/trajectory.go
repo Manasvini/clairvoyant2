@@ -25,11 +25,20 @@ func (trajectory *Trajectory) HasEnded() bool {
 }
 
 func (trajectory *Trajectory) Advance() {
-	advCtr := 4
-	//advCtr = 1
+	//advCtr := 4
+	advCtr := 1
 
 	if len(trajectory.points) > trajectory.curIdx+advCtr {
-		trajectory.curIdx += advCtr
+		cur_timestamp := trajectory.points[trajectory.curIdx].timestamp
+		for {
+			trajectory.curIdx += advCtr
+			if trajectory.curIdx == len(trajectory.points) {
+				break
+			}
+			if trajectory.points[trajectory.curIdx].timestamp > cur_timestamp{
+				break
+			}
+		}
 	} else {
 		trajectory.curIdx = len(trajectory.points)
 	}

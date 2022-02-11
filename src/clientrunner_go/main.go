@@ -70,6 +70,19 @@ func getFilesInDir(dirName string, isBench2 bool) []string {
 	return fileNames
 }
 
+func writeLogs(filename string, records []string) {
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		panic(err)
+	}
+	for _, record := range records {
+		_, err = f.WriteString(record + "\n")
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
 func main() {
 
 	defer glog.Flush() // flushes buffer, if any
@@ -100,6 +113,7 @@ func main() {
 	zipf := rand.NewZipf(r, 1.1, 1, uint64(*numVideos)-1)
 	edgeNodes := cvclient.EdgeNodes{}
 	edgeNodes.LoadFromFile(*edgeNodesFile)
+	trajectories = []string{"../../eval/routes/user1917.csv"}
 	/*trajectories = []string{"../../eval/enode_positions/microbenchmark/bench2/30users_new/user0.csv",
 		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user1.csv",
 		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user2.csv",
@@ -163,7 +177,8 @@ func main() {
 		}
 	}
 	fmt.Printf("\nelapsed = %s\n", time.Since(start))
-	f, err := os.Create(*ofilename)
+
+	/*f, err := os.Create(*ofilename)
 	ef, err := os.Create(*ofilename + ".edge")
 	cf, err := os.Create(*ofilename + ".contact")
 	if err != nil {
@@ -175,9 +190,27 @@ func main() {
 	}
 	_, err = ef.WriteString("client,token,edgenode,timestamp,bytes\n")
 	_, err = cf.WriteString("client,token,edgenode,timestamp,bytes\n")
+	*/
+	offloadFile := *ofilename
+	edgeDlFile := *ofilename + ".edge"
+	edgeContactFile := *ofilename + ".contact"
+	edgeUtilityFile := *ofilename + ".utility"
+
+	offloadHeader := []string{"token,id,receivedBytesCloud,receivedBytesEdge"}
+	dlHeader := []string{"client,token,edgenode,timestamp,bytes"}
+	utilHeader := []string{"client,token,edgenode,usefulSegCount,uselessSegCount,usefulBytes"}
+	writeLogs(offloadFile, offloadHeader)
+	writeLogs(edgeDlFile, dlHeader)
+	writeLogs(edgeContactFile, dlHeader)
+	writeLogs(edgeUtilityFile, utilHeader)
+
 	for _, c := range clients {
-		line := c.PrintStats()
-		_, err = f.WriteString(line)
+		line := []string{c.PrintStats()}
+		writeLogs(offloadFile, line)
+		writeLogs(edgeDlFile, c.GetDlLogs())
+		writeLogs(edgeContactFile, c.GetContactLogs())
+		writeLogs(edgeUtilityFile, c.GetUtilLogs())
+		/*_, err = f.WriteString(line)
 		if err != nil {
 			panic(err)
 		}
@@ -192,7 +225,8 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-		}
+		}*/
 
 	}
+
 }

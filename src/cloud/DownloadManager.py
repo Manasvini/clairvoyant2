@@ -232,7 +232,7 @@ class DownloadManager:
 
         #if node_id == 'node_5':
         #    import pdb; pdb.set_trace()
-
+        bits = 0
         for point in contact_points:
             logger.debug(f" node: {node_id} | contact point: ({point.x},{point.y}) | point dist: {point.distance}")
             num_points += 1
@@ -243,12 +243,12 @@ class DownloadManager:
                 time_of_last_distance = point.time
             if distance != last_distance:
                 point_contact_time = point.time - time_of_last_distance
-                if point_contact_time == 0:
-                    bits = dl_map[last_distance]
-                else:
+                #if point_contact_time == 0:
+                #    bits = dl_map[last_distance]
+                if point_contact_time > 0:
                     bits = (dl_map[last_distance]*point_contact_time)
-                totalBits += bits
-                logger.debug(f"Accumulate for dist={last_distance}, time={point_contact_time},speed={dl_map[last_distance]} bits={bits}")
+                    totalBits += bits
+                    logger.info(f"Accumulate for dist={last_distance}, time={point_contact_time},speed={dl_map[last_distance]} bits={bits}")
                 time_of_last_distance = point.time
                 last_distance = distance
 
@@ -258,6 +258,7 @@ class DownloadManager:
             logger.debug(f"Accumulate for dist={last_distance}, time={point_contact_time},speed={dl_map[last_distance]} bits={bits}")
         else:
             logger.error("No contact points on node: {}".format(node_id))
+        logger.info(f"For node {node_id} total {totalBits/8} bytes can be downloaded")
         return totalBits / 8
 
     def getDownloadAssignment(self, supposed_playback_start, segments, nodeInfos, token_id, request_timestamp):

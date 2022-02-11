@@ -2,12 +2,12 @@ package cvclient
 
 import (
 	"context"
-	"fmt"
-	"time"
 	"errors"
+	"fmt"
 	pb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
 	cpb "github.gatech.edu/cs-epl/clairvoyant2/edge_go/contentserver"
 	"google.golang.org/grpc"
+	"time"
 
 	//    "sync"
 	"encoding/json"
@@ -26,12 +26,20 @@ type DlLog struct {
 	edgeNode  string
 }
 
+type EdgeUtility struct {
+	nodeId      string
+	numUseful   int64
+	numUseless  int64
+	bytesUseful int64
+}
+
 type DlStats struct {
 	pendingBytes       int
 	receivedBytesCloud int
 	receivedBytesEdge  int
 	dlLogs             []DlLog
 	contactLogs        []DlLog
+	edgeUtilities      []EdgeUtility
 }
 
 type Buffer struct {
@@ -145,7 +153,7 @@ func (client *Client) GetEdgeBandwidth(edgeNode EdgeNode, distance float64) floa
 	bw := edgeNode.GetDownloadSpeedAtDistance(int(math.Ceil(distance)))
 
 	if distance < 40 {
-		glog.Infof("client %s near edge node %s bw = %f distance = %f\n", client.id, edgeNode.id, bw, distance)
+		//glog.Infof("client %s near edge node %s bw = %f distance = %f\n", client.id, edgeNode.id, bw, distance)
 		return bw
 	}
 
@@ -183,12 +191,12 @@ func (client *Client) doGetGRPC(edgeNode EdgeNode, lastSegment string, shouldRes
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	resp, err := contentClient.GetSegment(ctx, &segmentRequest)
-	if err != nil{
+	if err != nil {
 		glog.Info(err)
 	}
-	if resp != nil {
-		glog.Infof("got status %s", resp.GetStatus())
-	}
+	//if resp != nil {
+	//	glog.Debugf("got status %s", resp.GetStatus())
+	//}
 	if err == nil && resp != nil && resp.GetStatus() != "node busy" {
 		return resp.GetSegments(), err
 	} else if resp != nil && resp.GetStatus() == "node busy" {
@@ -280,7 +288,7 @@ func (client *Client) getAvailableSegments(edgeNode EdgeNode) []string {
 
 func (client *Client) disconnectFromCurrentEdgeNode(edgeNode EdgeNode) {
 	_, err := client.doGet(edgeNode, "", true)
-	if err != nil{
+	if err != nil {
 		glog.Info(err)
 	}
 }
@@ -302,7 +310,7 @@ func (client *Client) pretendDownload(edgeNode EdgeNode, segments []string, tota
 		fileSize := val.size
 		if int64(fileSize) < bytesAvailable {
 			segments, err := client.doGet(edgeNode, curSegment, false)
-			if err != nil{
+			if err != nil {
 				glog.Info(err)
 			}
 			if len(segments) > 0 {
@@ -325,15 +333,19 @@ func (client *Client) MakeEdgeRequest(edgeNode EdgeNode, bw float64) {
 	bytesDownloaded = 0
 	if &edgeNode != nil {
 		client.dlInfo.availableBits += int64(bw) // bps
-		glog.Infof("client %s can download %d bits from %s\n", client.id, client.dlInfo.availableBits, edgeNode.id)
+		glog.Infof("client %s can download %d bytes from %s\n", client.id, client.dlInfo.availableBits/8, edgeNode.id)
 		totalBytes := client.dlInfo.availableBits / 8
 		segments := client.getAvailableSegments(edgeNode)
 		segmentsToDownload := make([]string, 0)
+		utilInfo := EdgeUtility{nodeId: edgeNode.id, numUseful: 0, numUseless: 0, bytesUseful: 0}
 		if segments != nil {
 			for _, seg := range segments {
 				_, exists := client.dlInfo.bufferedData[seg]
 				if !exists {
 					segmentsToDownload = append(segmentsToDownload, seg)
+					utilInfo.numUseful += 1
+				} else {
+					utilInfo.numUseless += 1
 				}
 			}
 		}
@@ -343,7 +355,9 @@ func (client *Client) MakeEdgeRequest(edgeNode EdgeNode, bw float64) {
 		} else {
 			glog.Infof("client %s pretending to download %d segments from %s\n", client.id, len(segmentsToDownload), edgeNode.id)
 			bytesDownloaded = client.pretendDownload(edgeNode, segmentsToDownload, totalBytes)
+			utilInfo.bytesUseful = bytesDownloaded
 		}
+		client.stats.edgeUtilities = append(client.stats.edgeUtilities, utilInfo)
 	}
 	glog.Infof("client %s has %d urls completed, and %d in buffer so far", client.id, len(client.buffer.completedUrls), len(client.dlInfo.bufferedData))
 	if len(client.buffer.allUrls) > len(client.buffer.completedUrls) {
@@ -406,7 +420,7 @@ func (client *Client) FetchSegments(timestamp int64) {
 				break
 			}
 			// sufficient data downloaded such that there isn't a stall
-			if client.buffer.playback+30 /* 30 sec buffer ahead */ <= len(client.buffer.completedUrls) {
+			if client.buffer.playback+3 /* 3 sec buffer ahead */ <= len(client.buffer.completedUrls) {
 				break
 			}
 			nextUrl := client.buffer.allUrls[len(client.buffer.completedUrls)]
@@ -430,7 +444,7 @@ func (client *Client) FetchSegments(timestamp int64) {
 	} else {
 		if client.dlInfo.lastConnectedEdgeNode == nil {
 			glog.Infof("New request, will just set contact with node %s\n", edgeNode.id)
-			client.dlInfo.availableBits = int64(bw)
+			client.dlInfo.availableBits += int64(bw)
 			client.dlInfo.startContact = timestamp
 			client.dlInfo.endContact = timestamp
 			client.dlInfo.timeOfLastContact = timestamp
@@ -438,13 +452,15 @@ func (client *Client) FetchSegments(timestamp int64) {
 			client.dlInfo.lastConnectedEdgeNode = edgeNodePtr
 			dlLog := DlLog{timestamp: timestamp, edgeNode: client.dlInfo.lastConnectedEdgeNode.id, bytes: int64(bw) / 8}
 			client.dlInfo.tentativeLogs = append(client.dlInfo.tentativeLogs, dlLog)
-			glog.Infof("tentaive logs for client %s has %d entries", client.id, len(client.dlInfo.tentativeLogs))
+			glog.Infof("tentaive logs for client %s has %d entries last dist = %f", client.id, len(client.dlInfo.tentativeLogs), distance)
 		} else if client.dlInfo.lastConnectedEdgeNode.id != edgeNodePtr.id {
 			glog.Infof("Client %s Changing contact from %s to %s\n", client.id, client.dlInfo.lastConnectedEdgeNode.id, edgeNode.id)
 			client.dlInfo.endContact = timestamp
-			glog.Infof("tentaive logs for client %s has %d entries", client.id, len(client.dlInfo.tentativeLogs))
+			glog.Infof("tentaive logs for client %s has %d entries, last dist = %f", client.id, len(client.dlInfo.tentativeLogs), distance)
 			client.MakeEdgeRequest(*(client.dlInfo.lastConnectedEdgeNode), float64(lastBw))
-			client.dlInfo.availableBits = 0
+			client.dlInfo.availableBits = int64(bw)
+			client.dlInfo.startContact = timestamp
+			client.dlInfo.endContact = timestamp
 			client.dlInfo.lastConnectedEdgeNode = edgeNodePtr
 			client.dlInfo.lastEdgeNodeDistance = distance
 			client.dlInfo.timeOfLastContact = timestamp
@@ -454,9 +470,9 @@ func (client *Client) FetchSegments(timestamp int64) {
 				contactTime := timestamp - client.dlInfo.timeOfLastContact
 				glog.Infof("Update contact with %s to %d\n", client.dlInfo.lastConnectedEdgeNode.id, contactTime)
 				bits := 0
-				if contactTime == 0 {
-					bits = int(lastBw)
-				} else {
+				//if contactTime == 0 {
+				//	bits = int(lastBw)
+				if contactTime > 0 {
 					bits = int(lastBw) * int(contactTime)
 				}
 				client.dlInfo.availableBits += int64(bits)
@@ -465,7 +481,7 @@ func (client *Client) FetchSegments(timestamp int64) {
 				client.dlInfo.endContact = timestamp
 				dlLog := DlLog{timestamp: timestamp, edgeNode: client.dlInfo.lastConnectedEdgeNode.id, bytes: int64(bits) / 8}
 				client.dlInfo.tentativeLogs = append(client.dlInfo.tentativeLogs, dlLog)
-				glog.Infof("tentaive logs for client %s has %d entries", client.id, len(client.dlInfo.tentativeLogs))
+				glog.Infof("tentaive logs for client %s has %d entries, and total bits accumulated so far =%d last dist=%f", client.id, len(client.dlInfo.tentativeLogs), client.dlInfo.availableBits, distance)
 			}
 		}
 		if client.dlInfo.lastConnectedEdgeNode == nil {
@@ -487,7 +503,7 @@ func (client *Client) IsRegistered() bool {
 
 func (client *Client) PrintStats() string {
 	glog.Infof("printing for client %s token %d", client.id, client.token)
-	return fmt.Sprintf("%d,%s,%d,%d\n", *client.token, client.id, client.stats.receivedBytesCloud, client.stats.receivedBytesEdge)
+	return fmt.Sprintf("%d,%s,%d,%d", *client.token, client.id, client.stats.receivedBytesCloud, client.stats.receivedBytesEdge)
 
 }
 
@@ -505,7 +521,7 @@ func (client *Client) Move() {
 func (client *Client) getLogs(logs []DlLog) []string {
 	loglines := make([]string, 0)
 	for _, dlLog := range logs {
-		loglines = append(loglines, client.id+","+ strconv.FormatInt(*client.token, 10) + "," + dlLog.edgeNode+","+strconv.FormatInt(dlLog.timestamp, 10)+","+strconv.FormatInt(dlLog.bytes, 10))
+		loglines = append(loglines, client.id+","+strconv.FormatInt(*client.token, 10)+","+dlLog.edgeNode+","+strconv.FormatInt(dlLog.timestamp, 10)+","+strconv.FormatInt(dlLog.bytes, 10))
 	}
 	return loglines
 
@@ -517,4 +533,12 @@ func (client *Client) GetDlLogs() []string {
 
 func (client *Client) GetContactLogs() []string {
 	return client.getLogs(client.stats.contactLogs)
+}
+
+func (client *Client) GetUtilLogs() []string {
+	loglines := make([]string, 0)
+	for _, dlLog := range client.stats.edgeUtilities {
+		loglines = append(loglines, client.id+","+strconv.FormatInt(*client.token, 10)+","+dlLog.nodeId+","+strconv.FormatInt(dlLog.numUseful, 10)+","+strconv.FormatInt(dlLog.numUseless, 10)+","+strconv.FormatInt(dlLog.bytesUseful, 10))
+	}
+	return loglines
 }
