@@ -166,7 +166,13 @@ func main() {
 				wg.Add(1)
 				go func(timestamp int64, client *cvclient.Client) {
 					defer wg.Done()
-					client.FetchSegments(timestamp)
+					clientTimeAdvanced := false
+					for {
+						clientTimeAdvanced = client.FetchSegments(timestamp)
+						if clientTimeAdvanced {
+							break
+						}
+					}
 				}(timestamp, &clients[i])
 			}
 		}

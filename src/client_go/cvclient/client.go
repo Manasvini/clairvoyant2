@@ -328,11 +328,11 @@ func (client *Client) pretendDownload(edgeNode EdgeNode, segments []string, tota
 	return bytesDl
 }
 
-func (client *Client) MakeEdgeRequest(edgeNode EdgeNode, bw float64) {
+func (client *Client) MakeEdgeRequest(edgeNode EdgeNode) {
 	var bytesDownloaded int64
 	bytesDownloaded = 0
 	if &edgeNode != nil {
-		client.dlInfo.availableBits += int64(bw) // bps
+		//client.dlInfo.availableBits += int64(bw) // bps
 		glog.Infof("client %s can download %d bytes from %s\n", client.id, client.dlInfo.availableBits/8, edgeNode.id)
 		totalBytes := client.dlInfo.availableBits / 8
 		segments := client.getAvailableSegments(edgeNode)
@@ -378,16 +378,16 @@ func (client *Client) IsCloudRequestNecessary(segment string) bool {
 	return true
 }
 
-func (client *Client) FetchSegments(timestamp int64) {
-	client.Move()
+func (client *Client)FetchSegments(timestamp int64) bool{
+	hasClientTimeAdvanced := client.Move()
 	if client.trajectory.HasEnded() {
 		if client.dlInfo.lastConnectedEdgeNode != nil {
-			lastBw := client.GetEdgeBandwidth(*(client.dlInfo.lastConnectedEdgeNode), client.dlInfo.lastEdgeNodeDistance)
+			//lastBw := client.GetEdgeBandwidth(*(client.dlInfo.lastConnectedEdgeNode), client.dlInfo.lastEdgeNodeDistance)
 			glog.Infof("Client %s about to stop. Will finish edge actions with node %s\n", client.id, client.dlInfo.lastConnectedEdgeNode.id)
-			client.MakeEdgeRequest(*(client.dlInfo.lastConnectedEdgeNode), float64(lastBw))
+			client.MakeEdgeRequest(*(client.dlInfo.lastConnectedEdgeNode))
 			client.dlInfo.lastConnectedEdgeNode = nil
 		}
-		return
+		return true //nothing more to do for this client
 	}
 	edgeNode, distance := client.edgeNodes.GetNearestEdgeNode(client.trajectory.points[client.trajectory.curIdx])
 	bw := 4e7 // LTE b/w
@@ -411,16 +411,27 @@ func (client *Client) FetchSegments(timestamp int64) {
 		}
 		if client.dlInfo.lastConnectedEdgeNode != nil {
 			glog.Infof("Client %s Losing contact with %s, will update dl bytes now\n", client.id, client.dlInfo.lastConnectedEdgeNode.id)
-			client.MakeEdgeRequest(*(client.dlInfo.lastConnectedEdgeNode), float64(lastBw))
+			bits := 0
+			//if contactTime == 0 {
+			//	bits = int(lastBw)
+			contactTime := timestamp - client.dlInfo.timeOfLastContact
+			if contactTime > 0 {
+				bits = int(lastBw) * int(contactTime)
+			}
+			client.dlInfo.availableBits += int64(bits)
+			client.MakeEdgeRequest(*(client.dlInfo.lastConnectedEdgeNode))
 			client.dlInfo.lastConnectedEdgeNode = nil
 		}
 		for {
+			if !hasClientTimeAdvanced { // client time didn't change so we don't need to update playback or buffer
+				break
+			}
 			// all data downloaded
 			if len(client.buffer.completedUrls) >= len(client.buffer.allUrls) {
 				break
 			}
 			// sufficient data downloaded such that there isn't a stall
-			if client.buffer.playback+3 /* 3 sec buffer ahead */ <= len(client.buffer.completedUrls) {
+			if client.buffer.playback+1 /* 1 sec buffer ahead */ <= len(client.buffer.completedUrls) {
 				break
 			}
 			nextUrl := client.buffer.allUrls[len(client.buffer.completedUrls)]
@@ -442,9 +453,10 @@ func (client *Client) FetchSegments(timestamp int64) {
 			client.dlInfo.bufferedData[filepath] = true
 		}
 	} else {
+		// no prior edge history so just set contact to current node
 		if client.dlInfo.lastConnectedEdgeNode == nil {
 			glog.Infof("New request, will just set contact with node %s\n", edgeNode.id)
-			client.dlInfo.availableBits += int64(bw)
+			client.dlInfo.availableBits = 0
 			client.dlInfo.startContact = timestamp
 			client.dlInfo.endContact = timestamp
 			client.dlInfo.timeOfLastContact = timestamp
@@ -452,28 +464,35 @@ func (client *Client) FetchSegments(timestamp int64) {
 			client.dlInfo.lastConnectedEdgeNode = edgeNodePtr
 			dlLog := DlLog{timestamp: timestamp, edgeNode: client.dlInfo.lastConnectedEdgeNode.id, bytes: int64(bw) / 8}
 			client.dlInfo.tentativeLogs = append(client.dlInfo.tentativeLogs, dlLog)
-			glog.Infof("tentaive logs for client %s has %d entries last dist = %f", client.id, len(client.dlInfo.tentativeLogs), distance)
-		} else if client.dlInfo.lastConnectedEdgeNode.id != edgeNodePtr.id {
+			//glog.Infof("tentaive logs for client %s has %d entries last dist = %f", client.id, len(client.dlInfo.tentativeLogs), distance)
+		} else if client.dlInfo.lastConnectedEdgeNode.id != edgeNodePtr.id /* edge node changed*/{
 			glog.Infof("Client %s Changing contact from %s to %s\n", client.id, client.dlInfo.lastConnectedEdgeNode.id, edgeNode.id)
 			client.dlInfo.endContact = timestamp
-			glog.Infof("tentaive logs for client %s has %d entries, last dist = %f", client.id, len(client.dlInfo.tentativeLogs), distance)
-			client.MakeEdgeRequest(*(client.dlInfo.lastConnectedEdgeNode), float64(lastBw))
-			client.dlInfo.availableBits = int64(bw)
+			contactTime := timestamp - client.dlInfo.timeOfLastContact
+			bits := 0
+			if contactTime > 0 {
+					bits = int(bw) * int(contactTime)
+			}
+			client.dlInfo.availableBits += int64(bits)
+			//glog.Infof("tentaive logs for client %s has %d entries, last dist = %f", client.id, len(client.dlInfo.tentativeLogs), distance)
+			client.MakeEdgeRequest(*(client.dlInfo.lastConnectedEdgeNode))
+			// reset to new edge node
+			client.dlInfo.availableBits = 0
 			client.dlInfo.startContact = timestamp
 			client.dlInfo.endContact = timestamp
 			client.dlInfo.lastConnectedEdgeNode = edgeNodePtr
 			client.dlInfo.lastEdgeNodeDistance = distance
 			client.dlInfo.timeOfLastContact = timestamp
 			client.dlInfo.tentativeLogs = make([]DlLog, 0)
-		} else {
-			if distance != client.dlInfo.lastEdgeNodeDistance {
+		} else /*edge download in progress */{
+			if distance != client.dlInfo.lastEdgeNodeDistance  || timestamp != client.dlInfo.timeOfLastContact{
 				contactTime := timestamp - client.dlInfo.timeOfLastContact
 				glog.Infof("Update contact with %s to %d\n", client.dlInfo.lastConnectedEdgeNode.id, contactTime)
 				bits := 0
 				//if contactTime == 0 {
 				//	bits = int(lastBw)
 				if contactTime > 0 {
-					bits = int(lastBw) * int(contactTime)
+					bits = int(bw) * int(contactTime)
 				}
 				client.dlInfo.availableBits += int64(bits)
 				client.dlInfo.lastEdgeNodeDistance = distance
@@ -481,16 +500,17 @@ func (client *Client) FetchSegments(timestamp int64) {
 				client.dlInfo.endContact = timestamp
 				dlLog := DlLog{timestamp: timestamp, edgeNode: client.dlInfo.lastConnectedEdgeNode.id, bytes: int64(bits) / 8}
 				client.dlInfo.tentativeLogs = append(client.dlInfo.tentativeLogs, dlLog)
-				glog.Infof("tentaive logs for client %s has %d entries, and total bits accumulated so far =%d last dist=%f", client.id, len(client.dlInfo.tentativeLogs), client.dlInfo.availableBits, distance)
+				//glog.Infof("tentaive logs for client %s has %d entries, and total bits accumulated so far =%d last dist=%f", client.id, len(client.dlInfo.tentativeLogs), client.dlInfo.availableBits, distance)
 			}
 		}
 		if client.dlInfo.lastConnectedEdgeNode == nil {
 			glog.Warningf("something fishy going on with %s\n", client.id)
 		}
 	}
-	if float64(timestamp) > client.trajectory.points[0].timestamp {
+	if float64(timestamp) > client.trajectory.points[0].timestamp && hasClientTimeAdvanced{
 		client.buffer.playback += 1
 	}
+	return hasClientTimeAdvanced
 }
 
 func (client *Client) GetStartTime() float64 {
@@ -507,15 +527,16 @@ func (client *Client) PrintStats() string {
 
 }
 
-func (client *Client) Move() {
+func (client *Client) Move() bool{
 	if client.trajectory.HasEnded() {
-		return
+		return false
 	}
-	client.trajectory.Advance()
+	timeMoved := client.trajectory.Advance()
 
 	if client.trajectory.curIdx%100 == 0 {
 		glog.Infof("Client at idx %d\n", client.trajectory.curIdx)
 	}
+	return timeMoved
 }
 
 func (client *Client) getLogs(logs []DlLog) []string {

@@ -234,21 +234,23 @@ class DownloadManager:
         #    import pdb; pdb.set_trace()
         bits = 0
         for point in contact_points:
-            logger.debug(f" node: {node_id} | contact point: ({point.x},{point.y}) | point dist: {point.distance}")
+            logger.debug(f" node: {node_id} | contact point: ({point.x},{point.y}) | point dist: {point.distance}, time={point.time}")
             num_points += 1
             distance = self.get_model_dist(distances, point.distance)
 
             if num_points == 1:
                 last_distance = distance
                 time_of_last_distance = point.time
-            if distance != last_distance:
+            if point.time == time_of_last_distance:
+                continue
+            if distance != last_distance or point.time != time_of_last_distance:
                 point_contact_time = point.time - time_of_last_distance
                 #if point_contact_time == 0:
                 #    bits = dl_map[last_distance]
                 if point_contact_time > 0:
                     bits = (dl_map[last_distance]*point_contact_time)
                     totalBits += bits
-                    logger.info(f"Accumulate for dist={last_distance}, time={point_contact_time},speed={dl_map[last_distance]} bits={bits}")
+                    logger.info(f"Accumulate for dist={last_distance}, time={point.time},speed={dl_map[last_distance]} bits={bits}")
                 time_of_last_distance = point.time
                 last_distance = distance
 

@@ -24,24 +24,22 @@ func (trajectory *Trajectory) HasEnded() bool {
 	return trajectory.curIdx == len(trajectory.points)
 }
 
-func (trajectory *Trajectory) Advance() {
+
+func (trajectory *Trajectory) Advance() bool {
 	//advCtr := 4
 	advCtr := 1
-
+	timeMoved := false
 	if len(trajectory.points) > trajectory.curIdx+advCtr {
 		cur_timestamp := trajectory.points[trajectory.curIdx].timestamp
-		for {
-			trajectory.curIdx += advCtr
-			if trajectory.curIdx == len(trajectory.points) {
-				break
-			}
-			if trajectory.points[trajectory.curIdx].timestamp > cur_timestamp{
-				break
-			}
+		trajectory.curIdx += advCtr
+		if trajectory.points[trajectory.curIdx].timestamp > cur_timestamp{
+		//	glog.Infof("time is now %f point is x=%f, y=%f, curIdx is %d", trajectory.points[trajectory.curIdx].timestamp, trajectory.points[trajectory.curIdx].lon, trajectory.points[trajectory.curIdx].lat, trajectory.curIdx)
+			timeMoved = true
 		}
 	} else {
 		trajectory.curIdx = len(trajectory.points)
 	}
+	return timeMoved
 }
 
 func (trajectory *Trajectory) LoadFromFile(filename string) {
@@ -62,7 +60,7 @@ func (trajectory *Trajectory) LoadFromFile(filename string) {
 				break
 			}
 		}
-		// csv row: userid, time,x,y,z,velcoity, we're taking x, y, velocity, time
+		// csv row: userid,time,x,y,z,velcoity, we're taking x, y, velocity, time
 		curlat, err := strconv.ParseFloat(rec[2], 64)
 		curlon, err := strconv.ParseFloat(rec[3], 64)
 		speed, err := strconv.ParseFloat(rec[5], 64)

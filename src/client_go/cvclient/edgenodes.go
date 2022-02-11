@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"github.com/golang/glog"
-	"github.com/umahmood/haversine"
 	"io"
 	"os"
 	"sort"
@@ -30,28 +29,25 @@ type EdgeNodes struct {
 func (edgeNode *EdgeNode) GetDownloadSpeedAtDistance(distance int) float64 {
 	i := 0
 	j := len(edgeNode.model) - 1
-	mid := (i + j) / 2
 	if distance < edgeNode.model[i].distance {
 		return edgeNode.model[i].bw
 	}
 	if distance > edgeNode.model[j].distance {
 		return 0
 	}
-
-	for {
-		if i > j {
-			break
-		}
+	var mid int
+	for i <= j {
+		mid = (i + j) / 2
 		if edgeNode.model[mid].distance < distance {
 			i = mid + 1
-		} else if edgeNode.model[mid].distance > distance {
+		} else if edgeNode.model[mid].distance >= distance {
 			j = mid - 1
-		} else if edgeNode.model[mid].distance == distance {
-			break
 		}
-		mid = (i + j) / 2
 	}
-	return edgeNode.model[mid].bw
+	if i >  1{
+		i -= 1
+	}
+	return edgeNode.model[i].bw
 }
 
 func NewEdgeNodes() EdgeNodes {
@@ -59,16 +55,16 @@ func NewEdgeNodes() EdgeNodes {
 	edgeNodes := EdgeNodes{nodes: enodes}
 	return edgeNodes
 }
-
-func getCoord(p Point) haversine.Coord {
-	return haversine.Coord{Lat: p.lat, Lon: p.lon}
+// weird haversine issue, need to switch lat/lon
+func getCoord(p Point) Coord {
+	return Coord{Lat: p.lon, Lon: p.lat}
 }
 
 func (edgeNodes *EdgeNodes) GetNearestEdgeNode(point Point) (EdgeNode, float64) {
-	_, minDist := haversine.Distance(getCoord(edgeNodes.nodes[0].location), getCoord(point))
+	_, minDist := Distance(getCoord(edgeNodes.nodes[0].location), getCoord(point))
 	minDistNode := edgeNodes.nodes[0]
 	for _, edge := range edgeNodes.nodes[1:] {
-		_, dist := haversine.Distance(getCoord(edge.location), getCoord(point))
+		_, dist := Distance(getCoord(edge.location), getCoord(point))
 		if dist < minDist {
 			minDist = dist
 			minDistNode = edge
