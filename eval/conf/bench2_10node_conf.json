@@ -1,0 +1,13 @@
+{
+	"numTrials":1,
+	"numEdgeNodes":10,
+	"cloudConfig":"conf/10node_monacoCloudConfig.json",
+	"edgePositions":"eval/enode_positions/microbenchmark/bench2/m2_node_positions/10nodes_random.csv",
+	"cloudServerName":"cv0",
+	"machinePrefix":"cv",
+	"numUsers":200,
+	"edgeInfoFile":"input/monaco_traffic_lights_10_new.csv",
+	"outputDir":"../../results/enhancements/edge_go_50gig_lru",
+	"trajectoriesDir":"../../eval/routes/",
+	"segmentFile":"~/clairvoyant2/eval/videos/bbb_2ksegs.csv"
+}
