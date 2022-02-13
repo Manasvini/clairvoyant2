@@ -24,7 +24,7 @@ class EdgeDownloadAssignment:
         self.timeScale = timeScale
         self.downloadedSegments = set()  
         self.node_id = node_id    
-
+        self.max_dlc_time = 0
     def hasSegment(self, segment_id):
         return segment_id in self.downloadedSegments
 
@@ -40,7 +40,12 @@ class EdgeDownloadAssignment:
         self.mutex.acquire()
 
         #prune stale assignments. TODO: explore if periodically pruning is better
-        max_dlc_time = request_timestamp 
+        #max_dlc_time = request_timestamp
+        if self.max_dlc_time == None:
+            # HACK: sets earliest time to first request's time - 100 (that's what clientrunner is doing)
+            # TODO should be querying clock instead
+            self.max_dlc_time = request_timestamp - 100
+        max_dlc_time = self.max_dlc_time
 
         for seg_id in list(self.assignments.keys()):
             seg_info = self.assignments[seg_id]
@@ -52,16 +57,17 @@ class EdgeDownloadAssignment:
 
         segmentTime = (candidate.segment.segment_size * 8.0) / self.downloadSourceSpeeds[candidate.source]
         if max_dlc_time + segmentTime < candidate.arrival_time:
-            logger.debug("segment {} meets deadline".format(candidate.segment.segment_id))
+            logger.debug("segment {} meets deadline {}. Will complete by {}".format(candidate.segment.segment_id, candidate.arrival_time, max_dlc_time+segmentTime))
             candidate.expected_dlc_time = max_dlc_time + segmentTime
             self.assignments[candidate.segment.segment_id] = candidate
             add_success = True
-
+            self.max_dlc_time = max_dlc_time + segmentTime
         self.mutex.release()
 
         return add_success
 
     def isDownloadPossible(self, deadline, candidates):
+        self.mutex.acquire()
         latest_start_time = 0 
         possibleCandidates = []
         for seg_id in list(self.assignments.keys()):
@@ -72,10 +78,12 @@ class EdgeDownloadAssignment:
         for candidate in candidates:
             segmentTime = (candidate.segment.segment_size * 8.0) / self.downloadSourceSpeeds[candidate.source]
             if latest_start_time + segmentTime < candidate.arrival_time:
+                logger.debug(f'segment {candidate.segment.segment_id} will download by {latest_start_time + segmentTime}')
                 possibleCandidates.append(candidate)
                 latest_start_time += segmentTime
             else:
                 break
+        self.mutex.release()
         return possibleCandidates
 
     def addSegmentForDownload(self, candidate):

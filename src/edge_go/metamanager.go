@@ -40,7 +40,7 @@ type MetadataManager struct {
 	wg                 sync.WaitGroup
 }
 
-func newMetadataManager(size int64, cachetype string) *MetadataManager {
+func newMetadataManager(size int64, cachetype string, nodeId string) *MetadataManager {
 	metamgr := &MetadataManager{}
 	switch {
 	case cachetype == "lru":
@@ -64,12 +64,12 @@ func newMetadataManager(size int64, cachetype string) *MetadataManager {
 		glog.Fatal(err)
 	}
 
-	resultDir := filepath.Join(homeDir, "clairvoyant2", "results_"+strconv.FormatInt(size, 10))
+	resultDir := filepath.Join(homeDir, "clairvoyant2", "edge_results_"+strconv.FormatInt(size/1000000000, 10) + "GB_" + cachetype )
 	err = os.MkdirAll(resultDir, 0755)
 	if err != nil {
 		glog.Fatal(err)
 	}
-	metamgr.resultFile = filepath.Join(resultDir, "bench2.json")
+	metamgr.resultFile = filepath.Join(resultDir, nodeId + "_bench2.json")
 	metamgr.resultDir = resultDir
 	glog.Infof("initialized metadamanager of size = %d, type = %s", size, cachetype)
 
@@ -173,7 +173,8 @@ func (metamgr *MetadataManager) Close() {
 func (metamgr *MetadataManager) processDownloads() {
 	cdnstr := "ftp" //TODO: make this more robust
 
-	var edgeAggDownload, cloudAggDownload, edgeSegCount, cloudSegCount int32
+	var edgeAggDownload, cloudAggDownload int64
+	var edgeSegCount, cloudSegCount int32
 
 	for request := range metamgr.downloadReqChannel {
 		nodeSegMap := map[string][]int{} //map from node_src_ip -> seg_idx list
@@ -187,7 +188,7 @@ func (metamgr *MetadataManager) processDownloads() {
 				numEdge++
 			} else {
 				cloudSegCount++
-				cloudAggDownload += segment.SegmentSize
+				cloudAggDownload += int64(segment.SegmentSize)
 			}
 		}
 
@@ -200,17 +201,17 @@ func (metamgr *MetadataManager) processDownloads() {
 		for idx, success := range successTracker {
 			if success {
 				edgeSegCount++
-				edgeAggDownload += request.Segments[idx].SegmentSize
+				edgeAggDownload += int64(request.Segments[idx].SegmentSize)
 			} else {
 				cloudSegCount++
-				cloudAggDownload += request.Segments[idx].SegmentSize
+				cloudAggDownload += int64(request.Segments[idx].SegmentSize)
 			}
 		}
 
 	}
 	jsonString, err := json.MarshalIndent(struct {
-		EdgeAggDownload  int32
-		CloudAggDownload int32
+		EdgeAggDownload  int64
+		CloudAggDownload int64
 		EdgeSegCount     int32
 		CloudSegCount    int32
 	}{
@@ -226,17 +227,16 @@ func (metamgr *MetadataManager) processDownloads() {
 	check(err)
 }
 
-func (metamgr *MetadataManager) GetSegment(segmentId string, routeId int64, isEdge bool) error {
-	hasSegment := metamgr.SegmentCache.HasSegment(segmentId)
+func (metamgr *MetadataManager) GetSegment(segmentId string, routeId int64, isEdge bool) (*SegmentMetadata, error) {
+	segmentMeta, hasSegment := metamgr.SegmentCache.HasSegment(segmentId)
 	if !hasSegment {
-		return errors.New("segment not found")
+		return nil, errors.New("segment not found")
 	}
 
 	if !isEdge {
 		metamgr.SegmentCache.UpdateSegmentStatus(segmentId, routeId)
 	}
-
-	return nil
+	return segmentMeta, nil
 }
 
 func (metamgr *MetadataManager) GetSegments(routeId int64) []string {

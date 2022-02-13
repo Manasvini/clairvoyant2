@@ -118,7 +118,7 @@ func (client *Client) RegisterWithCloud(serverAddr string, startTime float64) {
 	defer conn.Close()
 	c := pb.NewCVServerClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()
 	resp, err := c.HandleCVRequest(ctx, cvreq)
 	if err != nil {
@@ -188,7 +188,7 @@ func (client *Client) doGetGRPC(edgeNode EdgeNode, lastSegment string, shouldRes
 		IsEdge:    false,
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	resp, err := contentClient.GetSegment(ctx, &segmentRequest)
 	if err != nil {

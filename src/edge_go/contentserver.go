@@ -55,16 +55,20 @@ func (server *ContentServer) GetSegment(ctx context.Context, req *pb.SegmentRequ
 	} else if len(req.SegmentId) == 0 {
 		// this is the first contact request
 		if server.canMakeContact(req.RouteId, req.StartTime, req.EndTime) {
-			response.Segments = server.metamgr.GetSegments(req.RouteId)
-		} else {
+            segmentIds := server.metamgr.GetSegments(req.RouteId)
+            for _, segId := range segmentIds{
+                response.Segments = append(response.Segments, segId)
+		    }
+        } else {
 			response.Status = "node busy"
 		}
 	} else {
 		// this is a segment request
-		err := server.metamgr.GetSegment(req.SegmentId, req.RouteId, req.IsEdge)
-		if err != nil {
+		segmentMeta, err := server.metamgr.GetSegment(req.SegmentId, req.RouteId, req.IsEdge)
+		if err == nil  && segmentMeta != nil {
+            segment := segmentMeta.segmentId
 			response.Status = "segment found"
-			response.Segments = append(response.Segments, req.SegmentId)
+			response.Segments = append(response.Segments, segment)
 		} else {
 			response.Status = "segment not found"
 		}

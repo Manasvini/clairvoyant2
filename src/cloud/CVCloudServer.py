@@ -36,6 +36,7 @@ class CVCloudServer(clairvoyant_pb2_grpc.CVServerServicer):
         nodeIds = [node["id"] for node in self.configDict["edgeNodes"]]
         nodeDaemonIps = {node["id"]:f'{node["ip"]}:{node["edgeDaemon"]}' for node in self.configDict["edgeNodes"]}
         nodeDownloadIps = {node["id"]:f'{node["ip"]}:{node["contentServer"]}' for node in self.configDict["edgeNodes"]}
+        print(nodeDownloadIps)
         nodeMap = {node["id"]:node for node in self.configDict["edgeNodes"]}
         downloadSourcesOldFormat = {}
         for node in self.configDict["edgeNodes"]:

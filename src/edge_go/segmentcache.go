@@ -51,7 +51,14 @@ func (cache *SegmentCache) curTS() int64 {
 }
 
 func (cache *SegmentCache) updateEvictable(segmentId string) {
-	idx := cache.segmentRouteMap[segmentId].evictListIdx
+	//idx := cache.segmentRouteMap[segmentId].evictListIdx
+	idx := -1
+	for i, v := range cache.evictable {
+		if v == segmentId {
+			idx = i
+			break
+		}
+	}
 	if idx != -1 {
 		cache.evictable = append(cache.evictable[:idx], cache.evictable[idx+1:]...)
 	}
@@ -99,9 +106,10 @@ func insert(a []string, index int, value string) []string {
 	if len(a) == index { // nil or empty slice or after last element
 		return append(a, value)
 	}
-	a = append(a[:index+1], a[index:]...) // index < len(a)
-	a[index] = value
-	return a
+	b := append(a[:index], value)
+	c := append(b, a[index+1:]...) // index < len(a)
+	c[index] = value
+	return c
 }
 
 func (cache *SegmentCache) addToEvictable(curSeg *SegmentMetadata) {
@@ -122,12 +130,12 @@ func (cache *SegmentCache) addToEvictable(curSeg *SegmentMetadata) {
 
 /*package external functions*/
 
-func (cache *SegmentCache) HasSegment(segmentId string) bool {
+func (cache *SegmentCache) HasSegment(segmentId string) (*SegmentMetadata, bool) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	_, ok := cache.segmentRouteMap[segmentId]
-	return ok
+	segment, ok := cache.segmentRouteMap[segmentId]
+	return segment, ok
 }
 
 func (cache *SegmentCache) DeliveredSegment(segmentId string, routeId int64) bool {

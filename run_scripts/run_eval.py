@@ -45,14 +45,27 @@ def start_edge(conf):
                             check=False)
     print('edge success=', result.returncode)
 
+def gather_results(conf, localResultDir):
+    resultDir = conf['edgeResultDir']
+    numEdgeNodes = conf['numEdgeNodes']
+    machinePrefix = conf['machinePrefix']
+    
+    result = subprocess.run(['scp', '-r', 'cvuser@' + machinePrefix + '0:' +  conf['outputDir'] ,  localResultDir  ])  
+    for i in range(numEdgeNodes):
+        result = subprocess.run(['scp', '-r', 'cvuser@' + machinePrefix + str(i+1) + ':' + resultDir,  localResultDir])
+   
 def start_clients(conf):
     numClients = conf["numUsers"]
     numVideos = conf['numUsers'] * 2 
+    if conf['bench2'] == 'yes':
+        numVideos = 1
+    print('numVideos =', numVideos, conf['bench2'])
     clientTrajectories = conf['trajectoriesDir']
     edgeInfo = conf['edgeInfoFile']
     outputFile = conf['outputDir'] + "/" + str(numClients) + 'users' + str(conf['numEdgeNodes']) + 'nodes' + str(round(time.time() * 1000)) + '.csv'
     segmentFile = conf['segmentFile']
     cloudServer = conf['cloudServerName']
+    bench2 = conf['bench2']
     result = subprocess.run(['ssh', cloudServer, ' export PATH=$PATH:/usr/local/go/bin && cd clairvoyant2/src/clientrunner_go &&  go run . ' +\
                             '-log_dir=\".\"'+\
                             ' -t ' + clientTrajectories + \
@@ -60,13 +73,15 @@ def start_clients(conf):
                             ' -n ' + str(numClients) + \
                             ' -o ' + outputFile +\
                             ' -e ' + edgeInfo + \
-                            ' -f ' + segmentFile], \
+                            ' -f ' + segmentFile +\
+                            ' -b ' + bench2], \
                             shell=False,\
                             check=False)
     print('client success=', result.returncode)
 
 def main():
     conf = read_config(sys.argv[1])
+    resultDir = sys.argv[2]
     #example conf script in eval folder 10node_conf.json
     num_trials = conf['numTrials']
     start = time.time()
@@ -78,6 +93,7 @@ def main():
         start_edge(conf)
         time.sleep(10)
         start_clients(conf)
+        gather_results(conf, resultDir)
     end = time.time()
     print(num_trials, " trials took ", (end-start), " seconds")
     stop_edge(conf)

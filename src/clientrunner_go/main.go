@@ -113,7 +113,7 @@ func main() {
 	zipf := rand.NewZipf(r, 1.1, 1, uint64(*numVideos)-1)
 	edgeNodes := cvclient.EdgeNodes{}
 	edgeNodes.LoadFromFile(*edgeNodesFile)
-	trajectories = []string{"../../eval/routes/user1917.csv"}
+	//trajectories = []string{"../../eval/routes/user1917.csv"}
 	/*trajectories = []string{"../../eval/enode_positions/microbenchmark/bench2/30users_new/user0.csv",
 		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user1.csv",
 		"../../eval/enode_positions/microbenchmark/bench2/30users_new/user2.csv",
@@ -160,7 +160,9 @@ func main() {
 				clients[i].RegisterWithCloud(*serverAddr, float64(timestamp))
 
 				//For benchmark2
-				//clients[i].ExplicitClose = true
+				//if *bench2 == "yes" {
+				//	clients[i].ExplicitClose = true
+				//}
 
 			} else if !clients[i].IsDone() && int64(clients[i].GetStartTime()) < timestamp {
 				wg.Add(1)

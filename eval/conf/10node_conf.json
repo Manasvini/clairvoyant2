@@ -9,5 +9,7 @@
 	"edgeInfoFile":"input/monaco_traffic_lights_10_new.csv",
 	"outputDir":"../../results/enhancements/",
 	"trajectoriesDir":"../../eval/routes/",
-	"segmentFile":"~/clairvoyant2/eval/videos/bbb_2ksegs.csv"
+	"segmentFile":"~/clairvoyant2/eval/videos/bbb_2ksegs.csv",
+	"bench2":"no",
+    "edgeResultDir":"~/clairvoyant2/edge_results_100GB_lru"
 }

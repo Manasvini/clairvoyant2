@@ -57,7 +57,7 @@ func waitForUserExit() {
 func initEdgeRoutines(configFile string) {
 
 	config := parseConfig(configFile)
-	metamgr := newMetadataManager(int64(config.CacheSize), config.CacheType)
+	metamgr := newMetadataManager(int64(config.CacheSize), config.CacheType, config.NodeID)
 	startMonitoring(config)
 	eserver := startEdgeServer(config, metamgr)
 	cserver := startContentServer(config, metamgr)

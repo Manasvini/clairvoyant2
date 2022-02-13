@@ -54,19 +54,20 @@ class Oracle:
         self.mutex.release()
 
     def remove(self, node_id, seg_id):
-        if seg_id in self.segment_map[seg_id]:
+        if seg_id in self.segment_map:
             self.segment_map[seg_id].remove(node_id)
 
     def set_seg_source(self, node_id, seg_id):
         self.mutex.acquire()
         logger.debug(f"Updated source for segment {seg_id} to {node_id}")
-        self.segment_map[seg_id] = set(node_id)
+        self.segment_map[seg_id] = set([node_id])
         self.mutex.release()
 
     def findOptimalSourceNode(self, seg_id, node_id, neighbors):
         self.mutex.acquire()
         src_node = None
-
+        logger.info(neighbors)
+        logger.info(f"oracle: {seg_id}, {node_id}")
         # set initializations
         if seg_id not in self.segment_map:
             self.segment_map[seg_id] = set()
@@ -84,9 +85,12 @@ class Oracle:
 
         elif self.mode == Bench2Mode.ALL2ALL:
             if self.segment_map[seg_id]:
-                src_nodes = list(self.segment_map[seg_id])
-                src_node = random.choice(src_nodes)
-
+                src_nodes = self.segment_map[seg_id]
+                logger.info(f"all2all segids={src_nodes}")
+                if len(src_nodes)> 1:
+                    src_node = random.choice(list(src_nodes))
+                else:
+                    src_node = list(src_nodes)[0]
         elif self.mode == Bench2Mode.CUR_ROUTE_NBR:
             src_nodes = []
             for node in neighbhors:
@@ -250,7 +254,7 @@ class DownloadManager:
                 if point_contact_time > 0:
                     bits = (dl_map[last_distance]*point_contact_time)
                     totalBits += bits
-                    logger.info(f"Accumulate for dist={last_distance}, time={point.time},speed={dl_map[last_distance]} bits={bits}")
+                    logger.debug(f"Accumulate for dist={last_distance}, time={point.time},speed={dl_map[last_distance]} bits={bits}")
                 time_of_last_distance = point.time
                 last_distance = distance
 
@@ -322,8 +326,10 @@ class DownloadManager:
                                                           [node.node_id for node in effectiveNodeInfos])
 
                 if src_node:
+                    #import pdb; pdb.set_trace()
+                    logger.info(f"source for segment {candidate.segment.segment_id} is {src_node}")
                     candidate.source = self.nodeDownloadIps[src_node]
-
+        
                 candidate.arrival_time = node.arrival_time
                 candidate.contact_time = node.contact_time
                 tentativeCandidates.append(candidate)
