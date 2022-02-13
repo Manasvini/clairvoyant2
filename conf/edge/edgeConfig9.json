@@ -1,0 +1,21 @@
+{
+  "modelFile": "../../models/model2.csv",
+  "missedDeliveryThreshold": 10,
+  "timeScale": 60,
+  "redisHost": "127.0.0.1",
+  "redisPort": 6379,
+  "nodeId": "node_9",
+  "intervalSeconds": 1,
+  "serverAddress": "192.168.160.21:60050",
+  "downloadSources": {
+    "http://ftp.itec.aau.at/DASHDataset2014": 100000000
+  },
+  "monServerAddress": "192.168.160.21:8192",
+  "monInterval": 5,
+  "contentServerAddress": "0.0.0.0:8000",
+  "contentServerMaxClients": 2,
+  "edgeServerAddress": "0.0.0.0:50056",
+  "cacheSize": 100000000000,
+  "cacheType": "lru",
+  "clockServerAddr": "192.168.160.21:8383"
+}
