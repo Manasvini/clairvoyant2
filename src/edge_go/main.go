@@ -10,8 +10,8 @@ import (
 	"github.com/golang/glog"
 )
 
-func startDeliveryMonitor(config EdgeConfig, metamgr *MetadataManager) *DeliveryMonitor {
-	dm := NewDeliveryMonitor(config.ServerAddress, metamgr, config.NodeID, config.ClockServerAddr)
+func startDeliveryMonitor(config EdgeConfig, metamgr *MetadataManager, clock *Clock) *DeliveryMonitor {
+	dm := NewDeliveryMonitor(config.ServerAddress, metamgr, config.NodeID, clock)
 	dm.Start()
 	return dm
 }
@@ -57,12 +57,18 @@ func waitForUserExit() {
 func initEdgeRoutines(configFile string) {
 
 	config := parseConfig(configFile)
-	metamgr := newMetadataManager(int64(config.CacheSize), config.CacheType, config.NodeID)
+	dlSourceMap := parseSources(config.DownloadSourceFile)
+    linkStateTracker := NewLinkStateTracker(dlSourceMap)
+    if linkStateTracker == nil {
+        glog.Infof("BOOM")
+    }
+    clock := NewClock(config.NodeID, config.ClockServerAddr)
+    metamgr := newMetadataManager(int64(config.CacheSize), config.CacheType, config.NodeID, clock, linkStateTracker)
 	startMonitoring(config)
 	eserver := startEdgeServer(config, metamgr)
 	cserver := startContentServer(config, metamgr)
-	dmonitor := startDeliveryMonitor(config, metamgr)
-	defer dmonitor.Stop()
+	//dmonitor := startDeliveryMonitor(config, metamgr)
+	//defer dmonitor.Stop()
 	waitForUserExit()
 	eserver.grpcServer.GracefulStop()
 	cserver.grpcServer.GracefulStop()

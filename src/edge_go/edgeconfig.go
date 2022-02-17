@@ -17,13 +17,18 @@ type EdgeConfig struct {
 	ServerAddress           string   `json:"serverAddress"`
 	MonServerAddress        string   `json:"monServerAddress"`
 	MonInterval             int      `json:"monInterval"`
-	DownloadSources         []string //*FIXME*
+	DownloadSourceFile      string   `json:"downloadSourceFile"`
 	ContentServerAddress    string   `json:"contentServerAddress"`
 	ContentServerMaxClients int      `json:"contentServerMaxClients"`
 	EdgeServerAddress       string   `json:"edgeServerAddress"`
 	CacheSize               int      `json:"cacheSize"`
 	CacheType               string   `json:"cacheType"`
 	ClockServerAddr		string	 `json:"clockServerAddr"`
+}
+
+type DownloadSource struct {
+    src_id          string
+    bandwidth       int64
 }
 
 func parseConfig(configFile string) EdgeConfig {
@@ -36,4 +41,18 @@ func parseConfig(configFile string) EdgeConfig {
 
 	json.Unmarshal(bstr, &config)
 	return config
+}
+
+func parseSources(dlSourceFile string) map[string]int64 {
+    dlSources := make([]DownloadSource, 0)
+    fstr, err := ioutil.ReadFile(dlSourceFile)
+    if err != nil {
+        glog.Exitf("Unable to read download source file %s err=%v", dlSourceFile, err)
+    }
+    json.Unmarshal([]byte(fstr), &dlSources)
+    dlSourceMap := make(map[string]int64)
+    for _, dlSource := range dlSources {
+        dlSourceMap[dlSource.src_id] = dlSource.bandwidth
+    }
+    return dlSourceMap
 }

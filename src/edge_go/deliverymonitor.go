@@ -14,18 +14,17 @@ type DeliveryMonitor struct {
 	serverAddr              string
 	metamgr                 *MetadataManager
 	nodeId                  string
-	clockSvrAddr            string
 	syncThreshold           int
 	scheduler               *tasks.Scheduler
-	timestamp               int64
+    clock                   *Clock
 	missedDeliveryThreshold int64
 }
 
-func NewDeliveryMonitor(serverAddr string, metaMgr *MetadataManager, nodeId string, clockSvrAddr string) *DeliveryMonitor {
+func NewDeliveryMonitor(serverAddr string, metaMgr *MetadataManager, nodeId string, clock *Clock) *DeliveryMonitor {
 	dm := &DeliveryMonitor{serverAddr: serverAddr,
 		metamgr:       metaMgr,
 		nodeId:        nodeId,
-		clockSvrAddr:  clockSvrAddr,
+		clock:         clock,
 		syncThreshold: 5,
 		scheduler:     nil}
 
@@ -42,7 +41,7 @@ func (dm *DeliveryMonitor) Start() {
 	_, err := dm.scheduler.Add(&tasks.Task{
 		Interval: time.Duration(time.Duration(dm.syncThreshold) * time.Second),
 		TaskFunc: func() error {
-			dm.Sync()
+			//dm.Sync()
 			dm.UpdateRoutes()
 			return nil
 		},
@@ -54,8 +53,8 @@ func (dm *DeliveryMonitor) Start() {
 
 }
 
-func (dm *DeliveryMonitor) Sync() {
-	conn, err := grpc.Dial(dm.clockSvrAddr, grpc.WithInsecure())
+/*func (dm *DeliveryMonitor) Sync() {
+	/*conn, err := grpc.Dial(dm.clockSvrAddr, grpc.WithInsecure())
 	if err != nil {
 		panic("Could not connect to clock server")
 	}
@@ -71,16 +70,19 @@ func (dm *DeliveryMonitor) Sync() {
 		dm.timestamp = resp.GetCurTime()
 		glog.Infof("Tick tock. Time is %d", dm.timestamp)
 	}
+    //dm.timestamp = clock.GetTime()
 }
+*/
 
 func (dm *DeliveryMonitor) UpdateRoutes() {
-	overdueSegmentsByRoute := dm.metamgr.GetOverdueSegments(dm.timestamp, dm.missedDeliveryThreshold)
+	timestamp := dm.clock.GetTime()
+    overdueSegmentsByRoute := dm.metamgr.GetOverdueSegments(timestamp, dm.missedDeliveryThreshold)
 	if overdueSegmentsByRoute == nil || len(overdueSegmentsByRoute) == 0 {
 		glog.Infof("No routes with overdue segments")
 		return
 	}
 	for route, segments := range overdueSegmentsByRoute {
-		missedDeliveryReq := &pb.MissedDeliveryRequest{TokenId: route, Segments: segments, NodeId: dm.nodeId, Timestamp: dm.timestamp}
+		missedDeliveryReq := &pb.MissedDeliveryRequest{TokenId: route, Segments: segments, NodeId: dm.nodeId, Timestamp: timestamp}
 		req := &pb.CVRequest{Request: &pb.CVRequest_Misseddeliveryrequest{missedDeliveryReq}}
 		conn, err := grpc.Dial(dm.serverAddr, grpc.WithInsecure())
 		if err != nil {

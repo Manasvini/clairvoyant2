@@ -11,7 +11,9 @@ bash run_scripts/kill-edge-go-svrs.sh $num_edge $machine_prefix
 for ((i=1;i<=num_edge;i++)); do
   confid=$(($i-1))
   nodeid=$i
-  scp conf/edge/edgeConfig$confid.json cvuser@${machine_prefix}${nodeid}:~/clairvoyant2/conf/edgeConfig.json
+  scp conf/gen_conf/edgeConfig$confid.json cvuser@${machine_prefix}${nodeid}:~/clairvoyant2/conf/edgeConfig.json
+  scp conf/download_source_info.json cvuser@${machine_prefix}${nodeid}:~/clairvoyant2/conf/
+
   ssh ${machine_prefix}$i bash <<EOF
 cd clairvoyant2/
 mkdir -p logs

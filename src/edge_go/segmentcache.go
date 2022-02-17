@@ -19,6 +19,7 @@ type SegmentMetadata struct {
 	segSize      int64
 	routeIdSet   map[int64]bool
 	timestamp    int64 //for LRU
+    popularity   int64 //for LFU
 	evictListIdx int   //can be -1 if not in list
 }
 
@@ -30,6 +31,7 @@ type SegmentCache struct {
 	cachePolicy      string
 	mu               sync.Mutex
 	currentTimestamp int64
+    evictCount       int64
 }
 
 /*package internal functions*/
@@ -70,7 +72,10 @@ func (cache *SegmentCache) pop() (string, error) {
 	}
 	segId := cache.evictable[0]
 	cache.currentSize -= cache.segmentRouteMap[segId].segSize
-	delete(cache.segmentRouteMap, segId)
+	cache.evictCount += 1
+    glog.Infof("deleting segment %s, total evictions = %d", segId, cache.evictCount)
+
+    delete(cache.segmentRouteMap, segId)
 	cache.evictable = cache.evictable[1:]
 	return segId, nil
 }
@@ -125,6 +130,16 @@ func (cache *SegmentCache) addToEvictable(curSeg *SegmentMetadata) {
 		}
 		curSeg.evictListIdx = idx
 		cache.evictable = insert(cache.evictable, idx, curSeg.segmentId)
+    case LFU:
+        var idx int
+        for i, segId := range cache.evictable {
+            if curSeg.popularity < cache.segmentRouteMap[segId].popularity {
+                idx = i
+                break
+            }
+        }
+        curSeg.evictListIdx = idx
+        cache.evictable = insert(cache.evictable, idx, curSeg.segmentId)
 	}
 }
 
@@ -165,12 +180,14 @@ func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]st
 			segmentId:  segment.SegmentId,
 			segSize:    int64(segment.SegmentSize),
 			routeIdSet: map[int64]bool{routeId: true},
+            popularity: 0,
 		}
 	} else {
 		cache.segmentRouteMap[segment.SegmentId].routeIdSet[routeId] = true
+        cache.segmentRouteMap[segment.SegmentId].popularity += 1
 		//remove from evictable if we need to
-		cache.updateEvictable(segment.SegmentId)
 	}
+    cache.segmentRouteMap[segment.SegmentId].popularity += 1
 	cache.segmentRouteMap[segment.SegmentId].timestamp = cache.curTS()
 	return evictedIds, nil
 }

@@ -12,7 +12,8 @@ curdir=$(pwd)
 if [ $purge_redis = "yes" ]; then
 	pkill redis
 	rm -rf cluster/*
-	bash scripts/start_redis_cluster.sh 3
+	sleep 10
+    bash scripts/start_redis_cluster.sh 3
 
 	sleep 15
 

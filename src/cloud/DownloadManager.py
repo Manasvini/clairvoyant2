@@ -93,7 +93,7 @@ class Oracle:
                     src_node = list(src_nodes)[0]
         elif self.mode == Bench2Mode.CUR_ROUTE_NBR:
             src_nodes = []
-            for node in neighbhors:
+            for node in neighbors:
                 if node in self.segment_map[seg_id]:
                     src_nodes.append(node)
             if src_nodes:
@@ -336,6 +336,8 @@ class DownloadManager:
                 maxAvailDlBytes -= segments[segmentIdx].segment_size 
                 sum_of_seg_sizes += segments[segmentIdx].segment_size
                 segmentIdx += 1
+            if len(tentativeCandidates) == 0:
+                continue
             # tentativeCandidates refers to the max no. of segments an edge node can deliver to the user within the user's contact time period. 
             #We still need to check the edge node's schedule to see if it has enogh bandwidth to download that many segments. 
             #If the backhaul links are busy, the edge node may not potentially be able to download all the tentative segments. This is reflected in possibleCandidates. Thus len(possibleCandidates) <= len(tentativeCandidates)  

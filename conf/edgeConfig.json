@@ -7,10 +7,7 @@
     "nodeId": "node_0",
     "intervalSeconds":1,
     "serverAddress":"192.168.160.22:60050",
-    "downloadSources":{
-        "http://ftp.itec.aau.at/DASHDataset2014": 100000000
-
-    },
+    "downloadSourceFile":"../../conf/download_source_info.json",
     "monServerAddress": "192.168.160.22:8192",
     "monInterval": 5,
     "contentServerAddress": "0.0.0.0:8000",

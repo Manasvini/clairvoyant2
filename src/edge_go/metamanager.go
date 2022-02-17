@@ -16,6 +16,7 @@ import (
 	pb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
 	cpb "github.gatech.edu/cs-epl/clairvoyant2/edge_go/contentserver"
 	"google.golang.org/grpc"
+    "fmt"
 )
 
 func check(err error) {
@@ -33,15 +34,18 @@ type MetadataManager struct {
 	SegmentCache       *SegmentCache
 	routeAddChannel    chan RouteInfo
 	downloadReqChannel chan pb.DownloadRequest
-	evicted            []string
+    linkStateTracker   *LinkStateTracker
+	clock               *Clock
+    evicted            []string
 	routes             map[int64]RouteInfo
 	resultFile         string
-	resultDir          string
+	nodeId             string
+    resultDir          string
 	wg                 sync.WaitGroup
 }
 
-func newMetadataManager(size int64, cachetype string, nodeId string) *MetadataManager {
-	metamgr := &MetadataManager{}
+func newMetadataManager(size int64, cachetype string, nodeId string, clock *Clock, linkStateTracker *LinkStateTracker) *MetadataManager {
+	metamgr := &MetadataManager{clock:clock, linkStateTracker: linkStateTracker}
 	switch {
 	case cachetype == "lru":
 		metamgr.SegmentCache = NewSegmentCache(size, "lru")
@@ -71,6 +75,7 @@ func newMetadataManager(size int64, cachetype string, nodeId string) *MetadataMa
 	}
 	metamgr.resultFile = filepath.Join(resultDir, nodeId + "_bench2.json")
 	metamgr.resultDir = resultDir
+    metamgr.nodeId = nodeId
 	glog.Infof("initialized metadamanager of size = %d, type = %s", size, cachetype)
 
 	return metamgr
@@ -168,6 +173,17 @@ func (metamgr *MetadataManager) Close() {
 	close(metamgr.downloadReqChannel)
 	metamgr.wg.Wait()
 	//metamgr.SegmentCache.RecordStats(filepath.Join(metamgr.resultDir, "edgestats"))
+    linkUtilFile := metamgr.resultDir + "/" + metamgr.nodeId + "_linkutilization.csv"
+    f, err := os.Create(linkUtilFile)
+    defer f.Close()
+    linkUtils := metamgr.linkStateTracker.GetLinkStates()
+    for node, bw := range linkUtils {
+        _, err = f.WriteString(node + "/" + fmt.Sprintf("%f", bw) + "\n")
+        if err != nil{
+            panic(err)
+        }
+    }
+    f.Sync()
 }
 
 func (metamgr *MetadataManager) processDownloads() {
@@ -183,8 +199,13 @@ func (metamgr *MetadataManager) processDownloads() {
 		for idx, segment := range request.Segments {
 			segmentId := segment.SegmentId
 			source := request.SegmentSources[segmentId]
-			if !strings.Contains(source, cdnstr) {
-				nodeSegMap[source] = append(nodeSegMap[source], idx)
+            currentTime := metamgr.clock.GetTime()
+            deadline := request.ArrivalTime
+            glog.Infof("source for seg %s is %s", segmentId, source) 
+            isDownloadPossible, err := metamgr.linkStateTracker.IsDownloadPossible(int64(segment.SegmentSize), currentTime, deadline, source)
+			if !strings.Contains(source, cdnstr) && isDownloadPossible && err == nil{
+			    nodeSegMap[source] = append(nodeSegMap[source], idx)
+                metamgr.linkStateTracker.UpdateDownloads(int64(segment.SegmentSize), currentTime, source)
 				numEdge++
 			} else {
 				cloudSegCount++
