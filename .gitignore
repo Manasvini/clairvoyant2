@@ -10,5 +10,5 @@ results/
 *ERROR*
 *INFO*
 *WARN*
-routes/*
-all_logs/*
+transient/*
+*.DS_Store

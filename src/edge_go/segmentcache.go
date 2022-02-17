@@ -204,6 +204,7 @@ func (cache *SegmentCache) DeliveredSegment(segmentId string, routeId int64) boo
 }
 
 // adds a given segment and a route id to the cache
+// returns the evicted ids if some get evicted
 func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]string, error) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
