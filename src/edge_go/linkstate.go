@@ -22,6 +22,7 @@ func NewLinkStateTracker(sourceDlSpeeds map[string]int64) *LinkStateTracker {
                                     startTime:0,
                                     currentTime: 0,
                                 }
+    glog.Infof("Link state tracking %d nodes\n", len(sourceDlSpeeds))
     return linkStateTracker
 }
 

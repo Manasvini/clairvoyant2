@@ -24,8 +24,8 @@ try:
             obj["contentServerAddress"] = "0.0.0.0:8000"
             obj["contentServerMaxClients"] = 2
             obj["edgeServerAddress"] = "0.0.0.0:50056"
-            obj["cacheSize"] = 50000000000
-            obj["cacheType"] = "lru"
+            obj["cacheSize"] = 1000000000
+            obj["cacheType"] = "lfu"
             obj["clockServerAddr"] = "192.168.160.21:8383"
             fw.write(json.dumps(obj, indent=2))
 except Exception as e:

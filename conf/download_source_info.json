@@ -1,86 +1,107 @@
 [
   {
-    "src_id":"default", 
+    "src_id":"default",
+    "src_ip":"ftp", 
     "bandwidth":100000000 
   },
   {
-    "src_id":"node_0", 
+    "src_id":"node_0",
+    "src_ip":"192.168.160.22:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_1", 
+    "src_ip":"192.168.160.23:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_2", 
+    "src_ip":"192.168.160.23:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_3", 
+    "src_ip":"192.168.160.24:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_4", 
+    "src_ip":"192.168.160.25:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_5", 
+    "src_ip":"192.168.160.26:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_6", 
+    "src_ip":"192.168.160.27:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_7", 
+    "src_ip":"192.168.160.28:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_8", 
+    "src_ip":"192.168.160.29:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_9", 
+    "src_ip":"192.168.160.30:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_10", 
+    "src_ip":"192.168.160.31:8000",
     "bandwidth":500000000
   },
   {
-    "src_id":"node_11", 
+    "src_id":"node_11",
+    "src_ip":"192.168.160.32:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_12", 
+    "src_ip":"192.168.160.33:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_13", 
+    "src_ip":"192.168.160.34:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_14", 
+    "src_ip":"192.168.160.35:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_15", 
+    "src_ip":"192.168.160.36:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_16", 
+    "src_ip":"192.168.160.37:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_17", 
+    "src_ip":"192.168.160.38:8000",
     "bandwidth":500000000
   },
   {
-    "src_id":"node_18", 
+    "src_id":"node_18",
+    "src_ip":"192.168.160.39:8000",
     "bandwidth":500000000
   },
   {
     "src_id":"node_19", 
+    "src_ip":"192.168.160.40:8000",
     "bandwidth":500000000
   }
 ]

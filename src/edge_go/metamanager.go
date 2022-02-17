@@ -49,7 +49,9 @@ func newMetadataManager(size int64, cachetype string, nodeId string, clock *Cloc
 	switch {
 	case cachetype == "lru":
 		metamgr.SegmentCache = NewSegmentCache(size, "lru")
-	}
+	case cachetype == "lfu":
+        metamgr.SegmentCache = NewSegmentCache(size, "lfu")
+    }
 
 	metamgr.routeAddChannel = make(chan RouteInfo, 10)             //can accept at most 10 simultaneous routeAdd requests
 	metamgr.downloadReqChannel = make(chan pb.DownloadRequest, 10) //can accept at most 10 simultaneous requests
@@ -174,16 +176,23 @@ func (metamgr *MetadataManager) Close() {
 	metamgr.wg.Wait()
 	//metamgr.SegmentCache.RecordStats(filepath.Join(metamgr.resultDir, "edgestats"))
     linkUtilFile := metamgr.resultDir + "/" + metamgr.nodeId + "_linkutilization.csv"
+    glog.Infof("file is %s", linkUtilFile)
     f, err := os.Create(linkUtilFile)
     defer f.Close()
     linkUtils := metamgr.linkStateTracker.GetLinkStates()
     for node, bw := range linkUtils {
-        _, err = f.WriteString(node + "/" + fmt.Sprintf("%f", bw) + "\n")
+        _, err = f.WriteString(node + "," + fmt.Sprintf("%f", bw) + "\n")
         if err != nil{
             panic(err)
         }
     }
     f.Sync()
+
+    evictCtFile := metamgr.resultDir + "/" + metamgr.nodeId + "_eviction.csv"
+    f1, err := os.Create(evictCtFile)
+    defer f1.Close()
+    f1.WriteString(fmt.Sprintf("%d", metamgr.SegmentCache.GetEvictionCount()))
+    f1.Sync()
 }
 
 func (metamgr *MetadataManager) processDownloads() {
@@ -201,7 +210,7 @@ func (metamgr *MetadataManager) processDownloads() {
 			source := request.SegmentSources[segmentId]
             currentTime := metamgr.clock.GetTime()
             deadline := request.ArrivalTime
-            glog.Infof("source for seg %s is %s", segmentId, source) 
+            glog.Infof("source for seg %s is %s", segmentId, source)
             isDownloadPossible, err := metamgr.linkStateTracker.IsDownloadPossible(int64(segment.SegmentSize), currentTime, deadline, source)
 			if !strings.Contains(source, cdnstr) && isDownloadPossible && err == nil{
 			    nodeSegMap[source] = append(nodeSegMap[source], idx)
@@ -243,6 +252,7 @@ func (metamgr *MetadataManager) processDownloads() {
 	}, "", "  ")
 	check(err)
 
+    glog.Infof("result file is %s", metamgr.resultFile)
 	err = ioutil.WriteFile(metamgr.resultFile, jsonString, 0644)
 	glog.Infof("Finished Writing File")
 	check(err)

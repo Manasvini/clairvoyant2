@@ -47,6 +47,10 @@ func NewSegmentCache(size int64, cachetype string) *SegmentCache {
 	return segmentCache
 }
 
+func (cache *SegmentCache) GetEvictionCount() int64 {
+    return cache.evictCount
+}
+
 func (cache *SegmentCache) curTS() int64 {
 	cache.currentTimestamp++
 	return cache.currentTimestamp

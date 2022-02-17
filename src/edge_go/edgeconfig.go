@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/golang/glog"
 	"io/ioutil"
+//    "os"
 )
 
 type EdgeConfig struct {
@@ -27,8 +28,9 @@ type EdgeConfig struct {
 }
 
 type DownloadSource struct {
-    src_id          string
-    bandwidth       int64
+    SrcId          string          `json:"src_id"`
+    SrcIp          string          `json:"src_ip"`
+    Bandwidth       int64           `json:"bandwidth"`
 }
 
 func parseConfig(configFile string) EdgeConfig {
@@ -44,15 +46,18 @@ func parseConfig(configFile string) EdgeConfig {
 }
 
 func parseSources(dlSourceFile string) map[string]int64 {
-    dlSources := make([]DownloadSource, 0)
+    var dlSources []DownloadSource
     fstr, err := ioutil.ReadFile(dlSourceFile)
+    glog.Infof("file is :%s", dlSourceFile)
     if err != nil {
         glog.Exitf("Unable to read download source file %s err=%v", dlSourceFile, err)
     }
+    glog.Infof("fstr is %s", fstr)
     json.Unmarshal([]byte(fstr), &dlSources)
     dlSourceMap := make(map[string]int64)
     for _, dlSource := range dlSources {
-        dlSourceMap[dlSource.src_id] = dlSource.bandwidth
+        glog.Infof("dlSource is %s", dlSource.SrcIp)
+        dlSourceMap[dlSource.SrcIp] = dlSource.Bandwidth
     }
     return dlSourceMap
 }

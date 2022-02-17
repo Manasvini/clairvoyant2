@@ -57,8 +57,8 @@ def gather_results(conf, localResultDir):
 def start_clients(conf):
     numClients = conf["numUsers"]
     numVideos = conf['numUsers'] * 2 
-    if conf['bench2'] == 'yes':
-        numVideos = 1
+    #if conf['bench2'] == 'yes':
+    #    numVideos = 1
     print('numVideos =', numVideos, conf['bench2'])
     clientTrajectories = conf['trajectoriesDir']
     edgeInfo = conf['edgeInfoFile']
@@ -93,9 +93,9 @@ def main():
         start_edge(conf)
         time.sleep(10)
         start_clients(conf)
+        stop_edge(conf)
         gather_results(conf, resultDir)
     end = time.time()
     print(num_trials, " trials took ", (end-start), " seconds")
-    stop_edge(conf)
 if __name__=='__main__':
     main()
