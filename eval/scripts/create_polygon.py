@@ -99,12 +99,11 @@ def create_polygon(numNodes, maxDist, lat, lon, outFile):
     return points
 
 
-if __name__ != '__main__':
+if __name__ == '__main__':
     args = parse_args()
     edge_nodes = create_polygon(args.numedgenodes, args.edge, args.lat, args.lon, args.outputfile)
     
-    collection = build_collection(args.numedgenodes)
-    cur_time = 0
+    cur_time = 400
     for i in range(args.numusers):
         #first = edge_nodes[i:]
         #last = []

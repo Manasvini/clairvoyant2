@@ -2,8 +2,8 @@ import pandas as pd
 import os
 import random
 
-newd = "overlapped_users"
-oldd = "nonoverlapped_users"
+newd = "users/5nodes/overlapped"
+oldd = "users/5nodes/nonoverlapped"
 #os.mkdir(newd)
 
 files = os.listdir(oldd)
