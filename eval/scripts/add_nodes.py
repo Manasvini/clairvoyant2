@@ -1,7 +1,7 @@
 from rediscluster import RedisCluster
 import pandas as pd
 from optparse import OptionParser
-
+  
 startup_nodes = [{"host":"127.0.0.1", "port":"7000"}]
 rc = RedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 

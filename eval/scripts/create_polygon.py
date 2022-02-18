@@ -8,18 +8,19 @@ import pandas as pd
 import numpy as np
 import random
 from scipy import interpolate
+import itertools
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument('-n', '--numedgenodes', type=int, default=1, help='Number of edge nodes')
-    parser.add_argument('--lat', type=float, required=True, help='start latitude')
-    parser.add_argument('--lon', type=float, required=True, help='start longitude')
-    parser.add_argument('-o', '--outputfile', required=True, type=str, help='output file')
-    parser.add_argument('-u', '--numusers', required=True, type=int, help='num users')
+    parser.add_argument('-n', '--numedgenodes', type=int, default=1, help='Number of edge nodes')# 10
+    parser.add_argument('--lon', type=float, required=True, help='start latitude') # 7.490957273435992
+    parser.add_argument('--lat', type=float, required=True, help='start longitude')# 43.77477219407852
+    parser.add_argument('-o', '--outputfile', required=True, type=str, help='output file') # 10nodes.csv
+    parser.add_argument('-u', '--numusers', required=True, type=int, help='num users') # 20 users
     
-    parser.add_argument('-i', '--timeincr', required=True, type=float, help='time step size')
-    parser.add_argument('-s', '--speed', required=True, type=float, help='speed in m/s')
-    parser.add_argument('-e', '--edge', required=True, type=float, help='polygon edge')
+    parser.add_argument('-i', '--timeincr', required=True, type=float, help='time step size') # 1
+    parser.add_argument('-s', '--speed', required=True, type=float, help='speed in m/s') # 15
+    parser.add_argument('-e', '--edge', required=True, type=float, help='polygon edge') # 3272
     args = parser.parse_args()
 
     return args
@@ -46,7 +47,17 @@ def interpolate_vals(lat1, lon1, lat2, lon2, incr, speed):
     ynew = f(xnew)
     return xnew, ynew
     
-    
+def build_collection(numNodes):
+    nodes = list(range(numNodes))
+    collection = [nodes.copy()]
+    for _ in range(numNodes-1):
+        nodes = nodes[1:] + [nodes[0]]
+        collection.append(nodes.copy())
+    print(len(collection))
+    for nodeset in sorted(collection, key=lambda x : x.index(0)):
+        print(nodeset)
+        
+
 def create_trajectory(numNodes, speed, edge_node_positions, time_incr, filename, userId, cur_time):
     nodes = [i for i in range(numNodes)]
     random.shuffle(nodes)
@@ -87,10 +98,12 @@ def create_polygon(numNodes, maxDist, lat, lon, outFile):
     df.to_csv(outFile, index=False)
     return points
 
-if __name__ == '__main__':
+
+if __name__ != '__main__':
     args = parse_args()
     edge_nodes = create_polygon(args.numedgenodes, args.edge, args.lat, args.lon, args.outputfile)
     
+    collection = build_collection(args.numedgenodes)
     cur_time = 0
     for i in range(args.numusers):
         #first = edge_nodes[i:]
