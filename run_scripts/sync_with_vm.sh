@@ -15,6 +15,7 @@ for ((i=0;i<=num_vms;i++)); do
              --exclude="/clairvoyant2/conf" \
              --exclude="*pycache*"\
              --exclude="results"\
+             --exclude="eval"\
              --exclude="localenv"\
         $HOME/clairvoyant2 ${machine_prefix}${i}:~/
 done

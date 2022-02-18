@@ -7,7 +7,7 @@
 	"machinePrefix":"cv",
 	"numUsers":100,
 	"edgeInfoFile":"input/microbenchmark/bench2/10nodes_random.csv",
-	"outputDir":"~/clairvoyant2/results/enhancements/bench2/cache_5gig/900segs_all2all",
+	"outputDir":"~/clairvoyant2/results/enhancements/bench2/cache_1gig/900segs_all2all",
 	"trajectoriesDir":"../../eval/microbenchmark/bench2/users/10nodes/overlapped/",
 	"segmentFile":"~/clairvoyant2/eval/videos/bbb_900segs.csv",
 	"bench2":"yes",

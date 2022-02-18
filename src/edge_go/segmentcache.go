@@ -50,6 +50,9 @@ func NewSegmentCache(size int64, cachetype string) *SegmentCache {
 func (cache *SegmentCache) GetEvictionCount() int64 {
     return cache.evictCount
 }
+func (cache *SegmentCache) GetCurrentStorageUsed() int64 {
+    return  cache.currentSize
+}
 
 func (cache *SegmentCache) curTS() int64 {
 	cache.currentTimestamp++
@@ -186,6 +189,7 @@ func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]st
 			routeIdSet: map[int64]bool{routeId: true},
             popularity: 0,
 		}
+        cache.currentSize += int64(segment.SegmentSize)
 	} else {
 		cache.segmentRouteMap[segment.SegmentId].routeIdSet[routeId] = true
         cache.segmentRouteMap[segment.SegmentId].popularity += 1

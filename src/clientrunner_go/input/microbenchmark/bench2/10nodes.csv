@@ -1,0 +1,11 @@
+x,y,id,ip,model
+43.766479,node_0,192.168.160.22,../../models/model1.csv
+43.764185,node_1,192.168.160.23,../../models/model2.csv
+43.761351,node_2,192.168.160.24,../../models/model1.csv
+43.759057,node_3,192.168.160.25,../../models/model2.csv
+43.758181,node_4,192.168.160.26,../../models/model1.csv
+43.759057,node_5,192.168.160.27,../../models/model2.csv
+43.761351,node_6,192.168.160.28,../../models/model2.csv
+43.764185,node_7,192.168.160.29,../../models/model1.csv
+43.766479,node_8,192.168.160.30,../../models/model1.csv
+43.767355,node_9,192.168.160.31,../../models/model2.csv

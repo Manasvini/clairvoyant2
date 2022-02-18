@@ -90,6 +90,7 @@ func (metamgr *MetadataManager) addSegments(segments []*pb.Segment, routeId int6
 		if err != nil {
 			break
 		}
+	    glog.Infof("Cache is %fMB occupied, had %d evictions so far", float64(metamgr.SegmentCache.GetCurrentStorageUsed())/1e6, metamgr.SegmentCache.GetEvictionCount())
 		committed = append(committed, segment.SegmentId)
 		metamgr.evicted = append(metamgr.evicted, evicted...)
 	}
