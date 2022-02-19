@@ -32,7 +32,7 @@ func (clock *Clock) sync() {
 		glog.Error(err)
 	} else {
 		clock.timestamp = resp.GetCurTime()
-		glog.Infof("Tick tock. Time is %d", clock.timestamp)
+		//glog.Infof("Tick tock. Time is %d", clock.timestamp)
 	}
 }
 

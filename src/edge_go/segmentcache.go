@@ -32,6 +32,8 @@ type SegmentCache struct {
 	mu               sync.Mutex
 	currentTimestamp int64
     evictCount       int64
+    promoteCount     int64
+    acceptCount      int64
 }
 
 /*package internal functions*/
@@ -47,6 +49,13 @@ func NewSegmentCache(size int64, cachetype string) *SegmentCache {
 	return segmentCache
 }
 
+func (cache *SegmentCache) GetAcceptCount() int64 {
+    return cache.acceptCount
+}
+
+func (cache *SegmentCache) GetPromoteCount() int64 {
+    return  cache.promoteCount
+}
 func (cache *SegmentCache) GetEvictionCount() int64 {
     return cache.evictCount
 }
@@ -71,6 +80,7 @@ func (cache *SegmentCache) updateEvictable(segmentId string) {
 	if idx != -1 {
 		cache.evictable = append(cache.evictable[:idx], cache.evictable[idx+1:]...)
 	}
+    cache.promoteCount += 1
 }
 
 func (cache *SegmentCache) pop() (string, error) {
@@ -181,7 +191,7 @@ func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]st
 	if evictedIds, isFull = cache.isSegmentCacheFull(int64(segment.SegmentSize)); isFull {
 		return nil, errors.New("SegmentCache is full")
 	}
-
+    cache.acceptCount += 1
 	if _, ok := cache.segmentRouteMap[segment.SegmentId]; !ok {
 		cache.segmentRouteMap[segment.SegmentId] = &SegmentMetadata{
 			segmentId:  segment.SegmentId,
@@ -194,6 +204,7 @@ func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]st
 		cache.segmentRouteMap[segment.SegmentId].routeIdSet[routeId] = true
         cache.segmentRouteMap[segment.SegmentId].popularity += 1
 		//remove from evictable if we need to
+        cache.updateEvictable(segment.SegmentId)
 	}
     cache.segmentRouteMap[segment.SegmentId].popularity += 1
 	cache.segmentRouteMap[segment.SegmentId].timestamp = cache.curTS()

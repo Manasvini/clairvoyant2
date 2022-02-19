@@ -19,14 +19,6 @@ try:
         with open(outfile, 'w') as fw:
             obj['nodeId'] = "node_{}".format(i)
             obj['modelFile'] = f"../../models/{df[1][i]}"
-            obj['serverAddress'] = "192.168.160.21:60050"
-            obj['monServerAddress'] = "192.168.160.21:8192"
-            obj["contentServerAddress"] = "0.0.0.0:8000"
-            obj["contentServerMaxClients"] = 2
-            obj["edgeServerAddress"] = "0.0.0.0:50056"
-            obj["cacheSize"] = 1000000000
-            obj["cacheType"] = "lfu"
-            obj["clockServerAddr"] = "192.168.160.21:8383"
             fw.write(json.dumps(obj, indent=2))
 except Exception as e:
     print(e.trace())

@@ -4,7 +4,8 @@ import json
 import subprocess
 import sys
 import time
-
+import pathlib
+import os
 def read_config(filename):
     with open(filename) as fh:
         conf = json.load(fh)
@@ -37,6 +38,13 @@ def stop_edge(conf):
                             check=False)
 
 def start_edge(conf):
+    templateEdgeCfg = conf['templateEdgeCfg']
+    owd = os.getcwd()
+    print('curdir = ', owd)
+    os.chdir(owd + '/conf')
+    edgeRes = subprocess.run(['python3','scripts/conf_generator.py', '-n',  str(conf['numEdgeNodes']), '-t', templateEdgeCfg, '-p', 'gen_conf/'])
+    os.chdir(owd)
+    print('cur dir is ', os.getcwd())
     numEdgeNodes = conf['numEdgeNodes']
     machinePrefix = conf['machinePrefix']
     result = subprocess.run(['bash', 'run_scripts/start-edge-go-svrs.sh',\
@@ -46,11 +54,13 @@ def start_edge(conf):
     print('edge success=', result.returncode)
 
 def gather_results(conf, localResultDir):
+    pathlib.Path(localResultDir).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(localResultDir + '/cloud').mkdir(parents=True, exist_ok=True)
     resultDir = conf['edgeResultDir']
     numEdgeNodes = conf['numEdgeNodes']
     machinePrefix = conf['machinePrefix']
     
-    result = subprocess.run(['scp', '-r', 'cvuser@' + machinePrefix + '0:' +  conf['outputDir'] ,  localResultDir  ])  
+    result = subprocess.run(['scp', '-r', 'cvuser@' + machinePrefix + '0:' +  conf['outputDir'] ,  localResultDir + '/cloud/'  ])  
     for i in range(numEdgeNodes):
         result = subprocess.run(['scp', '-r', 'cvuser@' + machinePrefix + str(i+1) + ':' + resultDir,  localResultDir])
    
@@ -62,7 +72,7 @@ def start_clients(conf):
     print('numVideos =', numVideos, conf['bench2'])
     clientTrajectories = conf['trajectoriesDir']
     edgeInfo = conf['edgeInfoFile']
-    outputFile = conf['outputDir'] + "/" + str(numClients) + 'users' + str(conf['numEdgeNodes']) + 'nodes' + str(round(time.time() * 1000)) + '.csv'
+    outputFile = conf['outputDir'] + "/" + str(numClients) + 'users' + str(conf['numEdgeNodes']) + 'nodes' + '.csv'
     segmentFile = conf['segmentFile']
     cloudServer = conf['cloudServerName']
     bench2 = conf['bench2']

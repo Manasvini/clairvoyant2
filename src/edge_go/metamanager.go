@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -42,6 +41,7 @@ type MetadataManager struct {
 	nodeId             string
     resultDir          string
 	wg                 sync.WaitGroup
+    requestCtr         int64
 }
 
 func newMetadataManager(size int64, cachetype string, nodeId string, clock *Clock, linkStateTracker *LinkStateTracker) *MetadataManager {
@@ -70,7 +70,7 @@ func newMetadataManager(size int64, cachetype string, nodeId string, clock *Cloc
 		glog.Fatal(err)
 	}
 
-	resultDir := filepath.Join(homeDir, "clairvoyant2", "edge_results_"+strconv.FormatInt(size/1000000000, 10) + "GB_" + cachetype )
+	resultDir := filepath.Join(homeDir, "clairvoyant2", "edge_results" )
 	err = os.MkdirAll(resultDir, 0755)
 	if err != nil {
 		glog.Fatal(err)
@@ -90,7 +90,7 @@ func (metamgr *MetadataManager) addSegments(segments []*pb.Segment, routeId int6
 		if err != nil {
 			break
 		}
-	    glog.Infof("Cache is %fMB occupied, had %d evictions so far", float64(metamgr.SegmentCache.GetCurrentStorageUsed())/1e6, metamgr.SegmentCache.GetEvictionCount())
+	    //glog.Infof("Cache is %fMB occupied, had %d evictions so far", float64(metamgr.SegmentCache.GetCurrentStorageUsed())/1e6, metamgr.SegmentCache.GetEvictionCount())
 		committed = append(committed, segment.SegmentId)
 		metamgr.evicted = append(metamgr.evicted, evicted...)
 	}
@@ -107,7 +107,7 @@ func (metamgr *MetadataManager) GetOverdueSegments(curTime int64, threshold int6
 
 		if float64(curTime) > deadline {
 			// currently fetching overdue only if we cross the deadline for the route
-			glog.Infof("overdue segs, curTime=%d, contact=%f, arrival=%d, deadline=%f", curTime, req.ContactTime, req.ArrivalTime, deadline)
+			//glog.Infof("overdue segs, curTime=%d, contact=%f, arrival=%d, deadline=%f", curTime, req.ContactTime, req.ArrivalTime, deadline)
 
 			var unused, used []string
 			for _, segment := range req.Segments {
@@ -180,6 +180,7 @@ func (metamgr *MetadataManager) Close() {
     glog.Infof("file is %s", linkUtilFile)
     f, err := os.Create(linkUtilFile)
     defer f.Close()
+    f.WriteString("node,bandwidth\n")
     linkUtils := metamgr.linkStateTracker.GetLinkStates()
     for node, bw := range linkUtils {
         _, err = f.WriteString(node + "," + fmt.Sprintf("%f", bw) + "\n")
@@ -192,7 +193,8 @@ func (metamgr *MetadataManager) Close() {
     evictCtFile := metamgr.resultDir + "/" + metamgr.nodeId + "_eviction.csv"
     f1, err := os.Create(evictCtFile)
     defer f1.Close()
-    f1.WriteString(fmt.Sprintf("%d", metamgr.SegmentCache.GetEvictionCount()))
+    f1.WriteString("evict,promote,accept,request\n")
+    f1.WriteString(fmt.Sprintf("%d,%d,%d", metamgr.SegmentCache.GetEvictionCount(), metamgr.SegmentCache.GetPromoteCount(), metamgr.SegmentCache.GetAcceptCount()))
     f1.Sync()
 }
 
@@ -211,7 +213,7 @@ func (metamgr *MetadataManager) processDownloads() {
 			source := request.SegmentSources[segmentId]
             currentTime := metamgr.clock.GetTime()
             deadline := request.ArrivalTime
-            glog.Infof("source for seg %s is %s", segmentId, source)
+            //glog.Infof("source for seg %s is %s", segmentId, source)
             isDownloadPossible, err := metamgr.linkStateTracker.IsDownloadPossible(int64(segment.SegmentSize), currentTime, deadline, source)
 			if !strings.Contains(source, cdnstr) && isDownloadPossible && err == nil{
 			    nodeSegMap[source] = append(nodeSegMap[source], idx)
@@ -293,7 +295,10 @@ func (metamgr *MetadataManager) handleAddRoute() {
 			metamgr.routes[routeInfo.request.TokenId] = routeInfo
 			glog.Infof("Added route %d with %d segments", routeInfo.request.TokenId, len(routeInfo.request.Segments))
 			committedSegments = metamgr.addSegments(routeInfo.request.Segments, routeInfo.request.TokenId)
-		}
+		    if len(committedSegments) > 0 {
+                metamgr.requestCtr += 1
+            }
+        }
 		dlReply := &pb.DownloadReply{TokenId: routeInfo.request.TokenId, SegmentIds: committedSegments, EvictedIds: metamgr.evicted}
 		metamgr.downloadReqChannel <- routeInfo.request
 		glog.Infof("len_evicted=%d, len_committed=%d", len(metamgr.evicted), len(committedSegments))

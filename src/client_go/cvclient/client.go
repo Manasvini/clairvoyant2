@@ -487,7 +487,7 @@ func (client *Client)FetchSegments(timestamp int64) bool{
 		} else /*edge download in progress */{
 			if distance != client.dlInfo.lastEdgeNodeDistance  || timestamp != client.dlInfo.timeOfLastContact{
 				contactTime := timestamp - client.dlInfo.timeOfLastContact
-				glog.Infof("Update contact with %s to %d\n", client.dlInfo.lastConnectedEdgeNode.id, contactTime)
+				//glog.Infof("Update contact with %s to %d\n", client.dlInfo.lastConnectedEdgeNode.id, contactTime)
 				bits := 0
 				//if contactTime == 0 {
 				//	bits = int(lastBw)
