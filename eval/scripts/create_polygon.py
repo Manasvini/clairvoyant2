@@ -79,7 +79,8 @@ def create_trajectory(numNodes, speed, edge_node_positions, time_incr, filename,
             cur_time += time_incr
         idx += 1
     df = pd.DataFrame(points)
-    df.to_csv(filename, index=False)
+    ndf = df.reindex(columns=['userId','time','x','y','z','velocity'])
+    ndf.to_csv(filename, index=False)
     return cur_time
 
 def create_polygon(numNodes, maxDist, lat, lon, outFile):

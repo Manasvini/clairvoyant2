@@ -2,9 +2,9 @@ import pandas as pd
 import os
 import random
 
-newd = "users/5nodes/overlapped"
-oldd = "users/5nodes/nonoverlapped"
-#os.mkdir(newd)
+newd = "users/10nodes/1kusers/set5/overlapped"
+oldd = "users/10nodes/1kusers/set5/nonoverlapped"
+os.mkdir(newd)
 
 files = os.listdir(oldd)
 
@@ -22,7 +22,7 @@ for f in sorted(files, key=lambda x : int(x.split('.')[0][4:])):
 
         if start != -1:
             nstart = int(random.uniform(start, end))
-            print(oldd, df['time'].iloc[0], df['time'].iloc[-1], '{} from ({},{})'.format(nstart, start, end))
+            #print(oldd, df['time'].iloc[0], df['time'].iloc[-1], '{} from ({},{})'.format(nstart, start, end))
             ndf['time'] = df['time'] - df['time'].iloc[0] + nstart
 
         start = ndf['time'].iloc[0]
