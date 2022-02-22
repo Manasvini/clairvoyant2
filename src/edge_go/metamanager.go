@@ -194,7 +194,7 @@ func (metamgr *MetadataManager) Close() {
     f1, err := os.Create(evictCtFile)
     defer f1.Close()
     f1.WriteString("evict,promote,accept,request\n")
-    f1.WriteString(fmt.Sprintf("%d,%d,%d", metamgr.SegmentCache.GetEvictionCount(), metamgr.SegmentCache.GetPromoteCount(), metamgr.SegmentCache.GetAcceptCount()))
+    f1.WriteString(fmt.Sprintf("%d,%d,%d,%d", metamgr.SegmentCache.GetEvictionCount(), metamgr.SegmentCache.GetPromoteCount(), metamgr.SegmentCache.GetAcceptCount(), metamgr.requestCtr))
     f1.Sync()
 }
 
