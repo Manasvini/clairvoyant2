@@ -15,11 +15,27 @@ const (
 	LFU = "lfu" //unimplemented
 )
 
+// Per segment
+const (
+	PushEvent      = iota
+	TouchEvent     = iota
+	EvictableEvent = iota
+	PopEvent       = iota
+)
+
+type Event struct {
+	segmentId string
+	routeId   int64
+	eventType int
+	timestamp int64
+}
+
 type SegmentMetadata struct {
 	segmentId    string
 	segSize      int64
 	routeIdSet   map[int64]bool
 	timestamp    int64 //for LRU, not in sync with global time
+	popularity   int64 //for LFU
 	evictListIdx int   //can be -1 if not in list
 }
 
@@ -38,17 +54,24 @@ type SegmentCache struct {
 	evictCount       int64
 	promoteCount     int64
 	acceptCount      int64
+
+	// append only
+	events []Event
+
+	clock *Clock
 }
 
 /*package internal functions*/
 
-func NewSegmentCache(size int64, cachetype string) *SegmentCache {
+func NewSegmentCache(size int64, cachetype string, clock *Clock) *SegmentCache {
 	segmentCache := &SegmentCache{
 		size:             size,
 		cachePolicy:      cachetype,
 		evictable:        make([]string, 0),
 		segmentRouteMap:  make(map[string]*SegmentMetadata),
 		currentTimestamp: 0,
+		events:           make([]Event, 0),
+		clock:            clock,
 	}
 	return segmentCache
 }
@@ -66,10 +89,21 @@ func (cache *SegmentCache) GetEvictionCount() int64 {
 func (cache *SegmentCache) GetCurrentStorageUsed() int64 {
 	return cache.currentSize
 }
+func (cache *SegmentCache) GetEvents() []Event {
+	return cache.events
+}
 
 func (cache *SegmentCache) curTS() int64 {
 	cache.currentTimestamp++
 	return cache.currentTimestamp
+}
+
+func (cache *SegmentCache) curRealTS() int64 {
+	if cache.clock == nil {
+		return cache.currentTimestamp
+	} else {
+		return cache.clock.GetTime()
+	}
 }
 
 // remove a segment id from the evictable set if it exists in that set.
@@ -147,6 +181,17 @@ func insert(a []string, index int, value string) []string {
 	return c
 }
 
+func (cache *SegmentCache) addEvent(segmentId string, routeId int64, eventType int) {
+	glog.Info("[extneded_utilities][%s,%d,%d,%d]\n", segmentId, routeId, eventType, cache.curRealTS())
+
+	cache.events = append(cache.events, Event{
+		segmentId: segmentId,
+		routeId:   routeId,
+		eventType: eventType,
+		timestamp: cache.curRealTS(),
+	})
+}
+
 // Marks a segment to be useless and hence can be thrown away
 func (cache *SegmentCache) addToEvictable(curSeg *SegmentMetadata) {
 	switch cache.cachePolicy {
@@ -164,6 +209,8 @@ func (cache *SegmentCache) addToEvictable(curSeg *SegmentMetadata) {
 		curSeg.evictListIdx = idx
 		// simply do an insert
 		cache.evictable = insert(cache.evictable, idx, curSeg.segmentId)
+
+		cache.addEvent(curSeg.segmentId, -1, EvictableEvent)
 	case LFU:
 		var idx int
 		for i, segId := range cache.evictable {
@@ -174,6 +221,8 @@ func (cache *SegmentCache) addToEvictable(curSeg *SegmentMetadata) {
 		}
 		curSeg.evictListIdx = idx
 		cache.evictable = insert(cache.evictable, idx, curSeg.segmentId)
+
+		cache.addEvent(curSeg.segmentId, -1, EvictableEvent)
 	}
 }
 
@@ -225,15 +274,22 @@ func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]st
 			routeIdSet: map[int64]bool{routeId: true},
 			popularity: 0,
 		}
+		cache.addEvent(segment.SegmentId, routeId, PushEvent)
 		// segment id is present
 	} else {
 		cache.segmentRouteMap[segment.SegmentId].routeIdSet[routeId] = true
 		cache.segmentRouteMap[segment.SegmentId].popularity += 1
 		//remove from evictable if we need to
 		cache.updateEvictable(segment.SegmentId)
+
+		cache.addEvent(segment.SegmentId, routeId, TouchEvent)
 	}
 	// update the segment map with the "touched" timestamp
 	cache.segmentRouteMap[segment.SegmentId].timestamp = cache.curTS()
+
+	for _, evictedId := range evictedIds {
+		cache.addEvent(evictedId, -1, PopEvent)
+	}
 	return evictedIds, nil
 }
 

@@ -51,9 +51,9 @@ func newMetadataManager(size int64, cachetype string, nodeId string, clock *Cloc
 	metamgr := &MetadataManager{clock: clock, linkStateTracker: linkStateTracker}
 	switch {
 	case cachetype == "lru":
-		metamgr.SegmentCache = NewSegmentCache(size, "lru")
+		metamgr.SegmentCache = NewSegmentCache(size, "lru", clock)
 	case cachetype == "lfu":
-		metamgr.SegmentCache = NewSegmentCache(size, "lfu")
+		metamgr.SegmentCache = NewSegmentCache(size, "lfu", clock)
 	}
 
 	metamgr.routeAddChannel = make(chan RouteInfo, 10)             //can accept at most 10 simultaneous routeAdd requests

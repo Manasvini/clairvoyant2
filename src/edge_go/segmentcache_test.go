@@ -18,7 +18,7 @@ func TestHasSegment(t *testing.T) {
 		{"segment not present", "test2", false},
 	}
 
-	cache := NewSegmentCache(2, "lru")
+	cache := NewSegmentCache(2, "lru", nil)
 	cache.segmentRouteMap["test1"] = &SegmentMetadata{}
 
 	for _, tc := range table {
@@ -35,7 +35,7 @@ type TestCase struct {
 }
 
 func setupSuite(tc TestCase) (*SegmentCache, cvpb.Segment, int64) {
-	cache := NewSegmentCache(3, "lru")
+	cache := NewSegmentCache(3, "lru", nil)
 	cache.currentSize = 2
 	cache.segmentRouteMap = map[string]*SegmentMetadata{
 		"test1": &SegmentMetadata{
