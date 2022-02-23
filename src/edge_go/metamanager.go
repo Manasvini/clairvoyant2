@@ -213,16 +213,17 @@ func (metamgr *MetadataManager) processDownloads() {
 			source := request.SegmentSources[segmentId]
             currentTime := metamgr.clock.GetTime()
             deadline := request.ArrivalTime
-            //glog.Infof("source for seg %s is %s", segmentId, source)
+            glog.Infof("source for seg %s is %s", segmentId, source)
             isDownloadPossible, err := metamgr.linkStateTracker.IsDownloadPossible(int64(segment.SegmentSize), currentTime, deadline, source)
 			if !strings.Contains(source, cdnstr) && isDownloadPossible && err == nil{
 			    nodeSegMap[source] = append(nodeSegMap[source], idx)
                 metamgr.linkStateTracker.UpdateDownloads(int64(segment.SegmentSize), currentTime, source)
 				numEdge++
-			} else {
-				cloudSegCount++
-				cloudAggDownload += int64(segment.SegmentSize)
 			}
+            // else {
+			//	cloudSegCount++
+			//	cloudAggDownload += int64(segment.SegmentSize)
+			//}
 		}
 
 		glog.Infof("num_cloud=%d, num_edge=%d", len(request.SegmentSources)-numEdge, numEdge)
