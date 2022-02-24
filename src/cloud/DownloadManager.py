@@ -66,18 +66,19 @@ class Oracle:
     def findOptimalSourceNode(self, seg_id, node_id, neighbors):
         self.mutex.acquire()
         src_node = None
-        logger.info(neighbors)
-        logger.info(f"oracle: {seg_id}, {node_id}")
+        #logger.info(neighbors)
+        #logger.info(f"oracle: {seg_id}, {node_id}")
         # set initializations
+        
         if seg_id not in self.segment_map:
             self.segment_map[seg_id] = set()
 
         if node_id not in self.node_nbr_map:
             self.node_nbr_map[node_id] = set()
-
+       
         # main logic
         if node_id in self.segment_map[seg_id]:
-            logger.debug("assumed to exist in local cache")
+            logger.info(f"assumed {seg_id} to exist in local cache of {node_id}")
             src_node = node_id
 
         elif self.mode == Bench2Mode.LOCAL:
@@ -86,7 +87,7 @@ class Oracle:
         elif self.mode == Bench2Mode.ALL2ALL:
             if self.segment_map[seg_id]:
                 src_nodes = self.segment_map[seg_id]
-                logger.info(f"all2all segids={src_nodes}")
+                #logger.info(f"all2all segids={src_nodes}")
                 if len(src_nodes)> 1:
                     src_node = random.choice(list(src_nodes))
                 else:
@@ -108,8 +109,8 @@ class Oracle:
             if src_nodes:
                 src_node = random.choice(src_nodes)
 
-        #if src_node:
-        #    logger.info("found a non cloud src={} for node={}".format(src_node, node_id))
+        if src_node:
+            logger.info("found a non cloud src={} for node={}".format(src_node, node_id))
 
         self.segment_map[seg_id].add(node_id)
         self.mutex.release()

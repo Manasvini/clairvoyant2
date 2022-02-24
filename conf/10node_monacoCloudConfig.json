@@ -2,7 +2,7 @@
   "modelMap":"models/model_map.csv",
   "modelDir":"models/",
   "mode": "all2all",
-  "bookKeeping":"recent",
+  "bookKeeping":"tracking",
   "phase3":true,
   "timeScale":60,
   "metaServerAddress": "0.0.0.0:50051",
