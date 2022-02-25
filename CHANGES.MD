@@ -46,3 +46,21 @@ On the path, if the user reaches ith node, i+kth node is informed to download fr
 ### Define a time/distance factor per route
 
 Incorporating the velocity, we can calculate the next stop required?
+
+### Metrics to capture
+
+- Retention
+- Size of max dormant interval for every segment in a node.
+### Knobs in the system
+
+1. Edge->cloud bandwidth : Fixed
+2. **Storage at the edge node : In Consideration**
+   1. Change of route. Check how the cloud can process this.
+   2. Plot metrics wrt change in cache sizes.
+   3. Showcase the issue by having an extreme case.
+   4. Bad users will useup cache space making other users not able to get the video from the edge.
+3. Cache Policies : Fixed
+4. Edge-Edge connections : In Consideration
+5. Request arrival modelling : Fixed
+6. Ratio between edge nodes to cloud, Number of edge nodes : Fixed
+7. Density of the edge nodes, Inter-location of edge nodes : Fixed
