@@ -43,13 +43,13 @@ class Oracle:
         self.node_nbr_map = {} #node_id -> set of node neighbors so far
 
     def update(self, node_id, response):
-        if len(response.segment_ids) == 0:
+        if len(response.evicted_ids) == 0:
             logger.debug("No evictions. nothing to do")
             return
 
         logger.debug("Received evicted segments. Updating State")
         self.mutex.acquire()
-        for seg_id in response.segment_ids:
+        for seg_id in response.evicted_ids:
             self.remove(node_id, seg_id)
         self.mutex.release()
 
