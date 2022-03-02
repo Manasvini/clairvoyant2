@@ -10,3 +10,5 @@ results/
 *ERROR*
 *INFO*
 *WARN*
+transient/*
+*.DS_Store

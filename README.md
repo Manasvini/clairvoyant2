@@ -5,13 +5,23 @@
 Then run the following in the cosmos staging from the project root.
 
 ```shell
-python3 run_scripts/run_eval.sh eval/conf/10node_conf.json 
+python3 run_scripts/run_eval.py eval/conf/10node_conf.json ../result_dir
 ```
 
 Check the logs (.csv and .csv.edge) in the output directory mentioned in the configuration file.
 
+### VM set change
 
-## Benchmark 2 run instructions
+Set 1: 192.168.160.22
+set 2: 192.168.160.42
+
+Make ip changes to the following
+
+10nodes_monacoCloudConfig.json
+clientrunner_go/input/*.csv
+run_scripts/start_cloud_services.sh
+
+### Benchmark 2 run instructions
 
 1. Start redis
 2. Add the right 10 edge nodes to redis. Path for edge nodes: `clairvoyant2/eval/enode_positions/microbenchmark/bench2/m2_node_positions/10nodes_random.csv`
@@ -45,3 +55,4 @@ Check the logs (.csv and .csv.edge) in the output directory mentioned in the con
 1. clientrunner exits early for benchmark2 purposes. Make this behavior config driven.
 2. Aggregate results from edge
 3. Currently tested with mode=All2All & cache=lru. Need to test for all cases.
+
