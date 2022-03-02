@@ -118,7 +118,7 @@ func (client *Client) RegisterWithCloud(serverAddr string, startTime float64) {
 	defer conn.Close()
 	c := pb.NewCVServerClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*120)
 	defer cancel()
 	resp, err := c.HandleCVRequest(ctx, cvreq)
 	if err != nil {

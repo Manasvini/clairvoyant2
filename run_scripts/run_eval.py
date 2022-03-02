@@ -66,7 +66,8 @@ def gather_results(conf, localResultDir):
    
 def start_clients(conf):
     numClients = conf["numUsers"]
-    numVideos = conf['numUsers'] * 2 
+    numVideos = 1000 
+    #conf['numUsers'] * 2 
     #if conf['bench2'] == 'yes':
     #    numVideos = 1
     print('numVideos =', numVideos, conf['bench2'])

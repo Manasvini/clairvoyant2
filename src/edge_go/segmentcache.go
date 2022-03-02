@@ -202,7 +202,6 @@ func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]st
         cache.currentSize += int64(segment.SegmentSize)
 	} else {
 		cache.segmentRouteMap[segment.SegmentId].routeIdSet[routeId] = true
-        cache.segmentRouteMap[segment.SegmentId].popularity += 1
 		//remove from evictable if we need to
         cache.updateEvictable(segment.SegmentId)
 	}

@@ -90,7 +90,7 @@ func (metamgr *MetadataManager) addSegments(segments []*pb.Segment, routeId int6
 		if err != nil {
 			break
 		}
-	    //glog.Infof("Cache is %fMB occupied, had %d evictions so far", float64(metamgr.SegmentCache.GetCurrentStorageUsed())/1e6, metamgr.SegmentCache.GetEvictionCount())
+	    glog.Infof("Cache is %fMB occupied, had %d evictions so far", float64(metamgr.SegmentCache.GetCurrentStorageUsed())/1e6, metamgr.SegmentCache.GetEvictionCount())
 		committed = append(committed, segment.SegmentId)
 		metamgr.evicted = append(metamgr.evicted, evicted...)
 	}
@@ -296,7 +296,8 @@ func (metamgr *MetadataManager) handleAddRoute() {
 			metamgr.routes[routeInfo.request.TokenId] = routeInfo
 			glog.Infof("Added route %d with %d segments", routeInfo.request.TokenId, len(routeInfo.request.Segments))
 			committedSegments = metamgr.addSegments(routeInfo.request.Segments, routeInfo.request.TokenId)
-		    if len(committedSegments) > 0 {
+		    glog.Infof("Accepted %d segments", len(committedSegments))
+            if len(committedSegments) > 0 {
                 metamgr.requestCtr += 1
             }
         }
