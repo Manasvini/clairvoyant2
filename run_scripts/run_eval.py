@@ -71,6 +71,7 @@ def start_clients(conf):
     segmentFile = conf['segmentFile']
     cloudServer = conf['cloudServerName']
     bench2 = conf['bench2']
+    truncationTime = conf['truncationTime']
     result = subprocess.run(['ssh', cloudServer, ' export PATH=$PATH:/usr/local/go/bin && cd clairvoyant2/src/clientrunner_go &&  go run . ' +\
                             '-log_dir=\".\"'+\
                             ' -t ' + clientTrajectories + \
@@ -80,7 +81,10 @@ def start_clients(conf):
                             ' -e ' + edgeInfo + \
                             ' -f ' + segmentFile +\
                             ' -b ' + bench2 +\
-                            ' -r ' + conf['distribution']], shell=False,check=False)
+                            ' -r ' + conf['distribution']
+                            ' -r ' + truncationTime], \
+                            shell=False,\
+                            check=False)
     print('client success=', result.returncode)
 
 def update_configs(conf):

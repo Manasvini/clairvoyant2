@@ -1,0 +1,17 @@
+{
+	"numTrials":1,
+	"numEdgeNodes":10,
+	"cloudConfig":"~/clairvoyant2/conf/10node_monacoCloudConfig.json",
+	"edgePositions":"eval/microbenchmark/bench2/node_positions/10nodes_1kusers.csv",
+	"cloudServerName":"cv0",
+	"machinePrefix":"cv",
+	"numUsers":1,
+	"edgeInfoFile":"input/microbenchmark/bench2/10nodes_1kusers.csv",
+	"outputDir":"~/clairvoyant2/results/bench2/cloud",
+	"trajectoriesDir":"../../eval/microbenchmark/bench2/users/10nodes/1user/",
+	"segmentFile":"~/clairvoyant2/eval/videos/bbb_900segs.csv",
+	"bench2":"yes",
+    "templateEdgeCfg":"edgeConfig.json",    
+    "edgeResultDir":"~/clairvoyant2/edge_results",
+    "truncationTime":500
+}

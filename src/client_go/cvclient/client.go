@@ -69,13 +69,15 @@ type Client struct {
 	id            string
 	token         *int64
 	ExplicitClose bool
+	finalTime	  float64
+	truncationTime int64
 }
 
 func (client *Client) Id() string {
 	return client.id
 }
 
-func NewClient(id string, traj *Trajectory, eNodes EdgeNodes, video Video, urls []string) Client {
+func NewClient(id string, traj *Trajectory, eNodes EdgeNodes, video Video, urls []string, truncationTime int64) Client {
 	glog.Infof("Client %s has %d points in journey\n", id, len(traj.points))
 	dlLogs := make([]DlLog, 0)
 	tdlLogs := make([]DlLog, 0)
@@ -97,7 +99,9 @@ func NewClient(id string, traj *Trajectory, eNodes EdgeNodes, video Video, urls 
 		buffer:        buffer,
 		dlInfo:        dlInfo,
 		token:         new(int64),
-		ExplicitClose: false}
+		ExplicitClose: false,
+		finalTime:	   traj.points[len(traj.points) - 1].timestamp,
+		truncationTime: truncationTime}
 	return client
 }
 
@@ -135,9 +139,13 @@ func (client *Client) RegisterWithCloud(serverAddr string, startTime float64) {
 	}
 }
 
-func (client *Client) IsDone() bool {
+func (client *Client) IsDone(timestamp int64) bool {
 
 	if client.ExplicitClose {
+		return true
+	}
+	
+	if client.finalTime < float64(timestamp) {
 		return true
 	}
 
@@ -379,6 +387,11 @@ func (client *Client) IsCloudRequestNecessary(segment string) bool {
 }
 
 func (client *Client)FetchSegments(timestamp int64) bool{
+
+	if timestamp > client.truncationTime {
+		return true
+	}
+
 	hasClientTimeAdvanced := client.Move()
 	if client.trajectory.HasEnded() {
 		if client.dlInfo.lastConnectedEdgeNode != nil {

@@ -17,9 +17,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-func areAllClientsDone(clients []cvclient.Client) bool {
+func areAllClientsDone(clients []cvclient.Client, timestamp int64) bool {
 	for _, client := range clients {
-		if !client.IsDone() {
+		if !client.IsDone(timestamp) {
 			return false
 		}
 	}
@@ -96,7 +96,9 @@ func main() {
 	ofilename := flag.String("o", "output.txt", "output file name")
 	bench2 := flag.String("b", "no", "benchmark 2(yes/no)")
 	dist := flag.String("r", "zipf", "distribution(Zipf/random)")
-    flag.Parse()
+	truncationTime := flag.Int64("r", 100000000, "time to truncate the run")
+
+	flag.Parse()
 	fmt.Printf("Making flags, num users = %d traj dir = %s, server addr = %s, edge nodes file = %s, numVideos = %d, videoFile = %s\n", *numUsers, *trajectoryDir, *serverAddr, *edgeNodesFile, *numVideos, *videoFile)
 	//edgeNodes := cvclient.EdgeNodes{}
 	//edgeNodes.LoadFromFile(*edgeNodesFile)
@@ -147,7 +149,7 @@ func main() {
         video.LoadFromFile(*videoFile, videoId)
 		glog.Infof("file = %s video is %s\n", f, videoId)
 		//"../../eval/enode_positions/17min_user0/user0_17min.csv")
-		client := cvclient.NewClient(f, &trajectory, edgeNodes, video, urls)
+		client := cvclient.NewClient(f, &trajectory, edgeNodes, video, urls, *truncationTime)
 		//client := cvclient.NewClient(f, &trajectory, edgeNodes, video, urls)
 		clients = append(clients, client)
 		i += 1
@@ -174,7 +176,7 @@ func main() {
 				//	clients[i].ExplicitClose = true
 				//}
 
-			} else if !clients[i].IsDone() && int64(clients[i].GetStartTime()) < timestamp {
+			} else if !clients[i].IsDone(timestamp) && int64(clients[i].GetStartTime()) < timestamp {
 				wg.Add(1)
 				go func(timestamp int64, client *cvclient.Client) {
 					defer wg.Done()
@@ -189,8 +191,7 @@ func main() {
 			}
 		}
 		wg.Wait()
-		if areAllClientsDone(clients) {
-
+		if areAllClientsDone(clients, timestamp) {
 			break
 		}
 	}
