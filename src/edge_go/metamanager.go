@@ -94,6 +94,8 @@ func newMetadataManager(size int64, cachetype string, nodeId string, clock *Cloc
 	metamgr.nodeId = nodeId
 	glog.Infof("initialized metadamanager of size = %d, type = %s", size, cachetype)
 
+	glog.Infof("[extended_utilites][cache_start][%d]\n", metamgr.clock.GetTime())
+
 	return metamgr
 }
 
@@ -243,6 +245,7 @@ func (metamgr *MetadataManager) getSegmentFromEdge(address string, segments []*p
 
 func (metamgr *MetadataManager) Close() {
 	glog.Info("Closing Metamgr!")
+	glog.Infof("[extended_utilites][cache_end][%d]\n", metamgr.clock.GetTime())
 	close(metamgr.downloadReqChannel)
 	metamgr.wg.Wait()
 	//metamgr.SegmentCache.RecordStats(filepath.Join(metamgr.resultDir, "edgestats"))
