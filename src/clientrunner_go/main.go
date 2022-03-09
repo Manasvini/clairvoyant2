@@ -110,7 +110,15 @@ func main() {
 	clients := make([]cvclient.Client, 0)
 	glog.Infof("Make %d clients", *numUsers)
 	trajectories := getFilesInDir(*trajectoryDir, isBench2)
-	glog.Infof("files= %s, %s\n", trajectories[0], trajectories[1])
+
+	if len(trajectories) >= 2{
+		glog.Infof("files= %s, %s\n", trajectories[0], trajectories[1])
+	}
+	
+	if len(trajectories) == 1{
+		glog.Infof("files= %s\n", trajectories[0])
+	}
+
 	i := 0
     seed := time.Now().UnixNano()
     if *bench2 == "yes" {
