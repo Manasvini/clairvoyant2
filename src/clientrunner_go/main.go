@@ -96,7 +96,7 @@ func main() {
 	ofilename := flag.String("o", "output.txt", "output file name")
 	bench2 := flag.String("b", "no", "benchmark 2(yes/no)")
 	dist := flag.String("r", "zipf", "distribution(Zipf/random)")
-	truncationTime := flag.Int64("r", 100000000, "time to truncate the run")
+	truncationTime := flag.Int64("r", -1, "time to truncate the run")
 
 	flag.Parse()
 	fmt.Printf("Making flags, num users = %d traj dir = %s, server addr = %s, edge nodes file = %s, numVideos = %d, videoFile = %s\n", *numUsers, *trajectoryDir, *serverAddr, *edgeNodesFile, *numVideos, *videoFile)

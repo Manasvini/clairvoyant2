@@ -144,10 +144,6 @@ func (client *Client) IsDone(timestamp int64) bool {
 	if client.ExplicitClose {
 		return true
 	}
-	
-	if client.finalTime < float64(timestamp) {
-		return true
-	}
 
 	if (len(client.buffer.allUrls) > 0 && len(client.buffer.allUrls) == len(client.buffer.completedUrls)) || client.trajectory.HasEnded() {
 		return true
@@ -388,7 +384,7 @@ func (client *Client) IsCloudRequestNecessary(segment string) bool {
 
 func (client *Client)FetchSegments(timestamp int64) bool{
 
-	if timestamp > client.truncationTime {
+	if (client.truncationTime != -1) && (timestamp > client.truncationTime) {
 		return true
 	}
 
