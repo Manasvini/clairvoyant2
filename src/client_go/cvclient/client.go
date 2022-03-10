@@ -69,7 +69,9 @@ type Client struct {
 	id            string
 	token         *int64
 	ExplicitClose bool
-	finalTime	  float64
+
+	// time after which the client does not connect to the edge
+	// First implemented to understand the effect of a user changing the path in between
 	truncationTime int64
 }
 
@@ -100,7 +102,6 @@ func NewClient(id string, traj *Trajectory, eNodes EdgeNodes, video Video, urls 
 		dlInfo:        dlInfo,
 		token:         new(int64),
 		ExplicitClose: false,
-		finalTime:	   traj.points[len(traj.points) - 1].timestamp,
 		truncationTime: truncationTime}
 	return client
 }
@@ -383,11 +384,6 @@ func (client *Client) IsCloudRequestNecessary(segment string) bool {
 }
 
 func (client *Client)FetchSegments(timestamp int64) bool{
-
-	if (client.truncationTime != -1) && (timestamp > client.truncationTime) {
-		return true
-	}
-
 	hasClientTimeAdvanced := client.Move()
 	if client.trajectory.HasEnded() {
 		if client.dlInfo.lastConnectedEdgeNode != nil {
@@ -414,7 +410,7 @@ func (client *Client)FetchSegments(timestamp int64) bool{
 	if client.dlInfo.lastConnectedEdgeNode != nil {
 		lastBw = client.GetEdgeBandwidth(*(client.dlInfo.lastConnectedEdgeNode), client.dlInfo.lastEdgeNodeDistance)
 	}
-	if edgeNodePtr == nil {
+	if (edgeNodePtr == nil) || ((client.truncationTime != -1) && (timestamp > client.truncationTime)) {
 		if timestamp%100 == 0 {
 			glog.Infof("time = %d will maybe do cloud fetch\n", timestamp)
 		}
