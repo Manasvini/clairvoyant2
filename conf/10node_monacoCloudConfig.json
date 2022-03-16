@@ -1,85 +1,84 @@
 {
-  "modelMap":"models/model_map.csv",
-  "modelDir":"models/",
+  "modelMap": "models/model_map.csv",
+  "modelDir": "models/",
   "mode": "all2all",
-  "bookKeeping":"tracking",
-  "phase3":true,
-  "timeScale":60,
+  "bookKeeping": "tracking",
+  "phase3": true,
+  "timeScale": 60,
   "metaServerAddress": "0.0.0.0:50051",
-  "defaultSource":"http://ftp.itec.aau.at/DASHDataset2014/",
+  "defaultSource": "http://ftp.itec.aau.at/DASHDataset2014/",
   "monServerAddress": "0.0.0.0",
   "monServerPort": 8192,
-  "edgeNodes":[
-     {
-        "id":"node_0", 
-        "ip":"192.168.160.22",
-        "edgeDaemon":50056,
-        "contentServer":8000,
-        "downloadSourceFile": "conf/download_source_info.json"
-     },
-     {
-        "id":"node_1", 
-        "ip":"192.168.160.23",
-        "edgeDaemon":50056,
-        "contentServer":8000,
-        "downloadSourceFile": "conf/download_source_info.json"
-     },
-     {
-        "id":"node_2", 
-        "ip":"192.168.160.24",
-        "edgeDaemon":50056,
-        "contentServer":8000,
-        "downloadSourceFile": "conf/download_source_info.json"
-     },
-     {
-        "id":"node_3", 
-        "ip":"192.168.160.25",
-        "edgeDaemon":50056,
-        "contentServer":8000,
-        "downloadSourceFile": "conf/download_source_info.json"
-     },
-     {
-        "id":"node_4", 
-        "ip":"192.168.160.26",
-        "edgeDaemon":50056,
-        "contentServer":8000,
-        "downloadSourceFile": "conf/download_source_info.json"
-     },
-     {
-        "id":"node_5", 
-        "ip":"192.168.160.27",
-        "edgeDaemon":50056,
-        "contentServer":8000,
-        "downloadSourceFile": "conf/download_source_info.json"
-     },
-
-     {
-        "id":"node_6", 
-        "ip":"192.168.160.28",
-        "edgeDaemon":50056,
-        "contentServer":8000,
-        "downloadSourceFile": "conf/download_source_info.json"
-     },
-     {
-        "id":"node_7", 
-        "ip":"192.168.160.29",
-        "edgeDaemon":50056,
-        "contentServer":8000,
-        "downloadSourceFile": "conf/download_source_info.json"
-     },
-     {
-        "id":"node_8", 
-        "ip":"192.168.160.30",
-        "edgeDaemon":50056,
-        "contentServer":8000,
-        "downloadSourceFile": "conf/download_source_info.json"
-     },
-     {
-        "id":"node_9", 
-        "ip":"192.168.160.31",
-        "edgeDaemon":50056,
-        "contentServer":8000,
-        "downloadSourceFile": "conf/download_source_info.json"
-     }
+  "edgeNodes": [
+    {
+      "id": "node_0",
+      "ip": "192.168.160.43",
+      "edgeDaemon": 50056,
+      "contentServer": 8000,
+      "downloadSourceFile": "conf/download_source_info.json"
+    },
+    {
+      "id": "node_1",
+      "ip": "192.168.160.44",
+      "edgeDaemon": 50056,
+      "contentServer": 8000,
+      "downloadSourceFile": "conf/download_source_info.json"
+    },
+    {
+      "id": "node_2",
+      "ip": "192.168.160.45",
+      "edgeDaemon": 50056,
+      "contentServer": 8000,
+      "downloadSourceFile": "conf/download_source_info.json"
+    },
+    {
+      "id": "node_3",
+      "ip": "192.168.160.46",
+      "edgeDaemon": 50056,
+      "contentServer": 8000,
+      "downloadSourceFile": "conf/download_source_info.json"
+    },
+    {
+      "id": "node_4",
+      "ip": "192.168.160.47",
+      "edgeDaemon": 50056,
+      "contentServer": 8000,
+      "downloadSourceFile": "conf/download_source_info.json"
+    },
+    {
+      "id": "node_5",
+      "ip": "192.168.160.48",
+      "edgeDaemon": 50056,
+      "contentServer": 8000,
+      "downloadSourceFile": "conf/download_source_info.json"
+    },
+    {
+      "id": "node_6",
+      "ip": "192.168.160.49",
+      "edgeDaemon": 50056,
+      "contentServer": 8000,
+      "downloadSourceFile": "conf/download_source_info.json"
+    },
+    {
+      "id": "node_7",
+      "ip": "192.168.160.50",
+      "edgeDaemon": 50056,
+      "contentServer": 8000,
+      "downloadSourceFile": "conf/download_source_info.json"
+    },
+    {
+      "id": "node_8",
+      "ip": "192.168.160.51",
+      "edgeDaemon": 50056,
+      "contentServer": 8000,
+      "downloadSourceFile": "conf/download_source_info.json"
+    },
+    {
+      "id": "node_9",
+      "ip": "192.168.160.52",
+      "edgeDaemon": 50056,
+      "contentServer": 8000,
+      "downloadSourceFile": "conf/download_source_info.json"
+    }
   ]
 }

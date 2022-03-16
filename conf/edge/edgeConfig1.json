@@ -6,14 +6,15 @@
   "redisPort": 6379,
   "nodeId": "node_1",
   "intervalSeconds": 1,
-  "serverAddress": "192.168.160.21:60050",
+  "serverAddress": "192.168.160.42:60050",
   "downloadSourceFile": "../../conf/download_source_info.json",
-  "monServerAddress": "192.168.160.21:8192",
+  "monServerAddress": "192.168.160.42:8192",
   "monInterval": 5,
   "contentServerAddress": "0.0.0.0:8000",
   "contentServerMaxClients": 2,
   "edgeServerAddress": "0.0.0.0:50056",
   "cacheSize": 50000000000,
   "cacheType": "lru",
-  "clockServerAddr": "192.168.160.21:8383"
+  "clockServerAddr": "192.168.160.42:8383",
+  "clockServerAddress": "192.168.160.42:8383"
 }
