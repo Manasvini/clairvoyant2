@@ -10,6 +10,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"math"
+	"container/heap"
 
 	"fmt"
 
@@ -18,6 +20,8 @@ import (
 	cpb "github.gatech.edu/cs-epl/clairvoyant2/edge_go/contentserver"
 	"google.golang.org/grpc"
 )
+
+var DUMMY int32 = 1
 
 func check(err error) {
 	if err != nil {
@@ -41,7 +45,15 @@ type MetadataManager struct {
 	SegmentCache *SegmentCache
 	// pub sub stuff in go
 	routeAddChannel    chan RouteInfo
-	downloadReqChannel chan pb.DownloadRequest
+
+	// this channel now just stores dummies and acts like a mutex for the download requests
+	downloadReqChannel chan int32
+	// priority queue of download requests with the time
+	downloadRequests	PriorityQueue
+	// Stores the percentage of time to procastinate on (between 0, 1)
+	// 0 = no procastination, 1 = on user demand
+	procastinationProportion	float64
+
 	linkStateTracker   *LinkStateTracker
 	clock              *Clock
 	evicted            []string
@@ -58,7 +70,7 @@ type MetadataManager struct {
 }
 const CDNSTR = "ftp"
 const CDNSRC = "ftp:8000"
-func newMetadataManager(size int64, cachetype string, nodeId string, clock *Clock, linkStateTracker *LinkStateTracker) *MetadataManager {
+func newMetadataManager(size int64, cachetype string, nodeId string, clock *Clock, linkStateTracker *LinkStateTracker, procastinationProportion float64) *MetadataManager {
 	metamgr := &MetadataManager{clock: clock, linkStateTracker: linkStateTracker}
 	switch {
 	case cachetype == "lru":
@@ -68,7 +80,12 @@ func newMetadataManager(size int64, cachetype string, nodeId string, clock *Cloc
 	}
     metamgr.pendingDlSize = 0
 	metamgr.routeAddChannel = make(chan RouteInfo, 10)             //can accept at most 10 simultaneous routeAdd requests
-	metamgr.downloadReqChannel = make(chan pb.DownloadRequest, 10) //can accept at most 10 simultaneous requests
+	metamgr.downloadReqChannel = make(chan int32, 10) //can accept at most 10 simultaneous requests
+	metamgr.downloadRequests = make(PriorityQueue, 0)
+	heap.Init(&metamgr.downloadRequests)
+
+	metamgr.procastinationProportion = procastinationProportion
+
 	metamgr.routes = make(map[int64]RouteInfo, 0)
 	go metamgr.handleAddRoute()
 
@@ -293,7 +310,17 @@ func (metamgr *MetadataManager) processDownloads() {
 	var edgeSegCount, cloudSegCount, localSegCount int32
 
 	// read from the publisher queue
-	for request := range metamgr.downloadReqChannel {
+	for _ = range metamgr.downloadReqChannel {
+		priorityQueueItem := heap.Pop(&metamgr.downloadRequests).(*PriorityQueueItem)
+
+		if priorityQueueItem.priority > metamgr.clock.GetTime() {
+			metamgr.downloadReqChannel <- DUMMY
+			heap.Push(&metamgr.downloadRequests, priorityQueueItem)
+			continue
+		}
+
+		request := priorityQueueItem.value.(*pb.DownloadRequest)
+
 		nodeSegMap := map[string][]int{} //map from node_src_ip -> seg_idx list
 		numEdge := 0
         numLocal := 0
@@ -436,7 +463,17 @@ func (metamgr *MetadataManager) handleAddRoute() {
         }
 		// add the download request to download the segments
 		dlReply := &pb.DownloadReply{TokenId: routeInfo.request.TokenId, SegmentIds: committedSegments, EvictedIds: metamgr.evicted}
-		metamgr.downloadReqChannel <- routeInfo.request
+		
+		var currentTime int64 = metamgr.clock.GetTime()
+		var nodeArrivalTime int64 = routeInfo.request.ArrivalTime
+		var procastinationTime float64 = float64(nodeArrivalTime - currentTime)*metamgr.procastinationProportion
+
+		priorityQueueItem := &PriorityQueueItem{
+			value: routeInfo.request,
+			priority: currentTime + int64(math.Round(procastinationTime)),
+		}
+		heap.Push(&metamgr.downloadRequests, priorityQueueItem)
+		metamgr.downloadReqChannel <- DUMMY
 		glog.Infof("len_evicted=%d, len_committed=%d", len(metamgr.evicted), len(committedSegments))
 
 		routeInfo.doneChannel <- dlReply
