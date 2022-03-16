@@ -10,14 +10,16 @@ for ((i=0;i<=num_vms;i++)); do
   #      --exclude="conf" \
   #      $HOME/clairvoyant2 cv2$i:~/
 
+             # move this down when needed
+             #--exclude="/clairvoyant2/conf" \
+             #--exclude="eval"\
   rsync -avz --exclude ".git" \
              --exclude "*.sw*" \
-             --exclude="/clairvoyant2/conf" \
              --exclude="*pycache*"\
              --exclude="results"\
-             --exclude="eval"\
              --exclude="localenv"\
         $HOME/clairvoyant2 ${machine_prefix}${i}:~/
+
 done
 
 #echo "restart content-servers"

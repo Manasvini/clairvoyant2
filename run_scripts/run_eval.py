@@ -42,7 +42,10 @@ def start_edge(conf):
     owd = os.getcwd()
     print('curdir = ', owd)
     os.chdir(owd + '/conf')
-    edgeRes = subprocess.run(['python3','scripts/conf_generator.py', '-n',  str(conf['numEdgeNodes']), '-t', templateEdgeCfg, '-p', 'gen_conf/'])
+    edgeRes = subprocess.run(['python3','scripts/conf_generator.py',\
+                                        '-n', str(conf['numEdgeNodes']),\
+                                        '-t', templateEdgeCfg])
+
     os.chdir(owd)
     print('cur dir is ', os.getcwd())
     numEdgeNodes = conf['numEdgeNodes']
