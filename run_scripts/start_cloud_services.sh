@@ -8,12 +8,12 @@ purge_redis=$6
 
 echo "starting cloud services..."
 echo "options:"
-echo "\tnum_nodes=$1"
-echo "\tconf=$2"
-echo "\tnode_pos=$3"
-echo "\tnum_videos=$4"
-echo "\tsegments_file=$5"
-echo "\tpurge_redis=$6"
+echo "    num_nodes=$1"
+echo "    conf=$2"
+echo "    node_pos=$3"
+echo "    num_videos=$4"
+echo "    segments_file=$5"
+echo "    purge_redis=$6"
 
 cd
 cd clairvoyantedge-metadata

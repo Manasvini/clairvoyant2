@@ -2,6 +2,7 @@ import json
 import csv
 import sys
 import re
+import pandas as pd
 
 import os
 def get_repo_root():
@@ -75,3 +76,23 @@ with open('edgeConfig.json') as fh:
 
     with open(f'{out_dir}/edgeConfig.json','w') as fw:
         fw.write(json.dumps(data, indent=2))
+
+# clienrunner/input/microbenchmark/bench2
+src = repo_root + '/src/clientrunner_go/input/microbenchmark/bench2/'
+dest = src + '/tmp/'
+os.system(f'rm -rf {dest}')
+os.system(f'mkdir -p {dest}')
+
+files = os.listdir(src)
+for f in files:
+    if f.startswith('.') or f.startswith('tmp'):
+        continue
+    fname = src + f
+    df = pd.read_csv(fname)
+
+    for i in range(len(df)):
+        nodeid= df.iloc[i]['id']
+        df.at[i,'ip'] = ipInfo[nodeid]
+    df.to_csv(dest+f, index=False)
+
+        

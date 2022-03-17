@@ -12,3 +12,4 @@ results/
 *WARN*
 transient/*
 *.DS_Store
+src/edge_go/edge_go
