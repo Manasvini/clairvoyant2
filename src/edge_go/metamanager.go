@@ -312,14 +312,17 @@ func (metamgr *MetadataManager) processDownloads() {
 	// read from the publisher queue
 	for _ = range metamgr.downloadReqChannel {
 		priorityQueueItem := heap.Pop(&metamgr.downloadRequests).(*PriorityQueueItem)
+		currentTime := metamgr.clock.GetTime()
+		request := priorityQueueItem.value.(*pb.DownloadRequest)
 
-		if priorityQueueItem.priority > metamgr.clock.GetTime() {
+		if priorityQueueItem.priority > currentTime {
 			metamgr.downloadReqChannel <- DUMMY
 			heap.Push(&metamgr.downloadRequests, priorityQueueItem)
+			glog.Infof("[procastinate][time=%d][current=%d][expected=%d][ignore]", request.TokenId, currentTime, priorityQueueItem.priority)
 			continue
 		}
 
-		request := priorityQueueItem.value.(*pb.DownloadRequest)
+		glog.Infof("[procastinate][routeid=%d][current=%d][expected=%d][consider]", request.TokenId, currentTime, priorityQueueItem.priority)
 
 		nodeSegMap := map[string][]int{} //map from node_src_ip -> seg_idx list
 		numEdge := 0
@@ -467,11 +470,14 @@ func (metamgr *MetadataManager) handleAddRoute() {
 		var currentTime int64 = metamgr.clock.GetTime()
 		var nodeArrivalTime int64 = routeInfo.request.ArrivalTime
 		var procastinationTime float64 = float64(nodeArrivalTime - currentTime)*metamgr.procastinationProportion
+		var priority int64 = currentTime + int64(math.Round(procastinationTime))
 
 		priorityQueueItem := &PriorityQueueItem{
 			value: routeInfo.request,
-			priority: currentTime + int64(math.Round(procastinationTime)),
+			priority: priority,
 		}
+		glog.Infof("[procastinate][routeid=%d][from=%d][to=%d]", routeInfo.request.TokenId, currentTime, priority)
+
 		heap.Push(&metamgr.downloadRequests, priorityQueueItem)
 		metamgr.downloadReqChannel <- DUMMY
 		glog.Infof("len_evicted=%d, len_committed=%d", len(metamgr.evicted), len(committedSegments))
