@@ -66,7 +66,7 @@ def gather_results(conf, localResultDir):
    
 def start_clients(conf):
     numClients = conf["numUsers"]
-    numVideos = 1000 
+    numVideos = 250 
     #conf['numUsers'] * 2 
     #if conf['bench2'] == 'yes':
     #    numVideos = 1
@@ -96,7 +96,7 @@ def main():
     #example conf script in eval folder 10node_conf.json
     num_trials = conf['numTrials']
     start = time.time()
-    repopulate_db = 'yes'
+    repopulate_db = 'no'
     for i in range(num_trials):
         start_cloud(conf, repopulate_db)
         if repopulate_db == 'yes':

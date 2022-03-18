@@ -13,7 +13,7 @@
     "contentServerAddress": "0.0.0.0:8000",
     "contentServerMaxClients": 2,
     "edgeServerAddress": "0.0.0.0:50056",
-    "cacheSize": 75000000000,
+    "cacheSize": 40000000000,
     "cacheType": "lru",
     "clockServerAddr": "192.168.160.21:8383",
     "cahceSize": 10000000000

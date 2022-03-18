@@ -45,6 +45,7 @@ type MetadataManager struct {
 	resultDir  string
 	wg         sync.WaitGroup
 	requestCtr int64
+    receivedReqCtr int64
 }
 
 func newMetadataManager(size int64, cachetype string, nodeId string, clock *Clock, linkStateTracker *LinkStateTracker) *MetadataManager {
@@ -201,8 +202,8 @@ func (metamgr *MetadataManager) Close() {
 	evictCtFile := metamgr.resultDir + "/" + metamgr.nodeId + "_eviction.csv"
 	f1, err := os.Create(evictCtFile)
 	defer f1.Close()
-	f1.WriteString("evict,promote,accept,request\n")
-	f1.WriteString(fmt.Sprintf("%d,%d,%d,%d", metamgr.SegmentCache.GetEvictionCount(), metamgr.SegmentCache.GetPromoteCount(), metamgr.SegmentCache.GetAcceptCount(), metamgr.requestCtr))
+	f1.WriteString("evict,promote,accept,request,received\n")
+	f1.WriteString(fmt.Sprintf("%d,%d,%d,%d,%d", metamgr.SegmentCache.GetEvictionCount(), metamgr.SegmentCache.GetPromoteCount(), metamgr.SegmentCache.GetAcceptCount(), metamgr.requestCtr, metamgr.receivedReqCtr))
 	f1.Sync()
 }
 
@@ -217,7 +218,9 @@ func (metamgr *MetadataManager) processDownloads() {
 	for request := range metamgr.downloadReqChannel {
 		nodeSegMap := map[string][]int{} //map from node_src_ip -> seg_idx list
 		numEdge := 0
+        numLocal := 0
 		successTracker := make([]bool, len(request.Segments))
+        localSegments := map[string]int64{}
 		for idx, segment := range request.Segments {
 			segmentId := segment.SegmentId
 			source := request.SegmentSources[segmentId]
@@ -225,24 +228,36 @@ func (metamgr *MetadataManager) processDownloads() {
 			deadline := request.ArrivalTime
 			glog.Infof("source for seg %s is %s", segmentId, source)
 			isDownloadPossible, err := metamgr.linkStateTracker.IsDownloadPossible(int64(segment.SegmentSize), currentTime, deadline, source)
-			if !strings.Contains(source, cdnstr) && isDownloadPossible && err == nil {
+			_, isSegmentLocal := metamgr.SegmentCache.HasSegment(segmentId)
+            if !isSegmentLocal && !strings.Contains(source, cdnstr) && isDownloadPossible && err == nil {
 				nodeSegMap[source] = append(nodeSegMap[source], idx)
 				metamgr.linkStateTracker.UpdateDownloads(int64(segment.SegmentSize), currentTime, source)
-				numEdge++
+				if !isSegmentLocal {
+                    numEdge++
+                }
 			}
+            if isSegmentLocal {
+                glog.Infof("Segment %s found in cache", segmentId)
+                localSegments[segmentId] = int64(segment.SegmentSize)
+                numLocal++
+            }
 			// else {
 			//	cloudSegCount++
 			//	cloudAggDownload += int64(segment.SegmentSize)
 			//}
 		}
 
-		glog.Infof("num_cloud=%d, num_edge=%d", len(request.SegmentSources)-numEdge, numEdge)
+		glog.Infof("num_cloud=%d, num_edge=%d num_local=%d", len(request.SegmentSources)-numEdge - numLocal, numEdge, numLocal)
 
 		for source, segIdxList := range nodeSegMap {
 			metamgr.getSegmentFromEdge(source, request.Segments, segIdxList, &successTracker)
 		}
 
 		for idx, success := range successTracker {
+            _, exists := localSegments[request.Segments[idx].SegmentId]
+            if exists {
+                continue
+            }
 			if success {
 				edgeSegCount++
 				edgeAggDownload += int64(request.Segments[idx].SegmentSize)
@@ -319,6 +334,7 @@ func (metamgr *MetadataManager) handleAddRoute() {
             if len(committedSegments) > 0 {
                 metamgr.requestCtr += 1
             }
+            metamgr.receivedReqCtr +=1
         }
 		// add the download request to download the segments
 		dlReply := &pb.DownloadReply{TokenId: routeInfo.request.TokenId, SegmentIds: committedSegments, EvictedIds: metamgr.evicted}
@@ -326,5 +342,6 @@ func (metamgr *MetadataManager) handleAddRoute() {
 		glog.Infof("len_evicted=%d, len_committed=%d", len(metamgr.evicted), len(committedSegments))
 
 		routeInfo.doneChannel <- dlReply
+        metamgr.evicted = metamgr.evicted[:0]
 	}
 }

@@ -274,6 +274,7 @@ func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]st
 			routeIdSet: map[int64]bool{routeId: true},
 			popularity: 0,
 		}
+        cache.currentSize += int64(segment.SegmentSize)
 		cache.addEvent(segment.SegmentId, routeId, PushEvent)
 		// segment id is present
 	} else {
