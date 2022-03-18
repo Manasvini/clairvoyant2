@@ -313,7 +313,7 @@ func (metamgr *MetadataManager) processDownloads() {
 	for _ = range metamgr.downloadReqChannel {
 		priorityQueueItem := heap.Pop(&metamgr.downloadRequests).(*PriorityQueueItem)
 		currentTime := metamgr.clock.GetTime()
-		request := priorityQueueItem.value.(*pb.DownloadRequest)
+		request := priorityQueueItem.value.(pb.DownloadRequest)
 
 		if priorityQueueItem.priority > currentTime {
 			metamgr.downloadReqChannel <- DUMMY
