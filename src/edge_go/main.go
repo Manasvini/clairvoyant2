@@ -69,7 +69,7 @@ func initEdgeRoutines(configFile string) {
         glog.Infof("BOOM")
     }
     clock := NewClock(config.NodeID, config.ClockServerAddr)
-    metamgr := newMetadataManager(int64(config.CacheSize), config.CacheType, config.NodeID, clock, linkStateTracker, 0)
+    metamgr := newMetadataManager(int64(config.CacheSize), config.CacheType, config.NodeID, clock, linkStateTracker, config.ProcastinationProportion)
 	startMonitoring(config)
 	eserver := startEdgeServer(config, metamgr)
 	cserver := startContentServer(config, metamgr)

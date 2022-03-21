@@ -15,5 +15,7 @@
     "edgeServerAddress": "0.0.0.0:50056",
     "cacheSize": 120000000000,
     "cacheType": "lru",
-    "clockServerAddr": "192.168.160.42:8383"
+    "clockServerAddr": "192.168.160.42:8383",
+    "cahceSize": 10000000000,
+    "procastinationProportion": 0.5
 }
