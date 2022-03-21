@@ -84,6 +84,11 @@ func newMetadataManager(size int64, cachetype string, nodeId string, clock *Cloc
 	metamgr.downloadRequests = make(PriorityQueue, 0)
 	heap.Init(&metamgr.downloadRequests)
 
+	if procastinationProportion < 0 {
+		procastinationProportion = 0
+	} else if procastinationProportion > 1 {
+		procastinationProportion = 1
+	}
 	metamgr.procastinationProportion = procastinationProportion
 
 	metamgr.routes = make(map[int64]RouteInfo, 0)
