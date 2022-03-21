@@ -54,7 +54,8 @@ type MetadataManager struct {
     dlHistory          []HistoryRecord
     pendingDlSize      int64
 }
-
+const CDNSTR = "ftp"
+const CDNSRC = "ftp:8000"
 func newMetadataManager(size int64, cachetype string, nodeId string, clock *Clock, linkStateTracker *LinkStateTracker) *MetadataManager {
 	metamgr := &MetadataManager{clock: clock, linkStateTracker: linkStateTracker}
 	switch {
@@ -94,20 +95,39 @@ func newMetadataManager(size int64, cachetype string, nodeId string, clock *Cloc
 	return metamgr
 }
 
-func (metamgr *MetadataManager) canAddSegments(segments []*pb.Segment) []string {
+func (metamgr *MetadataManager) canAddSegments(request pb.DownloadRequest) []string {
     availableSpace := metamgr.SegmentCache.GetAvailableFreeSpace() - metamgr.pendingDlSize
     var possibleAdditions int64
     possibleAdditions = 0
+
     glog.Infof("available free space = %d", availableSpace)
     var possibleCommitted []string
-    for _, segment := range segments {
-        if int64(segment.SegmentSize) + int64(possibleAdditions) > int64(availableSpace) {
+
+    for _, segment := range request.Segments {
+		segmentId := segment.SegmentId
+		source := request.SegmentSources[segmentId]
+		currentTime := metamgr.clock.GetTime()
+		deadline := request.ArrivalTime
+		glog.Infof("source for seg %s is %s", segmentId, source)
+	    if int64(segment.SegmentSize) + int64(possibleAdditions) > int64(availableSpace) {
+            glog.Info("Ran out of cache space")
             break
+        }
+        if strings.Contains(source, CDNSTR){
+                source = CDNSRC
+        }
+        isDownloadPossible, err := metamgr.linkStateTracker.IsDownloadPossible(int64(segment.SegmentSize), currentTime, deadline, source)
+		 _, isSegmentLocal := metamgr.SegmentCache.HasSegment(segmentId)
+		if !isSegmentLocal && !isDownloadPossible && err != nil {
+            glog.Infof("No b/w to download from source %s", source)
+            continue
+        }
+		if !isSegmentLocal {
+            metamgr.pendingDlSize += int64(segment.SegmentSize)
         }
         possibleCommitted = append(possibleCommitted, segment.SegmentId)
         possibleAdditions += int64(segment.SegmentSize)
     }
-    metamgr.pendingDlSize += int64(possibleAdditions)
     glog.Infof("Metamgr added %d segments to pending, now pending size =%d, total pending size = %d", len(possibleCommitted), possibleAdditions, metamgr.pendingDlSize)
     return possibleCommitted
 }
@@ -126,7 +146,6 @@ func (metamgr *MetadataManager) addSegments(segments []*pb.Segment, routeId int6
 		}
         committedSize += int64(segment.SegmentSize)
 	    glog.Infof("Cache is %fMB occupied, had %d evictions so far", float64(metamgr.SegmentCache.GetCurrentStorageUsed())/1e6, metamgr.SegmentCache.GetEvictionCount())
-		//glog.Infof("Cache is %fMB occupied, had %d evictions so far", float64(metamgr.SegmentCache.GetCurrentStorageUsed())/1e6, metamgr.SegmentCache.GetEvictionCount())
 		committed = append(committed, segment.SegmentId)
 		metamgr.evicted = append(metamgr.evicted, evicted...)
 	}
@@ -256,7 +275,6 @@ func (metamgr *MetadataManager) Close() {
 
 // Download the segments from the cloud
 func (metamgr *MetadataManager) processDownloads() {
-	cdnstr := "ftp" //TODO: make this more robust
 
 	var edgeAggDownload, cloudAggDownload int64
 	var edgeSegCount, cloudSegCount int32
@@ -272,31 +290,28 @@ func (metamgr *MetadataManager) processDownloads() {
 			segmentId := segment.SegmentId
 			source := request.SegmentSources[segmentId]
 			currentTime := metamgr.clock.GetTime()
-			deadline := request.ArrivalTime
 			glog.Infof("source for seg %s is %s", segmentId, source)
-			isDownloadPossible, err := metamgr.linkStateTracker.IsDownloadPossible(int64(segment.SegmentSize), currentTime, deadline, source)
 			_, isSegmentLocal := metamgr.SegmentCache.HasSegment(segmentId)
-            if !isSegmentLocal && !strings.Contains(source, cdnstr) && isDownloadPossible && err == nil {
+            if strings.Contains(source, CDNSTR){
+                source = CDNSRC
+            }
+            if !isSegmentLocal {
 				nodeSegMap[source] = append(nodeSegMap[source], idx)
 				metamgr.linkStateTracker.UpdateDownloads(int64(segment.SegmentSize), currentTime, source)
 				if !isSegmentLocal {
                     numEdge++
-                    historyRec := HistoryRecord{timestamp:currentTime, segmentId: segmentId, routeId: request.TokenId}
-                    metamgr.dlHistory = append(metamgr.dlHistory, historyRec)
                 }
 			}
             if isSegmentLocal {
                 glog.Infof("Segment %s found in cache", segmentId)
                 localSegments[segmentId] = int64(segment.SegmentSize)
                 numLocal++
+            } else {
+                historyRec := HistoryRecord{timestamp:currentTime, segmentId: segmentId, routeId: request.TokenId}
+                metamgr.dlHistory = append(metamgr.dlHistory, historyRec)
+
             }
-			// else {
-			//	cloudSegCount++
-			//	cloudAggDownload += int64(segment.SegmentSize)
-			//}
 		}
-        _ = metamgr.addSegments(request.Segments, request.TokenId)
-		glog.Infof("num_cloud=%d, num_edge=%d num_local=%d", len(request.SegmentSources)-numEdge - numLocal, numEdge, numLocal)
 
 		for source, segIdxList := range nodeSegMap {
 			metamgr.getSegmentFromEdge(source, request.Segments, segIdxList, &successTracker)
@@ -315,6 +330,9 @@ func (metamgr *MetadataManager) processDownloads() {
 				cloudAggDownload += int64(request.Segments[idx].SegmentSize)
 			}
 		}
+        _ = metamgr.addSegments(request.Segments, request.TokenId)
+		glog.Infof("num_cloud=%d, num_edge=%d num_local=%d", len(request.SegmentSources)-numEdge - numLocal, numEdge, numLocal)
+
 
 	}
 	jsonString, err := json.MarshalIndent(struct {
@@ -382,7 +400,7 @@ func (metamgr *MetadataManager) handleAddRoute() {
             // Segments are added in processDownloads()
             // By moving addition of segments to processDownloads, we can keep track of segments that were downloaded from (1) cloud (2) edge and (3) already cached. 
             // The move will also make procrastination cleaner 
-			committedSegments = metamgr.canAddSegments(routeInfo.request.Segments)
+			committedSegments = metamgr.canAddSegments(routeInfo.request)
 		    glog.Infof("Accepted %d segments", len(committedSegments))
             if len(committedSegments) > 0 {
                 metamgr.requestCtr += 1
