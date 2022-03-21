@@ -318,7 +318,7 @@ func (metamgr *MetadataManager) processDownloads() {
 		if priorityQueueItem.priority > currentTime {
 			metamgr.downloadReqChannel <- DUMMY
 			heap.Push(&metamgr.downloadRequests, priorityQueueItem)
-			glog.Infof("[procastinate][time=%d][current=%d][expected=%d][ignore]", request.TokenId, currentTime, priorityQueueItem.priority)
+			glog.Infof("[procastinate][routeid=%d][current=%d][expected=%d][ignore]", request.TokenId, currentTime, priorityQueueItem.priority)
 			continue
 		}
 
@@ -476,7 +476,7 @@ func (metamgr *MetadataManager) handleAddRoute() {
 			value: routeInfo.request,
 			priority: priority,
 		}
-		glog.Infof("[procastinate][routeid=%d][from=%d][to=%d]", routeInfo.request.TokenId, currentTime, priority)
+		glog.Infof("[procastinate][routeid=%d][current=%d][to=%d][arrival=%d]", routeInfo.request.TokenId, currentTime, priority, nodeArrivalTime)
 
 		heap.Push(&metamgr.downloadRequests, priorityQueueItem)
 		metamgr.downloadReqChannel <- DUMMY
