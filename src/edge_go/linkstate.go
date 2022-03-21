@@ -35,7 +35,7 @@ func (lst *LinkStateTracker) GetLinkStates() map[string]float64 {
 }
 
 func (lst *LinkStateTracker) IsDownloadPossible(dlSizeBytes int64, currentTime int64, deadline int64, source string) (bool, error) {
-    glog.Infof("bytes = %d, curtime = %d deadline=%s, src=%s", dlSizeBytes, currentTime, deadline, source)
+    //glog.Infof("bytes = %d, curtime = %d deadline=%s, src=%s", dlSizeBytes, currentTime, deadline, source)
     lst.mu.Lock()
     defer lst.mu.Unlock()
     bw, ok := lst.sourceDlSpeeds[source]

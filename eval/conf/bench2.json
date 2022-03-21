@@ -5,13 +5,13 @@
 	"edgePositions":"eval/microbenchmark/bench2/node_positions/10nodes_1kusers.csv",
 	"cloudServerName":"cv20",
 	"machinePrefix":"cv2",
-	"numUsers":1000,
+	"numUsers":1,
 	"edgeInfoFile":"input/microbenchmark/bench2/10nodes_1kusers.csv",
 	"outputDir":"~/clairvoyant2/results/bench2/cloud",
-	"trajectoriesDir":"../../eval/microbenchmark/bench2/users/10nodes/1kusers/overlapped/set1/",
+	"trajectoriesDir":"../../eval/microbenchmark/bench2/users/10nodes/1kusers/overlapped/overlapped_200simultaneous/",
 	"segmentFile":"~/clairvoyant2/eval/videos/bbb_900segs.csv",
 	"bench2":"yes",
     "templateEdgeCfg":"edgeConfig.json",    
-    "edgeResultDir":"~/clairvoyant2/edge_results"
-
+    "edgeResultDir":"~/clairvoyant2/edge_results",
+    "numVideos":250
 }

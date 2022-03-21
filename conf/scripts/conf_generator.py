@@ -15,7 +15,7 @@ def get_repo_root():
     return repo_root
 
 repo_root = get_repo_root()
-out_dir = f'{repo_root}/conf/scripts/gen_confs'
+out_dir = f'{repo_root}/conf/edge'
 print(out_dir)
 os.system(f'rm -rf {out_dir}')
 os.system(f'mkdir -p {out_dir}')

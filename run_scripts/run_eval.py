@@ -38,15 +38,6 @@ def stop_edge(conf):
                             check=False)
 
 def start_edge(conf):
-    templateEdgeCfg = conf['templateEdgeCfg']
-    owd = os.getcwd()
-    print('curdir = ', owd)
-    os.chdir(owd + '/conf')
-    edgeRes = subprocess.run(['python3','scripts/conf_generator.py',\
-                                        '-n', str(conf['numEdgeNodes']),\
-                                        '-t', templateEdgeCfg])
-
-    os.chdir(owd)
     print('cur dir is ', os.getcwd())
     numEdgeNodes = conf['numEdgeNodes']
     machinePrefix = conf['machinePrefix']
@@ -69,7 +60,7 @@ def gather_results(conf, localResultDir):
    
 def start_clients(conf):
     numClients = conf["numUsers"]
-    numVideos = 250 
+    numVideos = conf['numVideos'] 
     #conf['numUsers'] * 2 
     #if conf['bench2'] == 'yes':
     #    numVideos = 1
@@ -93,8 +84,33 @@ def start_clients(conf):
                             check=False)
     print('client success=', result.returncode)
 
+def update_configs(conf):
+    owd = os.getcwd()
+    print('curdir = ', owd)
+    templateEdgeCfg = conf['templateEdgeCfg']
+    os.chdir(owd + '/conf')
+    edgeRes = subprocess.run(['python3','scripts/conf_generator.py',\
+                                        '-n', str(conf['numEdgeNodes']),\
+                                        '-t', templateEdgeCfg])
+
+    print('generated confs')
+    os.chdir(owd)
+    os.chdir(owd + '/conf')
+    result = subprocess.run(['python3', 'scripts/change_ips.py', 'ipinfo_' +  conf['machinePrefix'] + '.csv'])
+    cloud_config = conf['cloudConfig'].split('/')[-1]
+    clientrunner_input = conf['edgeInfoFile']
+    filepath_idx = clientrunner_input.find('input') + len('input')
+    filepath = clientrunner_input[filepath_idx:]
+    filename = filepath.split('/')[-1]
+    dirname = filepath[0:filepath.find(filename)]
+    print('cloud cfg is ', cloud_config, '\nclient runner cfg dir is', dirname, ' file is', filename) 
+    os.chdir(owd)
+    result = subprocess.run(['bash', 'run_scripts/update-cloud-configs.sh', conf['cloudServerName'], cloud_config, filename, dirname])
+
+
 def main():
     conf = read_config(sys.argv[1])
+    update_configs(conf)
     resultDir = sys.argv[2]
     #example conf script in eval folder 10node_conf.json
     num_trials = conf['numTrials']

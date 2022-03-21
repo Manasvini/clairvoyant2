@@ -1,4 +1,5 @@
 *__pycache__
+*.zip
 *.pyc
 *.sw*
 logs/
@@ -12,4 +13,10 @@ results/
 *WARN*
 transient/*
 *.DS_Store
+conf/tmp/
+conf/scripts/gen_confs/
+conf/scripts/tmp/
 src/edge_go/edge_go
+src/clientrunner_go/input/tmp
+src/clientrunner_go/input/scale/tmp
+src/clientrunner_go/input/microbenchmark/bench2/tmp

@@ -48,7 +48,8 @@ type SegmentCache struct {
 	size int64
 	// size left
 	currentSize      int64
-	cachePolicy      string
+	evictableSize    int64
+    cachePolicy      string
 	mu               sync.Mutex
 	currentTimestamp int64
 	evictCount       int64
@@ -132,7 +133,8 @@ func (cache *SegmentCache) pop() (string, error) {
 	}
 	segId := cache.evictable[0]
 	cache.currentSize -= cache.segmentRouteMap[segId].segSize
-	cache.evictCount += 1
+	cache.evictableSize -= cache.segmentRouteMap[segId].segSize
+    cache.evictCount += 1
 	glog.Infof("deleting segment %s, total evictions = %d", segId, cache.evictCount)
 
 	delete(cache.segmentRouteMap, segId)
@@ -202,6 +204,7 @@ func (cache *SegmentCache) addToEvictable(curSeg *SegmentMetadata) {
 			segTs := cache.segmentRouteMap[segId].timestamp
 			if curSeg.timestamp < segTs {
 				idx = i
+                cache.evictableSize += cache.segmentRouteMap[segId].segSize
 				break
 			}
 		}
@@ -216,7 +219,8 @@ func (cache *SegmentCache) addToEvictable(curSeg *SegmentMetadata) {
 		for i, segId := range cache.evictable {
 			if curSeg.popularity < cache.segmentRouteMap[segId].popularity {
 				idx = i
-				break
+				cache.evictableSize += cache.segmentRouteMap[segId].segSize
+                break
 			}
 		}
 		curSeg.evictListIdx = idx
@@ -282,7 +286,7 @@ func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]st
 		cache.segmentRouteMap[segment.SegmentId].popularity += 1
 		//remove from evictable if we need to
 		cache.updateEvictable(segment.SegmentId)
-
+        cache.evictableSize -= int64(segment.SegmentSize)
 		cache.addEvent(segment.SegmentId, routeId, TouchEvent)
 	}
 	// update the segment map with the "touched" timestamp
@@ -314,4 +318,11 @@ func (cache *SegmentCache) UpdateSegmentStatus(segmentId string, routeId int64) 
 		cache.addToEvictable(cache.segmentRouteMap[segmentId])
 	}
 
+}
+
+func (cache *SegmentCache) GetAvailableFreeSpace() int64{
+    //total size : cache.size
+    //occupied, unavailable: cache.currentSize
+    //occupied, available: cache.evictableSize
+    return (cache.size - cache.currentSize) + cache.evictableSize
 }

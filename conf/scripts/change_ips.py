@@ -20,7 +20,7 @@ out_dir=f'{repo_root}/conf/scripts/tmp'
 
 
 # change the ips in the following configs
-ipFile="ipinfo.csv"
+ipFile=sys.argv[1]
 ipInfo = {}
 with open(ipFile) as fh:
     csvreader = csv.reader(fh, delimiter=',')
@@ -78,21 +78,23 @@ with open('edgeConfig.json') as fh:
         fw.write(json.dumps(data, indent=2))
 
 # clienrunner/input/microbenchmark/bench2
-src = repo_root + '/src/clientrunner_go/input/microbenchmark/bench2/'
-dest = src + '/tmp/'
-os.system(f'rm -rf {dest}')
-os.system(f'mkdir -p {dest}')
+def update_ips_in_clientrunner(src, dest):
+    files = os.listdir(src)
+    for f in files:
+        if 'model' in f or (not os.path.isfile(os.path.join(src, f))) or (f.startswith('.') or f.startswith('tmp')):
+            continue
+        fname = src + f
+        df = pd.read_csv(fname)
+        for i in range(len(df)):
+            nodeid= df.iloc[i]['id']
+            df.at[i,'ip'] = ipInfo[nodeid]
+        df.to_csv(dest+f, index=False)
+    
+srcs = [repo_root + '/src/clientrunner_go/input/microbenchmark/bench2/', repo_root + '/src/clientrunner_go/input/scale/']
+for src in srcs:
+    dest = src + '/tmp/'
+    os.system(f'rm -rf {dest}')
+    os.system(f'mkdir -p {dest}')
 
-files = os.listdir(src)
-for f in files:
-    if f.startswith('.') or f.startswith('tmp'):
-        continue
-    fname = src + f
-    df = pd.read_csv(fname)
-
-    for i in range(len(df)):
-        nodeid= df.iloc[i]['id']
-        df.at[i,'ip'] = ipInfo[nodeid]
-    df.to_csv(dest+f, index=False)
-
-        
+    update_ips_in_clientrunner(src, dest)
+            

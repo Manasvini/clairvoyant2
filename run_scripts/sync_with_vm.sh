@@ -18,6 +18,7 @@ for ((i=0;i<=num_vms;i++)); do
              --exclude="*pycache*"\
              --exclude="results"\
              --exclude="localenv"\
+             --exclude="eval"\
         $HOME/clairvoyant2 ${machine_prefix}${i}:~/
 
 done

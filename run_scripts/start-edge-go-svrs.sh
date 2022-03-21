@@ -19,9 +19,9 @@ echo "copy & start edge_go.."
 for ((i=1;i<=num_edge;i++)); do
   confid=$(($i-1))
   nodeid=$i
-  scp conf/scripts/gen_confs/edgeConfig$confid.json cvuser@${machine_prefix}${nodeid}:~/clairvoyant2/conf/edgeConfig.json
-  scp conf/download_source_info.json cvuser@${machine_prefix}${nodeid}:~/clairvoyant2/conf/
-  
+  scp conf/scripts/tmp/edge/edgeConfig$confid.json cvuser@${machine_prefix}${nodeid}:~/clairvoyant2/conf/edgeConfig.json
+  scp conf/scripts/tmp/download_source_info.json cvuser@${machine_prefix}${nodeid}:~/clairvoyant2/conf/
+
   rsync src/edge_go/edge_go cvuser@${machine_prefix}${nodeid}:~/clairvoyant2/src/edge_go/edge_go
 
   ssh ${machine_prefix}$i bash <<EOF

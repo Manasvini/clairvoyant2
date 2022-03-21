@@ -71,7 +71,7 @@ func getFilesInDir(dirName string, isBench2 bool) []string {
 }
 
 func writeLogs(filename string, records []string) {
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(filename, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		panic(err)
 	}
