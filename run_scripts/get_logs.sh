@@ -1,6 +1,11 @@
+cd ~
 rm -rf all_logs
 mkdir all_logs
+
 cp out.txt ./all_logs/out.txt
+cp out_err.txt ./all_logs/out_err.txt
+cp out_xp.txt ./all_logs/out_xp.txt
+cp out_xp_err.txt ./all_logs/out_xp_err.txt
 
 echo "Getting logs from cloud cv0"
 scp cvuser@cv0:~/clairvoyant2/src/clientrunner_go/clientrunner_go.INFO ./all_logs/clientrunner_go.INFO
@@ -18,4 +23,3 @@ do
     
     scp cvuser@cv$i:~/clairvoyant2/logs.edge.out ./all_logs/edge_go$i.out
 done
-
