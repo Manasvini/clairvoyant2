@@ -70,13 +70,13 @@ func getFilesInDir(dirName string, isBench2 bool) []string {
 	return fileNames
 }
 
-func writeLogs(filename string, records []string) {
-	f, err := os.OpenFile(filename, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		panic(err)
-	}
+func writeLogs(f *os.File, records []string) {
+	//f, err := os.OpenFile(filename, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+	//if err != nil {
+	//	panic(err)
+	//}
 	for _, record := range records {
-		_, err = f.WriteString(record + "\n")
+		_, err := f.WriteString(record + "\n")
 		if err != nil {
 			panic(err)
 		}
@@ -212,17 +212,24 @@ func main() {
 	offloadHeader := []string{"token,id,receivedBytesCloud,receivedBytesEdge"}
 	dlHeader := []string{"client,token,edgenode,timestamp,bytes"}
 	utilHeader := []string{"client,token,edgenode,usefulSegCount,uselessSegCount,usefulBytes"}
-	writeLogs(offloadFile, offloadHeader)
-	writeLogs(edgeDlFile, dlHeader)
-	writeLogs(edgeContactFile, dlHeader)
-	writeLogs(edgeUtilityFile, utilHeader)
+
+    offload_f, _ := os.OpenFile(offloadFile, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+    edge_f, _ := os.OpenFile(edgeDlFile, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+    contact_f, _ := os.OpenFile(edgeContactFile, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+    util_f, _ := os.OpenFile(edgeUtilityFile, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+
+    writeLogs(offload_f, offloadHeader)
+	writeLogs(edge_f, dlHeader)
+	writeLogs(contact_f, dlHeader)
+	writeLogs(util_f, utilHeader)
+
 
 	for _, c := range clients {
 		line := []string{c.PrintStats()}
-		writeLogs(offloadFile, line)
-		writeLogs(edgeDlFile, c.GetDlLogs())
-		writeLogs(edgeContactFile, c.GetContactLogs())
-		writeLogs(edgeUtilityFile, c.GetUtilLogs())
+		writeLogs(offload_f, line)
+		writeLogs(edge_f, c.GetDlLogs())
+		writeLogs(contact_f, c.GetContactLogs())
+		writeLogs(util_f, c.GetUtilLogs())
 		/*_, err = f.WriteString(line)
 		if err != nil {
 			panic(err)

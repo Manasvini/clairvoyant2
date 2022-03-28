@@ -296,9 +296,11 @@ func (metamgr *MetadataManager) processDownloads() {
                 source = CDNSRC
             }
             if !isSegmentLocal {
-				nodeSegMap[source] = append(nodeSegMap[source], idx)
-				metamgr.linkStateTracker.UpdateDownloads(int64(segment.SegmentSize), currentTime, source)
-				if !isSegmentLocal {
+                if source !=CDNSRC {
+				    nodeSegMap[source] = append(nodeSegMap[source], idx)
+				}
+                metamgr.linkStateTracker.UpdateDownloads(int64(segment.SegmentSize), currentTime, source)
+				if !isSegmentLocal && source != CDNSRC {
                     numEdge++
                 }
 			}
