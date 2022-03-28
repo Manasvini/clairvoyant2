@@ -115,7 +115,7 @@ def main():
     #example conf script in eval folder 10node_conf.json
     num_trials = conf['numTrials']
     start = time.time()
-    repopulate_db = 'no'
+    repopulate_db = 'yes'
     for i in range(num_trials):
         start_cloud(conf, repopulate_db)
         if repopulate_db == 'yes':
