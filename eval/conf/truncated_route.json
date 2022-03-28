@@ -13,5 +13,6 @@
 	"bench2":"yes",
     "templateEdgeCfg":"edgeConfig.json",    
     "edgeResultDir":"~/clairvoyant2/edge_results",
-    "truncationTime":500
+    "truncationTime":-1,
+	"numVideos":1
 }
