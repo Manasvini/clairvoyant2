@@ -8,7 +8,7 @@
 	"numUsers":1,
 	"edgeInfoFile":"input/microbenchmark/bench2/10nodes_1kusers.csv",
 	"outputDir":"~/clairvoyant2/results/bench2/cloud",
-	"trajectoriesDir":"../../eval/microbenchmark/bench2/users/10nodes/1user/",
+	"trajectoriesDir":"../../eval/microbenchmark/bench2/users/10nodes/1kusers/set1/overlapped_of2.5/",
 	"segmentFile":"~/clairvoyant2/eval/videos/bbb_900segs.csv",
 	"bench2":"yes",
     "templateEdgeCfg":"edgeConfig.json",    
