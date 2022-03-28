@@ -15,7 +15,7 @@ def start_cloud(conf, repopulate_db):
     numEdgeNodes = conf['numEdgeNodes']
     cloudConfig = conf['cloudConfig']
     edgePos = conf['edgePositions']
-    numVideos = conf["numUsers"] * 2 + 1
+    numVideos = conf['numVideos'] + 1
     segmentFile = conf['segmentFile']
     result = subprocess.run(['ssh', conf['cloudServerName'], \
                             'cd clairvoyant2 && bash run_scripts/start_cloud_services.sh ' +\
@@ -105,7 +105,7 @@ def update_configs(conf):
     dirname = filepath[0:filepath.find(filename)]
     print('cloud cfg is ', cloud_config, '\nclient runner cfg dir is', dirname, ' file is', filename) 
     os.chdir(owd)
-    result = subprocess.run(['bash', 'run_scripts/update-cloud-configs.sh', conf['cloudServerName'], cloud_config, filename, dirname])
+    result = subprocess.run(['bash', 'run_scripts/update-cloud-configs.sh', conf['cloudServerName'], cloud_config, filename, dirname, conf['machinePrefix']])
 
 
 def main():
