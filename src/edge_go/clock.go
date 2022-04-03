@@ -40,3 +40,18 @@ func (clock *Clock) GetTime()int64{
     clock.sync()
     return clock.timestamp
 }
+
+func (server *ClockEdgeServer) start() {
+	lis, err := net.Listen("tcp", server.address)
+	if err != nil {
+		glog.Fatalf("ContentServer failed to listen: %v", err)
+	}
+
+	//start grpc Content Server to listen from  to listen from cloud
+	go func() {
+		server.grpcServer = grpc.NewServer()
+		pb.RegisterContentServer(server.grpcServer, server)
+		glog.Infof("Starting ContentServer")
+		server.grpcServer.Serve(lis)
+	}()
+}

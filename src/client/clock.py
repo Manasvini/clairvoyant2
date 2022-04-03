@@ -1,6 +1,7 @@
 import logging
 import threading
 from concurrent import futures
+import json
 import asyncio
 import grpc
 import genprotos.clock_pb2 as clock_pb2
@@ -14,13 +15,17 @@ class ClockEndException(Exception):
     pass
 
 class CVClock(clock_pb2_grpc.ClockServerServicer):
-    def __init__(self, end_of_time, time_incr, is_thread=True):
+    def __init__(self, end_of_time, time_incr, cloud_config, is_thread=True):
         self.end_of_time = end_of_time
         self.time_incr = time_incr
         self.cur_time = 0
         self.server = None
         self.addr = "0.0.0.0:8383"
         self.is_thread = is_thread
+
+        self.cloud_config = {}
+        with open(cloud_config) as fh:
+            self.configDict = json.load(fh)
         
         if is_thread:
           self.ClockServerThread = threading.Thread(target=self.server_thread, daemon=True)
@@ -72,6 +77,16 @@ class CVClock(clock_pb2_grpc.ClockServerServicer):
 
     def advance(self):
         self.cur_time += self.time_incr
+
+        logger.info(f"advancing clock server to {self.cur_time}")
+
+        self.advanceEdges()
+        
         if self.cur_time == self.end_of_time:
             raise ClockEndException
         return self.cur_time
+
+    def advanceEdges(self):
+        for edge_node in self.cloud_config['edgeNodes']:
+            logger.info(f"advancing clock to {self.cur_time} for {edge_node["id"]} on {edge_node["ip"]}")
+        pass
