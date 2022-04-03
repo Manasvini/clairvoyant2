@@ -1,20 +1,22 @@
 package main
+
 import (
 	"context"
-    "time"
+	"time"
+
 	"github.com/golang/glog"
 	pb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
 	"google.golang.org/grpc"
 )
 
 type Clock struct {
-    timestamp   int64
-    nodeId      string
-    serverAddr  string
+	timestamp  int64
+	nodeId     string
+	serverAddr string
 }
 
-func NewClock(nodeId string, serverAddr string) *Clock{
-    return &Clock{timestamp:0, nodeId:nodeId, serverAddr:serverAddr}
+func NewClock(nodeId string, serverAddr string) *Clock {
+	return &Clock{timestamp: 0, nodeId: nodeId, serverAddr: serverAddr}
 }
 
 func (clock *Clock) sync() {
@@ -36,22 +38,7 @@ func (clock *Clock) sync() {
 	}
 }
 
-func (clock *Clock) GetTime()int64{
-    clock.sync()
-    return clock.timestamp
-}
-
-func (server *ClockEdgeServer) start() {
-	lis, err := net.Listen("tcp", server.address)
-	if err != nil {
-		glog.Fatalf("ContentServer failed to listen: %v", err)
-	}
-
-	//start grpc Content Server to listen from  to listen from cloud
-	go func() {
-		server.grpcServer = grpc.NewServer()
-		pb.RegisterContentServer(server.grpcServer, server)
-		glog.Infof("Starting ContentServer")
-		server.grpcServer.Serve(lis)
-	}()
+func (clock *Clock) GetTime() int64 {
+	clock.sync()
+	return clock.timestamp
 }
