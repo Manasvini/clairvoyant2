@@ -25,7 +25,7 @@ class CVClock(clock_pb2_grpc.ClockServerServicer):
 
         self.cloud_config = {}
         with open(cloud_config) as fh:
-            self.configDict = json.load(fh)
+            self.config_dict = json.load(fh)
         
         if is_thread:
           self.ClockServerThread = threading.Thread(target=self.server_thread, daemon=True)
@@ -87,6 +87,6 @@ class CVClock(clock_pb2_grpc.ClockServerServicer):
         return self.cur_time
 
     def advanceEdges(self):
-        for edge_node in self.cloud_config['edgeNodes']:
+        for edge_node in self.config_dict['edgeNodes']:
             logger.info(f"advancing clock to {self.cur_time} for {edge_node["id"]} on {edge_node["ip"]}")
         pass
