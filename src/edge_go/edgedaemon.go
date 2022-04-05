@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
+	"net"
+
 	"github.com/golang/glog"
 	pb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
 	"google.golang.org/grpc"
-	"net"
 )
 
 type EdgeServer struct {
@@ -14,6 +15,15 @@ type EdgeServer struct {
 	address    string
 	grpcServer *grpc.Server
 	metamgr    *MetadataManager
+}
+
+func (server *EdgeServer) HandleUpdateClock(ctx context.Context,
+	req *pb.ClockUpdateRequest) (*pb.ClockUpdateReply, error) {
+	glog.Infof("update clock request, new time = %d", req.NewClock)
+
+	oldClock := server.metamgr.clock.UpdateTime(req.NewClock)
+
+	return &pb.ClockUpdateReply{OldClock: oldClock}, nil
 }
 
 func (server *EdgeServer) HandleDownloadRequest(ctx context.Context,

@@ -42,3 +42,9 @@ func (clock *Clock) GetTime() int64 {
 	clock.sync()
 	return clock.timestamp
 }
+
+func (clock *Clock) UpdateTime(newTime int64) int64 {
+	oldTime := clock.timestamp
+	clock.timestamp = newTime
+	return oldTime
+}
