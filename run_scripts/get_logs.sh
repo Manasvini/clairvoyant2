@@ -14,6 +14,7 @@ scp cvuser@cv0:~/clairvoyant2/src/clientrunner_go/clientrunner_go.ERROR ./all_lo
 
 echo "Getting cloud logs from cv0"
 scp cvuser@cv0:~/clairvoyant2/logs/cloud.log ./all_logs/cloud.log
+scp cvuser@cv0:~/clairvoyant2/logs/clock.log ./all_logs/clock.log
 
 
 for i in {1..10};

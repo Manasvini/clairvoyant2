@@ -4,8 +4,6 @@ rm -rf all_logs/
 rm -rf results_dir/
 rm out.txt
 rm out_err.txt
-rm out_xp.txt
-rm out_xp_err.txt
 
 echo "deleted logs"
 
