@@ -13,4 +13,6 @@ do
     ssh cv$i rm /home/cvuser/clairvoyant2/src/edge_go/edge_go.WARNING
     ssh cv$i rm /home/cvuser/clairvoyant2/src/edge_go/edge_go.ERROR
     ssh cv$i rm /home/cvuser/clairvoyant2/src/edge_go/edge_go.FATAL
+    ssh cv$i rm -rf /home/cvuser/clairvoyant2/edge_results
+    ssh cv$i mkdir /home/cvuser/clairvoyant2/edge_results
 done
