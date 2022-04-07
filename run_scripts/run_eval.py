@@ -118,13 +118,15 @@ def main():
     repopulate_db = 'yes'
     for i in range(num_trials):
         start_cloud(conf, repopulate_db)
-        if repopulate_db == 'yes':
-            repopulate_db = 'no'
+        #if repopulate_db == 'yes':
+        #    repopulate_db = 'no'
         start_edge(conf)
-        time.sleep(10)
+        time.sleep(60)
         start_clients(conf)
         stop_edge(conf)
+        time.sleep(30)
         gather_results(conf, resultDir)
+        time.sleep(60)
     end = time.time()
     print(num_trials, " trials took ", (end-start), " seconds")
 if __name__=='__main__':

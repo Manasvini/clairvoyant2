@@ -44,7 +44,7 @@ func (server *ContentServer) canMakeContact(routeId, start, end int64) bool {
 func (server *ContentServer) GetSegment(ctx context.Context, req *pb.SegmentRequest) (*pb.SegmentResponse, error) {
 	response := &pb.SegmentResponse{}
 	response.Status = "Success"
-	//glog.Infof("Got segment request for route %d", req.RouteId)
+	glog.Infof("Got segment %s request for route %d",req.SegmentId, req.RouteId)
 	if req.Remove {
 		//this is a disconnect request
 		server.mu.Lock()
@@ -69,7 +69,8 @@ func (server *ContentServer) GetSegment(ctx context.Context, req *pb.SegmentRequ
             segment := segmentMeta.segmentId
 			response.Status = "segment found"
 			response.Segments = append(response.Segments, segment)
-		} else {
+		    glog.Infof("Found segment%s", req.SegmentId)
+        } else {
 			response.Status = "segment not found"
 		}
 		//hasSegment := server.metamgr.SegmentCache.HasSegment(req.SegmentId)

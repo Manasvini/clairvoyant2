@@ -109,7 +109,7 @@ func (cache *SegmentCache) curRealTS() int64 {
 
 // remove a segment id from the evictable set if it exists in that set.
 // basically performs a "policy touch"
-func (cache *SegmentCache) updateEvictable(segmentId string) {
+func (cache *SegmentCache) updateEvictable(segmentId string) bool {
 	//idx := cache.segmentRouteMap[segmentId].evictListIdx
 	idx := -1
 	for i, v := range cache.evictable {
@@ -118,10 +118,13 @@ func (cache *SegmentCache) updateEvictable(segmentId string) {
 			break
 		}
 	}
+    glog.Infof("Segment %s found in evicatble at pos %d", segmentId, idx)
 	if idx != -1 {
 		cache.evictable = append(cache.evictable[:idx], cache.evictable[idx+1:]...)
-	}
-	cache.promoteCount += 1
+	    cache.promoteCount += 1
+        return true
+    }
+    return false
 }
 
 // cache pop based on policy. removes a complete segment
@@ -135,7 +138,7 @@ func (cache *SegmentCache) pop() (string, error) {
 	cache.currentSize -= cache.segmentRouteMap[segId].segSize
 	cache.evictableSize -= cache.segmentRouteMap[segId].segSize
     cache.evictCount += 1
-	glog.Infof("deleting segment %s, total evictions = %d", segId, cache.evictCount)
+	glog.Infof("deleting segment %s, total evictions = %d currentsize=%d evictable size =%d", segId, cache.evictCount, cache.currentSize, cache.evictableSize)
 
 	delete(cache.segmentRouteMap, segId)
 	cache.evictable = cache.evictable[1:]
@@ -204,7 +207,6 @@ func (cache *SegmentCache) addToEvictable(curSeg *SegmentMetadata) {
 			segTs := cache.segmentRouteMap[segId].timestamp
 			if curSeg.timestamp < segTs {
 				idx = i
-                cache.evictableSize += cache.segmentRouteMap[segId].segSize
 				break
 			}
 		}
@@ -212,22 +214,22 @@ func (cache *SegmentCache) addToEvictable(curSeg *SegmentMetadata) {
 		curSeg.evictListIdx = idx
 		// simply do an insert
 		cache.evictable = insert(cache.evictable, idx, curSeg.segmentId)
-
+        cache.evictableSize += curSeg.segSize
 		cache.addEvent(curSeg.segmentId, -1, EvictableEvent)
 	case LFU:
 		var idx int
 		for i, segId := range cache.evictable {
 			if curSeg.popularity < cache.segmentRouteMap[segId].popularity {
 				idx = i
-				cache.evictableSize += cache.segmentRouteMap[segId].segSize
                 break
 			}
 		}
 		curSeg.evictListIdx = idx
 		cache.evictable = insert(cache.evictable, idx, curSeg.segmentId)
-
+        cache.evictableSize += curSeg.segSize
 		cache.addEvent(curSeg.segmentId, -1, EvictableEvent)
 	}
+    glog.Infof("current size=%d evictable size =%d", cache.currentSize, cache.evictableSize)
 }
 
 /*package external functions*/
@@ -268,7 +270,6 @@ func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]st
 	if evictedIds, isFull = cache.isSegmentCacheFull(int64(segment.SegmentSize)); isFull {
 		return nil, errors.New("SegmentCache is full")
 	}
-
 	// add to cache now
 	// first case when segment id is not present
 	if _, ok := cache.segmentRouteMap[segment.SegmentId]; !ok {
@@ -285,13 +286,16 @@ func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]st
 		cache.segmentRouteMap[segment.SegmentId].routeIdSet[routeId] = true
 		cache.segmentRouteMap[segment.SegmentId].popularity += 1
 		//remove from evictable if we need to
-		cache.updateEvictable(segment.SegmentId)
-        cache.evictableSize -= int64(segment.SegmentSize)
-		cache.addEvent(segment.SegmentId, routeId, TouchEvent)
+		promoted := cache.updateEvictable(segment.SegmentId)
+        if promoted {
+            glog.Infof("segement %s was in evictable list, now promoted", segment.SegmentId)
+            cache.evictableSize -= int64(segment.SegmentSize)
+		}
+        cache.addEvent(segment.SegmentId, routeId, TouchEvent)
 	}
 	// update the segment map with the "touched" timestamp
 	cache.segmentRouteMap[segment.SegmentId].timestamp = cache.curTS()
-
+    glog.Infof("cache current size = %d evictable=%d", cache.currentSize, cache.evictableSize)
 	for _, evictedId := range evictedIds {
 		cache.addEvent(evictedId, -1, PopEvent)
 	}
@@ -324,5 +328,6 @@ func (cache *SegmentCache) GetAvailableFreeSpace() int64{
     //total size : cache.size
     //occupied, unavailable: cache.currentSize
     //occupied, available: cache.evictableSize
+    glog.Infof("current size=%d evictable=%d", cache.currentSize,cache.evictableSize)
     return (cache.size - cache.currentSize) + cache.evictableSize
 }

@@ -105,7 +105,7 @@ func (mclient *MonitoringClient) sendHTTP() {
 	resp, err := http.Post(fmt.Sprintf("%s/post", mclient.url),
 		"application/json", responseBody)
 	if err != nil {
-		glog.Fatalf("Unable to Post %v", err)
+		glog.Errorf("Unable to Post %v", err)
 	}
 	defer resp.Body.Close()
 	//glog.Infof("status=%d", resp.StatusCode)
