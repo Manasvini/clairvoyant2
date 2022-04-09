@@ -6,6 +6,8 @@ import asyncio
 import grpc
 import genprotos.clock_pb2 as clock_pb2
 import genprotos.clock_pb2_grpc as clock_pb2_grpc
+import genprotos.clairvoyant_pb2 as clairvoyant_pb2
+import genprotos.clairvoyant_pb2_grpc as clairvoyant_pb2_grpc
 
 client_logger = logging.getLogger("client")
 logger = client_logger.getChild("clock")
@@ -89,5 +91,13 @@ class CVClock(clock_pb2_grpc.ClockServerServicer):
 
     def advanceEdges(self):
         for edge_node in self.cloud_config_dict["edgeNodes"]:
-            logger.info("advancing clock to " + str(self.cur_time) + " for " + str(edge_node["id"]) + " on " + str(edge_node["ip"]))
+            address = str(edge_node["ip"]) + ":" + str(edge_node["contentServer"])
+            with grpc.insecure_channel(address) as channel:
+                stub = clairvoyant_pb2_grpc.EdgeServerStub(channel)
+                request = clairvoyant_pb2.ClockUpdateRequest()
+                request.newClock = self.cur_time
+
+                response = stub.HandleDownloadRequest(request)
+                
+                logger.info("advancing clock " + str(self.cur_time) + "->" + str(response.oldClock) + " for " + str(edge_node["id"]) + " on " + address)
         return

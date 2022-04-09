@@ -39,7 +39,7 @@ func (clock *Clock) sync() {
 }
 
 func (clock *Clock) GetTime() int64 {
-	clock.sync()
+	//clock.sync()
 	return clock.timestamp
 }
 

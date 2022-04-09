@@ -314,6 +314,8 @@ func (metamgr *MetadataManager) processDownloads() {
 	var edgeAggDownload, cloudAggDownload, localAggDownload int64
 	var edgeSegCount, cloudSegCount, localSegCount int32
 
+	count := 0
+
 	// read from the publisher queue
 	for _ = range metamgr.downloadReqChannel {
 		priorityQueueItem := heap.Pop(&metamgr.downloadRequests).(*PriorityQueueItem)
@@ -323,11 +325,17 @@ func (metamgr *MetadataManager) processDownloads() {
 		if priorityQueueItem.priority > currentTime {
 			metamgr.downloadReqChannel <- DUMMY
 			heap.Push(&metamgr.downloadRequests, priorityQueueItem)
-			glog.Infof("[procastinate][routeid=%d][current=%d][expected=%d][ignore]", request.TokenId, currentTime, priorityQueueItem.priority)
-			continue
+			count = count + 1
+
+			if count >= 100 {
+				glog.Infof("[procastinate][routeid=%d][current=%d][expected=%d][ignore=%d]", request.TokenId, currentTime, priorityQueueItem.priority, count)
+				count = 0
+				continue
+			}
 		}
 
 		glog.Infof("[procastinate][routeid=%d][current=%d][expected=%d][consider]", request.TokenId, currentTime, priorityQueueItem.priority)
+		count = 0
 
 		nodeSegMap := map[string][]int{} //map from node_src_ip -> seg_idx list
 		numEdge := 0
