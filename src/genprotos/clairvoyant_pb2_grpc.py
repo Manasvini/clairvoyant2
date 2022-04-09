@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from . import clairvoyant_pb2 as clairvoyant__pb2
+import clairvoyant_pb2 as clairvoyant__pb2
 
 
 class MonitoringServerStub(object):
@@ -141,12 +141,23 @@ class EdgeServerStub(object):
                 request_serializer=clairvoyant__pb2.DownloadRequest.SerializeToString,
                 response_deserializer=clairvoyant__pb2.DownloadReply.FromString,
                 )
+        self.HandleUpdateClock = channel.unary_unary(
+                '/clairvoyant.EdgeServer/HandleUpdateClock',
+                request_serializer=clairvoyant__pb2.ClockUpdateRequest.SerializeToString,
+                response_deserializer=clairvoyant__pb2.ClockUpdateReply.FromString,
+                )
 
 
 class EdgeServerServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def HandleDownloadRequest(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def HandleUpdateClock(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -159,6 +170,11 @@ def add_EdgeServerServicer_to_server(servicer, server):
                     servicer.HandleDownloadRequest,
                     request_deserializer=clairvoyant__pb2.DownloadRequest.FromString,
                     response_serializer=clairvoyant__pb2.DownloadReply.SerializeToString,
+            ),
+            'HandleUpdateClock': grpc.unary_unary_rpc_method_handler(
+                    servicer.HandleUpdateClock,
+                    request_deserializer=clairvoyant__pb2.ClockUpdateRequest.FromString,
+                    response_serializer=clairvoyant__pb2.ClockUpdateReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -184,5 +200,22 @@ class EdgeServer(object):
         return grpc.experimental.unary_unary(request, target, '/clairvoyant.EdgeServer/HandleDownloadRequest',
             clairvoyant__pb2.DownloadRequest.SerializeToString,
             clairvoyant__pb2.DownloadReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def HandleUpdateClock(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/clairvoyant.EdgeServer/HandleUpdateClock',
+            clairvoyant__pb2.ClockUpdateRequest.SerializeToString,
+            clairvoyant__pb2.ClockUpdateReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
