@@ -9,11 +9,11 @@
     "serverAddress": "192.168.160.42:60050",
     "downloadSourceFile": "../../conf/download_source_info.json",
     "monServerAddress": "192.168.160.42:8192",
-    "monInterval": 15,
+    "monInterval": 60,
     "contentServerAddress": "0.0.0.0:8000",
     "contentServerMaxClients": 2,
     "edgeServerAddress": "0.0.0.0:50056",
-    "cacheSize": 100000000000,
+    "cacheSize": 120000000000,
     "cacheType": "lru",
     "clockServerAddr": "192.168.160.42:8383"
 }

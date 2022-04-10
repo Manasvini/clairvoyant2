@@ -2,7 +2,7 @@ import json
 import os
 import subprocess
 import sys
-CACHE_SIZES = [ 100]
+CACHE_SIZES = [10, 20, 40, 60, 80, 100,  120]
 CACHE_POLICIES = ['lru']
 NUM_USERS = ['1kusers']
 PREFETCH_POLICIES = ['all2all']
