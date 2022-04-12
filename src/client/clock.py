@@ -91,7 +91,7 @@ class CVClock(clock_pb2_grpc.ClockServerServicer):
 
     def advanceEdges(self):
         for edge_node in self.cloud_config_dict["edgeNodes"]:
-            address = str(edge_node["ip"]) + ":" + str(edge_node["contentServer"])
+            address = str(edge_node["ip"]) + ":" + str(edge_node["edgeDaemon"])
             with grpc.insecure_channel(address) as channel:
                 stub = clairvoyant_pb2_grpc.EdgeServerStub(channel)
                 request = clairvoyant_pb2.ClockUpdateRequest()
