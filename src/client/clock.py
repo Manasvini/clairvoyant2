@@ -97,7 +97,7 @@ class CVClock(clock_pb2_grpc.ClockServerServicer):
                 request = clairvoyant_pb2.ClockUpdateRequest()
                 request.newClock = self.cur_time
 
-                response = stub.HandleDownloadRequest(request)
+                response = stub.HandleUpdateClock(request)
                 
                 logger.info("advancing clock " + str(self.cur_time) + "->" + str(response.oldClock) + " for " + str(edge_node["id"]) + " on " + address)
         return
