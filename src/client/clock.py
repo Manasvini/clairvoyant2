@@ -99,5 +99,6 @@ class CVClock(clock_pb2_grpc.ClockServerServicer):
 
                 response = stub.HandleUpdateClock(request)
                 
-                logger.info("advancing clock " + str(self.cur_time) + "->" + str(response.oldClock) + " for " + str(edge_node["id"]) + " on " + address)
+                logger.info(response)
+                logger.info("advancing clock " + str(response.oldClock) + "->"  + str(self.cur_time) + " for " + str(edge_node["id"]) + " on " + address)
         return
