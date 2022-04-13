@@ -95,7 +95,8 @@ func main() {
 	videoFile := flag.String("f", "./input/bbb.csv", "video segments file")
 	ofilename := flag.String("o", "output.txt", "output file name")
 	bench2 := flag.String("b", "no", "benchmark 2(yes/no)")
-	flag.Parse()
+	dist := flag.String("r", "zipf", "distribution(Zipf/random)")
+    flag.Parse()
 	fmt.Printf("Making flags, num users = %d traj dir = %s, server addr = %s, edge nodes file = %s, numVideos = %d, videoFile = %s\n", *numUsers, *trajectoryDir, *serverAddr, *edgeNodesFile, *numVideos, *videoFile)
 	//edgeNodes := cvclient.EdgeNodes{}
 	//edgeNodes.LoadFromFile(*edgeNodesFile)
@@ -135,10 +136,14 @@ func main() {
 		trajectory := cvclient.Trajectory{}
 		trajectory.LoadFromFile(f)
 		video := cvclient.Video{}
-
+        videoId := "v0"
+        if *dist == "zipf" {
 		//videoId := "v" + strconv.Itoa(rand.Intn(*numVideos - 2) + 2)
-		videoId := "v" + strconv.Itoa(int(zipf.Uint64()+2))
-		fmt.Println(videoId)
+		    videoId = "v" + strconv.Itoa(int(zipf.Uint64()+2))
+		} else {
+            videoId = "v" + strconv.Itoa(rand.Intn(*numVideos - 2) + 2)
+        }
+        fmt.Println(videoId)
         video.LoadFromFile(*videoFile, videoId)
 		glog.Infof("file = %s video is %s\n", f, videoId)
 		//"../../eval/enode_positions/17min_user0/user0_17min.csv")

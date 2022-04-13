@@ -34,6 +34,7 @@ type HistoryRecord struct {
     timestamp     int64
     routeId       int64
     dlSrc         string
+    segmentSize   int64
 }
 
 type MetadataManager struct {
@@ -271,9 +272,9 @@ func (metamgr *MetadataManager) Close() {
     glog.Info(err)
     defer f2.Close()
     glog.Infof("Writing %d dl records", len(metamgr.dlHistory))
-    f2.WriteString("segmentId,routeId,timestamp,source\n")
+    f2.WriteString("segmentId,segmentSize,routeId,timestamp,source\n")
 	for _, rec := range metamgr.dlHistory{
-        _, err = f2.WriteString(fmt.Sprintf("%s,%d,%d,%s\n",rec.segmentId, rec.routeId, rec.timestamp,rec.dlSrc))
+        _, err = f2.WriteString(fmt.Sprintf("%s,%d,%d,%d,%s\n",rec.segmentId, rec.segmentSize, rec.routeId, rec.timestamp,rec.dlSrc))
         if err != nil{
 
             panic(err)
@@ -323,7 +324,7 @@ func (metamgr *MetadataManager) processDownloads() {
                 localSegments[segmentId] = int64(segment.SegmentSize)
                 numLocal++
             } else {
-                historyRec := HistoryRecord{timestamp:currentTime, segmentId: segmentId, routeId: request.TokenId, dlSrc:source}
+                historyRec := HistoryRecord{timestamp:currentTime, segmentId: segmentId, routeId: request.TokenId, dlSrc:"local", segmentSize:int64(segment.SegmentSize)}
                 metamgr.dlHistory = append(metamgr.dlHistory, historyRec)
 
             }

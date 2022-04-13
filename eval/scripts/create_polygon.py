@@ -10,6 +10,11 @@ import random
 from scipy import interpolate
 import itertools
 
+def get_num_users_to_start(mean):
+    num_users = np.random.poisson(lam=mean)
+    return num_users
+
+
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument('-n', '--numedgenodes', type=int, default=1, help='Number of edge nodes')# 10
@@ -21,6 +26,7 @@ def parse_args():
     parser.add_argument('-i', '--timeincr', required=True, type=float, help='time step size') # 1
     parser.add_argument('-s', '--speed', required=True, type=float, help='speed in m/s') # 15
     parser.add_argument('-e', '--edge', required=True, type=float, help='polygon edge') # 3272
+    parser.add_argument('-p', '--poisson', required=False, type=float, help='model poisson arrival') # 3272
     args = parser.parse_args()
 
     return args
@@ -99,17 +105,35 @@ def create_polygon(numNodes, maxDist, lat, lon, outFile):
     df.to_csv(outFile, index=False)
     return points
 
+def do_non_overlapping(numusers, numedge, speed, edge_nodes, time_incr, cur_time):
+    for i in range(numusers):
+        cur_time = create_trajectory(numedge, speed, edge_nodes, time_incr, 'user' + str(i) + '.csv', 'user' + str(i),  cur_time)
 
+
+def do_poisson(numusers, numedge, speed, edge_nodes, time_incr, cur_time, poisson_mean):
+    user_ctr = 0
+    while user_ctr < numusers:
+        num_users_to_create = get_num_users_to_start(poisson_mean)
+        print('time = ', cur_time, 'num users to create=', num_users_to_create)
+        for i in range(user_ctr, user_ctr + num_users_to_create, 1):
+            create_trajectory(numedge, speed, edge_nodes, time_incr, 'user' + str(i) + '.csv', 'user'+str(i), cur_time)
+        user_ctr += num_users_to_create
+        cur_time += 1
+       
 if __name__ == '__main__':
     args = parse_args()
     edge_nodes = create_polygon(args.numedgenodes, args.edge, args.lat, args.lon, args.outputfile)
     
     cur_time = 400
-    for i in range(args.numusers):
+    if not args.poisson:
+        do_non_overlapping(args.numusers, args.numedgenodes, args.speed, edge_nodes, args.timeincr, cur_time)
+    else:
+        do_poisson(args.numusers, args.numedgenodes, args.speed, edge_nodes, args.timeincr, cur_time, args.poisson)
+    #for i in range(args.numusers):
         #first = edge_nodes[i:]
         #last = []
         #if i > 0:
         #    last = edge_nodes[0:i]
         #print(len(first), len(last))
         #edge_nodes_list = first + last
-        cur_time = create_trajectory(args.numedgenodes, args.speed, edge_nodes, args.timeincr, 'user' + str(i) + '.csv', 'user' + str(i), cur_time)
+     #   cur_time = create_trajectory(args.numedgenodes, args.speed, edge_nodes, args.timeincr, 'user' + str(i) + '.csv', 'user' + str(i), cur_time)

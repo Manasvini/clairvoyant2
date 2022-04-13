@@ -4,22 +4,28 @@ import (
 	"context"
 	"net"
 	"sync"
-
+    "os"
 	"github.com/golang/glog"
 	//cvpb "github.gatech.edu/cs-epl/clairvoyant2/client_go/clairvoyant"
 	pb "github.gatech.edu/cs-epl/clairvoyant2/edge_go/contentserver"
 	"google.golang.org/grpc"
+    "fmt"
 )
-
+type UserDlRequest struct {
+    segmentId   string
+    routeId     int64
+}
 type ContentServer struct {
 	pb.UnimplementedContentServer
-	address    string
-	grpcServer *grpc.Server
-	metamgr    *MetadataManager
-
+	address       string
+	grpcServer    *grpc.Server
+	metamgr       *MetadataManager
+    userDlReqs    []UserDlRequest
 	maxClients     int
 	contactHistory map[int64][]int64
 	mu             sync.Mutex
+    nodeId         string
+    resultDir      string
 }
 
 func (server *ContentServer) canMakeContact(routeId, start, end int64) bool {
@@ -66,6 +72,10 @@ func (server *ContentServer) GetSegment(ctx context.Context, req *pb.SegmentRequ
 		// this is a segment request
 		segmentMeta, err := server.metamgr.GetSegment(req.SegmentId, req.RouteId, req.IsEdge)
 		if err == nil  && segmentMeta != nil {
+            if req.RouteId != -1 {
+                dlReq := UserDlRequest{segmentId: req.SegmentId, routeId:req.RouteId}
+                server.userDlReqs = append(server.userDlReqs, dlReq)
+            }
             segment := segmentMeta.segmentId
 			response.Status = "segment found"
 			response.Segments = append(response.Segments, segment)
@@ -100,4 +110,15 @@ func (server *ContentServer) start() {
 		glog.Infof("Starting ContentServer")
 		server.grpcServer.Serve(lis)
 	}()
+}
+
+func (server *ContentServer) Close() {
+    dlReqFile := server.resultDir + "/" + server.nodeId + "_userRequests.csv"
+    f, _ := os.Create(dlReqFile)
+    defer f.Close()
+    f.WriteString("route,segment\n")
+    for _, dlReq := range server.userDlReqs {
+        f.WriteString(fmt.Sprintf("%d,%s\n", dlReq.routeId , dlReq.segmentId))
+    }
+    f.Sync()
 }

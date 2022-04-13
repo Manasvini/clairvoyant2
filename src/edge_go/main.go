@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
+    "path/filepath"
 	"github.com/golang/glog"
 )
 
@@ -27,12 +27,18 @@ func startEdgeServer(config EdgeConfig, metamgr *MetadataManager) *EdgeServer {
 }
 
 func startContentServer(config EdgeConfig, metamgr *MetadataManager) *ContentServer {
-	cserver := &ContentServer{
+	homeDir, err := os.UserHomeDir()
+    if err != nil{
+        glog.Fatal(err)
+    }
+    resultDir := filepath.Join(homeDir, "clairvoyant2", "edge_results")
+    cserver := &ContentServer{
 		address:        config.ContentServerAddress,
 		metamgr:        metamgr,
 		maxClients:     config.ContentServerMaxClients,
 		contactHistory: make(map[int64][]int64),
-	}
+        nodeId:         config.NodeID,
+        resultDir:      resultDir}
 	cserver.start()
 	return cserver
 }
@@ -73,6 +79,7 @@ func initEdgeRoutines(configFile string) {
 	eserver.grpcServer.GracefulStop()
 	cserver.grpcServer.GracefulStop()
 	metamgr.Close()
+    cserver.Close()
 }
 
 func main() {
