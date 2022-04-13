@@ -141,7 +141,7 @@ func main() {
 		//videoId := "v" + strconv.Itoa(rand.Intn(*numVideos - 2) + 2)
 		    videoId = "v" + strconv.Itoa(int(zipf.Uint64()+2))
 		} else {
-            videoId = "v" + strconv.Itoa(rand.Intn(*numVideos - 2) + 2)
+            videoId = "v" + strconv.Itoa(rand.Intn(*numVideos ) + 2)
         }
         fmt.Println(videoId)
         video.LoadFromFile(*videoFile, videoId)
