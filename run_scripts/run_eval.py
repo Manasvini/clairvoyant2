@@ -79,9 +79,8 @@ def start_clients(conf):
                             ' -o ' + outputFile +\
                             ' -e ' + edgeInfo + \
                             ' -f ' + segmentFile +\
-                            ' -b ' + bench2], \
-                            shell=False,\
-                            check=False)
+                            ' -b ' + bench2 +\
+                            ' -r ' + conf['distribution']], shell=False,check=False)
     print('client success=', result.returncode)
 
 def update_configs(conf):
