@@ -6,4 +6,5 @@ python3 create_polygon.py --numedgenodes 10 \
                           --timeincr 1 \
                           --speed 15 \
                           --edge 3272 \
-                          --poisson 0.4
+                          --poisson 0.4 \
+                          --totaltime 4000
