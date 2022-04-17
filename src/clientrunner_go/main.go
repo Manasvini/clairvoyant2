@@ -33,7 +33,7 @@ func advanceClock() int64 {
 	}
 	defer conn.Close()
 	clockClient := pb.NewClockServerClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*6000)
 	defer cancel()
 	req := pb.AdvanceClock{}
 	resp, err := clockClient.HandleAdvanceClock(ctx, &req)
