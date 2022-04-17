@@ -187,7 +187,7 @@ func insert(a []string, index int, value string) []string {
 }
 
 func (cache *SegmentCache) addEvent(segmentId string, routeId int64, eventType int) {
-	glog.Infof("[extended_utilites][cache_event][%s,%d,%d,%d]\n", segmentId, routeId, eventType, cache.curRealTS())
+	glog.Infof("[extended_utilites][cache_event][%s,%d,%d,%d,%d]\n", segmentId, routeId, eventType, cache.curRealTS(), cache.GetAvailableFreeSpace())
 
 	cache.events = append(cache.events, Event{
 		segmentId: segmentId,
