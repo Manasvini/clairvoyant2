@@ -327,11 +327,12 @@ func (metamgr *MetadataManager) processDownloads() {
 			heap.Push(&metamgr.downloadRequests, priorityQueueItem)
 			count = count + 1
 
-			if count >= 100 {
+			if count >= 10000 {
 				glog.Infof("[procastinate][routeid=%d][current=%d][expected=%d][ignore=%d]", request.TokenId, currentTime, priorityQueueItem.priority, count)
 				count = 0
-				continue
 			}
+			
+			continue
 		}
 
 		glog.Infof("[procastinate][routeid=%d][current=%d][expected=%d][consider]", request.TokenId, currentTime, priorityQueueItem.priority)
