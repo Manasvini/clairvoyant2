@@ -60,5 +60,6 @@ mkdir -p logs
 
 #TODO: change this ip to be configurable via command line, better still use conf file
 rm src/clientrunner_go/clientrunner.*
+rm -rf results/bench2/cloud/*
 python3 src/cloud_runner.py -a 0.0.0.0:60050 -c $conf  > logs/cloud.log 2>&1 &
 python3 src/clock_runner.py -s 0 -i 1  > logs/clock.log 2>&1 &
