@@ -13,10 +13,9 @@ def _plot_all(all_times, all_sizes, plotname, plotfilename):
         plt.legend()
         plt.title(f"Sizes vs Time plot {plotname}")
         plt.xlabel('Time')
-        plt.ylabel('Size')
+        plt.ylabel('Size (MB)')
         plt.savefig(f"./{plotfilename}.png")
         plt.clf()
-
 
 def _get_time_size_map(entries):
     min_time = 0
@@ -92,5 +91,27 @@ def _parse_events(root_folder):
     return all_times, all_sizes
 
 def cache_size_plot(folder_name, plotname):
-    parsed_all_times, parsed_all_sizes = _parse_events(folder_name)
-    _plot_all(parsed_all_times, parsed_all_sizes, folder_name, plotname)
+    all_times, all_sizes = _parse_events(folder_name)
+    _plot_all(all_times, all_sizes, plotname, plotname)
+    return all_times, all_sizes
+
+def cumulative_plot(list_all_times, list_all_sizes, labels, figname):
+     with plt.style.context('ggplot'):
+        for i in range(len(list_all_sizes)):
+            all_times = list_all_times[i]
+            all_sizes = list_all_sizes[i]
+
+            cumulative_sizes = [0]*len(all_times[list(all_times.keys())[0]])
+
+            for key in all_times:
+                for j in range(len(all_sizes[key])):
+                    cumulative_sizes[j] += all_sizes[key][j]
+
+            plt.plot(all_times[list(all_times.keys())[i]], cumulative_sizes, label=labels[i])
+
+        plt.legend()
+        plt.title(f"Cumulative space usage across {figname}.")
+        plt.xlabel('Time')
+        plt.ylabel('Size (MB)')
+        plt.savefig(f"./cumulative.png")
+        plt.clf()
