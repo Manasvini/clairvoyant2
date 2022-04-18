@@ -54,6 +54,8 @@ type MetadataManager struct {
 	// 0 = no procastination, 1 = on user demand
 	procastinationProportion	float64
 
+	pqMutex			   sync.Mutex
+
 	linkStateTracker   *LinkStateTracker
 	clock              *Clock
 	evicted            []string
@@ -318,6 +320,8 @@ func (metamgr *MetadataManager) processDownloads() {
 
 	// read from the publisher queue
 	for _ = range metamgr.downloadReqChannel {
+
+		metamgr.pqMutex.Lock()
 		priorityQueueItem := heap.Pop(&metamgr.downloadRequests).(*PriorityQueueItem)
 		currentTime := metamgr.clock.GetTime()
 		request := priorityQueueItem.value.(pb.DownloadRequest)
@@ -325,6 +329,8 @@ func (metamgr *MetadataManager) processDownloads() {
 		if priorityQueueItem.priority > currentTime {
 			metamgr.downloadReqChannel <- DUMMY
 			heap.Push(&metamgr.downloadRequests, priorityQueueItem)
+			metamgr.pqMutex.Unlock()
+
 			count = count + 1
 
 			if count >= 10000 {
@@ -334,6 +340,8 @@ func (metamgr *MetadataManager) processDownloads() {
 			
 			continue
 		}
+
+		metamgr.pqMutex.Unlock()
 
 		glog.Infof("[procastinate][routeid=%d][current=%d][expected=%d][consider]", request.TokenId, currentTime, priorityQueueItem.priority)
 		count = 0
@@ -492,8 +500,11 @@ func (metamgr *MetadataManager) handleAddRoute() {
 		}
 		glog.Infof("[procastinate][routeid=%d][current=%d][to=%d][arrival=%d]", routeInfo.request.TokenId, currentTime, priority, nodeArrivalTime)
 
+		metamgr.pqMutex.Lock()
 		heap.Push(&metamgr.downloadRequests, priorityQueueItem)
 		metamgr.downloadReqChannel <- DUMMY
+		metamgr.pqMutex.Unlock()
+
 		glog.Infof("len_evicted=%d, len_committed=%d", len(metamgr.evicted), len(committedSegments))
 
 		routeInfo.doneChannel <- dlReply
