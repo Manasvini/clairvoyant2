@@ -81,8 +81,8 @@ def start_clients(conf):
                             ' -e ' + edgeInfo + \
                             ' -f ' + segmentFile +\
                             ' -b ' + bench2 +\
-                            ' -r ' + conf['distribution']
-                            ' -r ' + truncationTime], \
+                            ' -r ' + conf['distribution'] +\
+                            ' -tr ' + truncationTime], \
                             shell=False,\
                             check=False)
     print('client success=', result.returncode)
