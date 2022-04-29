@@ -14,5 +14,6 @@
     "templateEdgeCfg":"edgeConfig.json",    
     "edgeResultDir":"~/clairvoyant2/edge_results",
     "truncationTime":-1,
-	"numVideos":1
+	"numVideos":1,
+	"distribution":"random"
 }
