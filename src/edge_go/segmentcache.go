@@ -153,12 +153,8 @@ func (cache *SegmentCache) isSegmentCacheFull(excess int64) ([]string, bool) {
 		return nil, false
 	}
 
-	//check if evicted list size can support excess
-	var evictSize int64
-	for _, segId := range cache.evictable {
-		evictSize += cache.segmentRouteMap[segId].segSize
-	}
-	if (cache.currentSize - evictSize + excess) > cache.size {
+	// check if evicted list size can support excess
+	if (cache.currentSize - cache.evictableSize + excess) > cache.size {
 		return nil, true
 	}
 
@@ -177,13 +173,12 @@ func (cache *SegmentCache) isSegmentCacheFull(excess int64) ([]string, bool) {
 
 // array util to insert at random position
 func insert(a []string, index int, value string) []string {
-	if len(a) == index { // nil or empty slice or after last element
-		return append(a, value)
-	}
-	b := append(a[:index], value)
-	c := append(b, a[index+1:]...) // index < len(a)
-	c[index] = value
-	return c
+    if len(a) == index { // nil or empty slice or after last element
+        return append(a, value)
+    }
+    a = append(a[:index+1], a[index:]...) // index < len(a)
+    a[index] = value
+    return a
 }
 
 func (cache *SegmentCache) addEvent(segmentId string, routeId int64, eventType int) {
@@ -329,5 +324,5 @@ func (cache *SegmentCache) GetAvailableFreeSpace() int64{
     //occupied, unavailable: cache.currentSize
     //occupied, available: cache.evictableSize
     glog.Infof("current size=%d evictable=%d", cache.currentSize,cache.evictableSize)
-    return (cache.size - cache.currentSize) + cache.evictableSize
+    return cache.size - cache.currentSize + cache.evictableSize
 }
