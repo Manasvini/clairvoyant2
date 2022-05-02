@@ -35,7 +35,7 @@ class DownloadDispatcher:
             #print(response)
             if self.callback is not None:
                 self.callback(edge_node_id, response)
-            logging.info("Dl client received response for token %s: ", response.token_id)
+            logger.info("Dl client received response for token %s: ", response.token_id)
             return response
 
 #if __name__ == '__main__':
