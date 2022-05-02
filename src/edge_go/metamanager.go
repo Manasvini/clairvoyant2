@@ -320,16 +320,12 @@ func (metamgr *MetadataManager) processDownloads() {
 
 	// read from the publisher queue
 	for _ = range metamgr.downloadReqChannel {
-
-		metamgr.pqMutex.Lock()
-		priorityQueueItem := heap.Pop(&metamgr.downloadRequests).(*PriorityQueueItem)
+		priorityQueueItem := metamgr.downloadRequests.Top().(*PriorityQueueItem)
 		currentTime := metamgr.clock.GetTime()
 		request := priorityQueueItem.value.(pb.DownloadRequest)
 
 		if priorityQueueItem.priority > currentTime {
 			metamgr.downloadReqChannel <- DUMMY
-			heap.Push(&metamgr.downloadRequests, priorityQueueItem)
-			metamgr.pqMutex.Unlock()
 
 			count = count + 1
 
@@ -341,6 +337,8 @@ func (metamgr *MetadataManager) processDownloads() {
 			continue
 		}
 
+		metamgr.pqMutex.Lock()
+		priorityQueueItem = heap.Pop(&metamgr.downloadRequests).(*PriorityQueueItem)
 		metamgr.pqMutex.Unlock()
 
 		glog.Infof("[procastinate][routeid=%d][current=%d][expected=%d][consider]", request.TokenId, currentTime, priorityQueueItem.priority)
