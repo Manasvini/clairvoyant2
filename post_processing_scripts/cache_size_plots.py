@@ -14,7 +14,7 @@ def _plot_all(all_times, all_sizes, plotname, plotfilename):
         plt.title(f"Sizes vs Time plot {plotname}")
         plt.xlabel('Time')
         plt.ylabel('Size (MB)')
-        plt.savefig(f"./{plotfilename}.png")
+        plt.savefig(f"./plots/{plotfilename}_cache.png")
         plt.clf()
 
 def _get_time_size_map(entries):
@@ -71,7 +71,7 @@ def _parse_events(root_folder):
     system_max_time = 0
 
     for key in cache_events:
-        print(f"processing {key}")
+        print(f"processing for cache size plots {key}")
 
         if len(cache_events[key]) == 0:
             continue
@@ -113,5 +113,5 @@ def cumulative_plot(list_all_times, list_all_sizes, labels, figname):
         plt.title(f"Cumulative space usage across {figname}.")
         plt.xlabel('Time')
         plt.ylabel('Size (MB)')
-        plt.savefig(f"./cumulative.png")
+        plt.savefig(f"./plots/cumulative.png")
         plt.clf()

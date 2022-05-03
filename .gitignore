@@ -21,3 +21,6 @@ src/clientrunner_go/input/tmp
 src/clientrunner_go/input/scale/tmp
 src/clientrunner_go/input/microbenchmark/bench2/tmp
 *.png
+plots/*
+*.csv
+*.pkl
