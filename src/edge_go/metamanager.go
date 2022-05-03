@@ -81,8 +81,8 @@ func newMetadataManager(size int64, cachetype string, nodeId string, clock *Cloc
 		metamgr.SegmentCache = NewSegmentCache(size, "lfu", clock)
 	}
     metamgr.pendingDlSize = 0
-	metamgr.routeAddChannel = make(chan RouteInfo, 10)             //can accept at most 10 simultaneous routeAdd requests
-	metamgr.downloadReqChannel = make(chan int32, 10) //can accept at most 10 simultaneous requests
+	metamgr.routeAddChannel = make(chan RouteInfo, 1000)             //can accept at most 10 simultaneous routeAdd requests
+	metamgr.downloadReqChannel = make(chan int32, 1000) //can accept at most 10 simultaneous requests
 	metamgr.downloadRequests = make(PriorityQueue, 0)
 	heap.Init(&metamgr.downloadRequests)
 
