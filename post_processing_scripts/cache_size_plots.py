@@ -1,6 +1,11 @@
 from os import system
 import sys
+
+import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_style('darkgrid')
 
 from edge_logs_parser import parse_logs, get_edge_number
 
@@ -115,3 +120,38 @@ def cumulative_plot(list_all_times, list_all_sizes, labels, figname):
         plt.ylabel('Size (MB)')
         plt.savefig(f"./plots/cumulative.png")
         plt.clf()
+
+def stats_plot(stats, all_sizes, folders):
+    statsdf = pd.DataFrame.from_records(
+        [
+            (l1, l2, l3d['Max Cache Size'], l3d['Mean Cache Size'])
+            for l1, l2d in stats.items()
+            for l2, l3d in l2d.items()
+        ], 
+        columns=["Run", "Edge Node", "Max Cache Size", "Mean Cache Size"]
+    )
+
+    plt.figure(figsize=(14,6))
+    sns.barplot(x='Edge Node', y='Max Cache Size', hue='Run', data=statsdf)
+    plt.savefig(f"./plots/max_cache.png")
+    plt.clf()
+
+    plt.figure(figsize=(14,6))
+    sns.barplot(x='Edge Node', y='Mean Cache Size', hue='Run', data=statsdf)
+    plt.savefig(f"./plots/min_cache.png")
+    plt.clf()
+
+    newstatsdf = pd.DataFrame.from_records(
+        [
+            (folders[i], get_edge_number(l2), j, val)
+            for i in range(len(folders))
+            for l2, l3l in all_sizes[i].items()
+            for j, val in enumerate(l3l)
+        ], 
+        columns=["Run", "Edge Node", "Index", "Size"]
+    )   
+
+    plt.figure(figsize=(18,8))
+    sns.boxplot(x='Edge Node', y='Size', hue='Run', data=newstatsdf)
+    plt.savefig(f"./plots/cumulative_barplot.png")
+    plt.clf()

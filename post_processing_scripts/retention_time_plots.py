@@ -56,7 +56,7 @@ def plot_retention_metrics(root_folder, filename):
     retentiondf = pd.DataFrame.from_dict(retention, orient='index')
     accessesdf = pd.DataFrame.from_dict(accesses, orient='index')
 
-    sns.boxplot(data=retentiondf.T)
+    sns.boxplot(data=retentiondf.T, order=range(1, 11))
     plt.xlabel("Edge node")
     plt.ylabel("Retention time (s)")
     plt.title(f"Retention time per node for {filename}")
