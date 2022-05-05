@@ -316,7 +316,7 @@ func (metamgr *MetadataManager) processDownloads() {
 	var edgeAggDownload, cloudAggDownload, localAggDownload int64
 	var edgeSegCount, cloudSegCount, localSegCount int32
 
-	count := 0
+	// count := 0
 
 	// read from the publisher queue
 	for _ = range metamgr.downloadReqChannel {
