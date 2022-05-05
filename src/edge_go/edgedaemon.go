@@ -19,11 +19,11 @@ type EdgeServer struct {
 
 func (server *EdgeServer) HandleUpdateClock(ctx context.Context,
 	req *pb.ClockUpdateRequest) (*pb.ClockUpdateReply, error) {
-	glog.Infof("update clock request start, new time = %d", req.NewClock)
+	// glog.Infof("update clock request start, new time = %d", req.NewClock)
 
 	oldClock := server.metamgr.clock.UpdateTime(req.NewClock)
 
-	glog.Infof("update clock request complete, old time = %d,new time = %d", oldClock, req.NewClock)
+	// glog.Infof("update clock request complete, old time = %d,new time = %d", oldClock, req.NewClock)
 
 	return &pb.ClockUpdateReply{OldClock: oldClock}, nil
 }

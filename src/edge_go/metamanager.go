@@ -327,12 +327,12 @@ func (metamgr *MetadataManager) processDownloads() {
 		if priorityQueueItem.priority > currentTime {
 			metamgr.downloadReqChannel <- DUMMY
 
-			count = count + 1
+			//count = count + 1
 
-			if count >= 10000 {
-				glog.Infof("[procastinate][routeid=%d][current=%d][expected=%d][ignore=%d]", request.TokenId, currentTime, priorityQueueItem.priority, count)
-				count = 0
-			}
+			//if count >= 10000 {
+				//glog.Infof("[procastinate][routeid=%d][current=%d][expected=%d][ignore=%d]", request.TokenId, currentTime, priorityQueueItem.priority, count)
+				//count = 0
+			//}
 			
 			continue
 		}
