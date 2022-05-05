@@ -342,7 +342,7 @@ func (metamgr *MetadataManager) processDownloads() {
 		metamgr.pqMutex.Unlock()
 
 		glog.Infof("[procastinate][routeid=%d][current=%d][expected=%d][consider]", request.TokenId, currentTime, priorityQueueItem.priority)
-		count = 0
+		// count = 0
 
 		nodeSegMap := map[string][]int{} //map from node_src_ip -> seg_idx list
 		numEdge := 0
