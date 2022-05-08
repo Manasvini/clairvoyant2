@@ -107,6 +107,14 @@ message UpdateRequest {
   }
 }
 
+message ClockUpdateRequest{
+  int64 newClock = 1;
+}
+
+message ClockUpdateReply{
+  int64 oldClock = 1;
+}
+
 service MonitoringServer {
   rpc HandleUpdateRequest (UpdateRequest) returns (StatusReply);
 }
@@ -118,5 +126,6 @@ service CVServer {
 
 service EdgeServer {
   rpc HandleDownloadRequest(DownloadRequest) returns (DownloadReply);
+  rpc HandleUpdateClock(ClockUpdateRequest) returns (ClockUpdateReply);
 }
 

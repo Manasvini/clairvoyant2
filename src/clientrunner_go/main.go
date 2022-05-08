@@ -17,9 +17,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-func areAllClientsDone(clients []cvclient.Client) bool {
+func areAllClientsDone(clients []cvclient.Client, timestamp int64) bool {
 	for _, client := range clients {
-		if !client.IsDone() {
+		if !client.IsDone(timestamp) {
 			return false
 		}
 	}
@@ -33,7 +33,7 @@ func advanceClock() int64 {
 	}
 	defer conn.Close()
 	clockClient := pb.NewClockServerClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*6000)
 	defer cancel()
 	req := pb.AdvanceClock{}
 	resp, err := clockClient.HandleAdvanceClock(ctx, &req)
@@ -70,13 +70,13 @@ func getFilesInDir(dirName string, isBench2 bool) []string {
 	return fileNames
 }
 
-func writeLogs(filename string, records []string) {
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		panic(err)
-	}
+func writeLogs(f *os.File, records []string) {
+	//f, err := os.OpenFile(filename, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+	//if err != nil {
+	//	panic(err)
+	//}
 	for _, record := range records {
-		_, err = f.WriteString(record + "\n")
+		_, err := f.WriteString(record + "\n")
 		if err != nil {
 			panic(err)
 		}
@@ -95,6 +95,9 @@ func main() {
 	videoFile := flag.String("f", "./input/bbb.csv", "video segments file")
 	ofilename := flag.String("o", "output.txt", "output file name")
 	bench2 := flag.String("b", "no", "benchmark 2(yes/no)")
+	dist := flag.String("r", "zipf", "distribution(Zipf/random)")
+	truncationTime := flag.Int64("c", -1, "time to truncate the run")
+
 	flag.Parse()
 	fmt.Printf("Making flags, num users = %d traj dir = %s, server addr = %s, edge nodes file = %s, numVideos = %d, videoFile = %s\n", *numUsers, *trajectoryDir, *serverAddr, *edgeNodesFile, *numVideos, *videoFile)
 	//edgeNodes := cvclient.EdgeNodes{}
@@ -107,7 +110,15 @@ func main() {
 	clients := make([]cvclient.Client, 0)
 	glog.Infof("Make %d clients", *numUsers)
 	trajectories := getFilesInDir(*trajectoryDir, isBench2)
-	glog.Infof("files= %s, %s\n", trajectories[0], trajectories[1])
+
+	if len(trajectories) >= 2{
+		glog.Infof("files= %s, %s\n", trajectories[0], trajectories[1])
+	}
+	
+	if len(trajectories) == 1{
+		glog.Infof("files= %s\n", trajectories[0])
+	}
+
 	i := 0
     seed := time.Now().UnixNano()
     if *bench2 == "yes" {
@@ -135,14 +146,18 @@ func main() {
 		trajectory := cvclient.Trajectory{}
 		trajectory.LoadFromFile(f)
 		video := cvclient.Video{}
-
+        videoId := "v0"
+        if *dist == "zipf" {
 		//videoId := "v" + strconv.Itoa(rand.Intn(*numVideos - 2) + 2)
-		videoId := "v" + strconv.Itoa(int(zipf.Uint64()+2))
-		fmt.Println(videoId)
+		    videoId = "v" + strconv.Itoa(int(zipf.Uint64()+2))
+		} else {
+            videoId = "v" + strconv.Itoa(rand.Intn(*numVideos ) + 2)
+        }
+        fmt.Println(videoId)
         video.LoadFromFile(*videoFile, videoId)
 		glog.Infof("file = %s video is %s\n", f, videoId)
 		//"../../eval/enode_positions/17min_user0/user0_17min.csv")
-		client := cvclient.NewClient(f, &trajectory, edgeNodes, video, urls)
+		client := cvclient.NewClient(f, &trajectory, edgeNodes, video, urls, *truncationTime)
 		//client := cvclient.NewClient(f, &trajectory, edgeNodes, video, urls)
 		clients = append(clients, client)
 		i += 1
@@ -169,7 +184,7 @@ func main() {
 				//	clients[i].ExplicitClose = true
 				//}
 
-			} else if !clients[i].IsDone() && int64(clients[i].GetStartTime()) < timestamp {
+			} else if !clients[i].IsDone(timestamp) && int64(clients[i].GetStartTime()) < timestamp {
 				wg.Add(1)
 				go func(timestamp int64, client *cvclient.Client) {
 					defer wg.Done()
@@ -184,8 +199,7 @@ func main() {
 			}
 		}
 		wg.Wait()
-		if areAllClientsDone(clients) {
-
+		if areAllClientsDone(clients, timestamp) {
 			break
 		}
 	}
@@ -212,17 +226,24 @@ func main() {
 	offloadHeader := []string{"token,id,receivedBytesCloud,receivedBytesEdge"}
 	dlHeader := []string{"client,token,edgenode,timestamp,bytes"}
 	utilHeader := []string{"client,token,edgenode,usefulSegCount,uselessSegCount,usefulBytes"}
-	writeLogs(offloadFile, offloadHeader)
-	writeLogs(edgeDlFile, dlHeader)
-	writeLogs(edgeContactFile, dlHeader)
-	writeLogs(edgeUtilityFile, utilHeader)
+
+    offload_f, _ := os.OpenFile(offloadFile, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+    edge_f, _ := os.OpenFile(edgeDlFile, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+    contact_f, _ := os.OpenFile(edgeContactFile, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+    util_f, _ := os.OpenFile(edgeUtilityFile, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+
+    writeLogs(offload_f, offloadHeader)
+	writeLogs(edge_f, dlHeader)
+	writeLogs(contact_f, dlHeader)
+	writeLogs(util_f, utilHeader)
+
 
 	for _, c := range clients {
 		line := []string{c.PrintStats()}
-		writeLogs(offloadFile, line)
-		writeLogs(edgeDlFile, c.GetDlLogs())
-		writeLogs(edgeContactFile, c.GetContactLogs())
-		writeLogs(edgeUtilityFile, c.GetUtilLogs())
+		writeLogs(offload_f, line)
+		writeLogs(edge_f, c.GetDlLogs())
+		writeLogs(contact_f, c.GetContactLogs())
+		writeLogs(util_f, c.GetUtilLogs())
 		/*_, err = f.WriteString(line)
 		if err != nil {
 			panic(err)

@@ -25,6 +25,7 @@ type EdgeConfig struct {
 	CacheSize               int      `json:"cacheSize"`
 	CacheType               string   `json:"cacheType"`
 	ClockServerAddr		string	 `json:"clockServerAddr"`
+	ProcastinationProportion float64      `json:"procastinationProportion"`
 }
 
 type DownloadSource struct {

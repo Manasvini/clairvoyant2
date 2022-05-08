@@ -69,13 +69,17 @@ type Client struct {
 	id            string
 	token         *int64
 	ExplicitClose bool
+
+	// time after which the client does not connect to the edge
+	// First implemented to understand the effect of a user changing the path in between
+	truncationTime int64
 }
 
 func (client *Client) Id() string {
 	return client.id
 }
 
-func NewClient(id string, traj *Trajectory, eNodes EdgeNodes, video Video, urls []string) Client {
+func NewClient(id string, traj *Trajectory, eNodes EdgeNodes, video Video, urls []string, truncationTime int64) Client {
 	glog.Infof("Client %s has %d points in journey\n", id, len(traj.points))
 	dlLogs := make([]DlLog, 0)
 	tdlLogs := make([]DlLog, 0)
@@ -97,7 +101,8 @@ func NewClient(id string, traj *Trajectory, eNodes EdgeNodes, video Video, urls 
 		buffer:        buffer,
 		dlInfo:        dlInfo,
 		token:         new(int64),
-		ExplicitClose: false}
+		ExplicitClose: false,
+		truncationTime: truncationTime}
 	return client
 }
 
@@ -135,7 +140,7 @@ func (client *Client) RegisterWithCloud(serverAddr string, startTime float64) {
 	}
 }
 
-func (client *Client) IsDone() bool {
+func (client *Client) IsDone(timestamp int64) bool {
 
 	if client.ExplicitClose {
 		return true
@@ -405,7 +410,7 @@ func (client *Client)FetchSegments(timestamp int64) bool{
 	if client.dlInfo.lastConnectedEdgeNode != nil {
 		lastBw = client.GetEdgeBandwidth(*(client.dlInfo.lastConnectedEdgeNode), client.dlInfo.lastEdgeNodeDistance)
 	}
-	if edgeNodePtr == nil {
+	if (edgeNodePtr == nil) || ((client.truncationTime != -1) && (timestamp > client.truncationTime)) {
 		if timestamp%100 == 0 {
 			glog.Infof("time = %d will maybe do cloud fetch\n", timestamp)
 		}

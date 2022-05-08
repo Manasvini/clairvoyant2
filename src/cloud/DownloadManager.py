@@ -19,7 +19,7 @@ from threading import Thread, Lock
 
 parent_logger = logging.getLogger("cloud")
 logger = parent_logger.getChild('downloadmgr')
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.WARN)
 
 class Bench2Mode(str, Enum):
     NOCACHE = "nocache"             # everything from cdn
@@ -47,15 +47,18 @@ class Oracle:
             logger.debug("No evictions. nothing to do")
             return
 
-        logger.debug("Received evicted segments. Updating State")
+        logger.debug(f"Received evicted segments for {node_id}. Updating State")
         self.mutex.acquire()
+        logger.info(f"Node {node_id} evicted {response.evicted_ids}")
         for seg_id in response.evicted_ids:
             self.remove(node_id, seg_id)
         self.mutex.release()
 
     def remove(self, node_id, seg_id):
         if seg_id in self.segment_map:
-            self.segment_map[seg_id].remove(node_id)
+            logger.info(f"seg {seg_id} has {self.segment_map[seg_id]}")
+            if node_id in self.segment_map:
+                self.segment_map[seg_id].remove(node_id)
 
     def set_seg_source(self, node_id, seg_id):
         self.mutex.acquire()
@@ -113,6 +116,7 @@ class Oracle:
             logger.info("found a non cloud src={} for node={}".format(src_node, node_id))
 
         self.segment_map[seg_id].add(node_id)
+        logger.info(f"Added not {node_id} for segment {seg_id}, now jas {self.segment_map[seg_id]}")
         self.mutex.release()
         return src_node
     

@@ -3,6 +3,7 @@
 # source: clairvoyant.proto
 """Generated protocol buffer code."""
 from google.protobuf import descriptor as _descriptor
+from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
@@ -13,884 +14,30 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor.FileDescriptor(
-  name='clairvoyant.proto',
-  package='clairvoyant',
-  syntax='proto3',
-  serialized_options=b'Z?github.gatech.edu/cs-epl/clairvoyant2/src/client_go/clairvoyant',
-  create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x11\x63lairvoyant.proto\x12\x0b\x63lairvoyant\"\x89\x01\n\x08NodeInfo\x12\x0f\n\x07node_id\x18\x01 \x01(\t\x12\x0f\n\x07node_ip\x18\x02 \x01(\t\x12\x14\n\x0c\x61rrival_time\x18\x03 \x01(\x01\x12\x14\n\x0c\x63ontact_time\x18\x04 \x01(\x01\x12/\n\x0e\x63ontact_points\x18\x05 \x03(\x0b\x32\x17.clairvoyant.Coordinate\"I\n\x07Segment\x12\x12\n\nsegment_id\x18\x01 \x01(\t\x12\x14\n\x0csegment_size\x18\x02 \x01(\x05\x12\x14\n\x0csegment_name\x18\x03 \x01(\t\"_\n\x0cSegmentOwner\x12%\n\x07segment\x18\x01 \x01(\x0b\x32\x14.clairvoyant.Segment\x12(\n\tnode_info\x18\x02 \x01(\x0b\x32\x15.clairvoyant.NodeInfo\"Q\n\nCoordinate\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\x12\r\n\x05speed\x18\x03 \x01(\x01\x12\x0c\n\x04time\x18\x04 \x01(\x01\x12\x10\n\x08\x64istance\x18\x05 \x01(\x01\"B\n\x05Route\x12\x10\n\x08route_id\x18\x01 \x01(\x05\x12\'\n\x06points\x18\x02 \x03(\x0b\x32\x17.clairvoyant.Coordinate\"V\n\x0cVideoRequest\x12\x10\n\x08video_id\x18\x01 \x01(\t\x12!\n\x05route\x18\x02 \x01(\x0b\x32\x12.clairvoyant.Route\x12\x11\n\ttimestamp\x18\x03 \x01(\x03\",\n\nVideoReply\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12\x0c\n\x04urls\x18\x02 \x03(\t\"\x1d\n\x0bStatusReply\x12\x0e\n\x06status\x18\x01 \x01(\t\"u\n\x15MissedDeliveryRequest\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12&\n\x08segments\x18\x02 \x03(\x0b\x32\x14.clairvoyant.Segment\x12\x0f\n\x07node_id\x18\x03 \x01(\t\x12\x11\n\ttimestamp\x18\x04 \x01(\x03\"\xaa\x02\n\x0f\x44ownloadRequest\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12&\n\x08segments\x18\x02 \x03(\x0b\x32\x14.clairvoyant.Segment\x12I\n\x0fsegment_sources\x18\x03 \x03(\x0b\x32\x30.clairvoyant.DownloadRequest.SegmentSourcesEntry\x12\x14\n\x0c\x61rrival_time\x18\x04 \x01(\x03\x12\x14\n\x0c\x63ontact_time\x18\x05 \x01(\x01\x12/\n\x0e\x63ontact_points\x18\x06 \x03(\x0b\x32\x17.clairvoyant.Coordinate\x1a\x35\n\x13SegmentSourcesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"K\n\rDownloadReply\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12\x13\n\x0bsegment_ids\x18\x02 \x03(\t\x12\x13\n\x0b\x65victed_ids\x18\x03 \x03(\t\"?\n\x17\x44ownloadCompleteRequest\x12\x13\n\x0bsegment_ids\x18\x01 \x03(\t\x12\x0f\n\x07node_id\x18\x02 \x01(\t\"\xd7\x01\n\tCVRequest\x12\x31\n\x0cvideorequest\x18\x01 \x01(\x0b\x32\x19.clairvoyant.VideoRequestH\x00\x12\x43\n\x15misseddeliveryrequest\x18\x02 \x01(\x0b\x32\".clairvoyant.MissedDeliveryRequestH\x00\x12G\n\x17\x64ownloadcompleterequest\x18\x03 \x01(\x0b\x32$.clairvoyant.DownloadCompleteRequestH\x00\x42\t\n\x07request\"m\n\x07\x43VReply\x12-\n\nvideoreply\x18\x01 \x01(\x0b\x32\x17.clairvoyant.VideoReplyH\x00\x12*\n\x06status\x18\x02 \x01(\x0b\x32\x18.clairvoyant.StatusReplyH\x00\x42\x07\n\x05reply\"\x8e\x01\n\x12ModelUpdateRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\t\x12\x39\n\x05model\x18\x02 \x03(\x0b\x32*.clairvoyant.ModelUpdateRequest.ModelEntry\x1a,\n\nModelEntry\x12\x0b\n\x03key\x18\x01 \x01(\x03\x12\r\n\x05value\x18\x02 \x01(\x01:\x02\x38\x01\"Q\n\rUpdateRequest\x12\x36\n\x0bmodelupdate\x18\x01 \x01(\x0b\x32\x1f.clairvoyant.ModelUpdateRequestH\x00\x42\x08\n\x06update2_\n\x10MonitoringServer\x12K\n\x13HandleUpdateRequest\x12\x1a.clairvoyant.UpdateRequest\x1a\x18.clairvoyant.StatusReply2K\n\x08\x43VServer\x12?\n\x0fHandleCVRequest\x12\x16.clairvoyant.CVRequest\x1a\x14.clairvoyant.CVReply2_\n\nEdgeServer\x12Q\n\x15HandleDownloadRequest\x12\x1c.clairvoyant.DownloadRequest\x1a\x1a.clairvoyant.DownloadReplyBAZ?github.gatech.edu/cs-epl/clairvoyant2/src/client_go/clairvoyantb\x06proto3'
-)
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x63lairvoyant.proto\x12\x0b\x63lairvoyant\"\x89\x01\n\x08NodeInfo\x12\x0f\n\x07node_id\x18\x01 \x01(\t\x12\x0f\n\x07node_ip\x18\x02 \x01(\t\x12\x14\n\x0c\x61rrival_time\x18\x03 \x01(\x01\x12\x14\n\x0c\x63ontact_time\x18\x04 \x01(\x01\x12/\n\x0e\x63ontact_points\x18\x05 \x03(\x0b\x32\x17.clairvoyant.Coordinate\"I\n\x07Segment\x12\x12\n\nsegment_id\x18\x01 \x01(\t\x12\x14\n\x0csegment_size\x18\x02 \x01(\x05\x12\x14\n\x0csegment_name\x18\x03 \x01(\t\"_\n\x0cSegmentOwner\x12%\n\x07segment\x18\x01 \x01(\x0b\x32\x14.clairvoyant.Segment\x12(\n\tnode_info\x18\x02 \x01(\x0b\x32\x15.clairvoyant.NodeInfo\"Q\n\nCoordinate\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\x12\r\n\x05speed\x18\x03 \x01(\x01\x12\x0c\n\x04time\x18\x04 \x01(\x01\x12\x10\n\x08\x64istance\x18\x05 \x01(\x01\"B\n\x05Route\x12\x10\n\x08route_id\x18\x01 \x01(\x05\x12\'\n\x06points\x18\x02 \x03(\x0b\x32\x17.clairvoyant.Coordinate\"V\n\x0cVideoRequest\x12\x10\n\x08video_id\x18\x01 \x01(\t\x12!\n\x05route\x18\x02 \x01(\x0b\x32\x12.clairvoyant.Route\x12\x11\n\ttimestamp\x18\x03 \x01(\x03\",\n\nVideoReply\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12\x0c\n\x04urls\x18\x02 \x03(\t\"\x1d\n\x0bStatusReply\x12\x0e\n\x06status\x18\x01 \x01(\t\"u\n\x15MissedDeliveryRequest\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12&\n\x08segments\x18\x02 \x03(\x0b\x32\x14.clairvoyant.Segment\x12\x0f\n\x07node_id\x18\x03 \x01(\t\x12\x11\n\ttimestamp\x18\x04 \x01(\x03\"\xaa\x02\n\x0f\x44ownloadRequest\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12&\n\x08segments\x18\x02 \x03(\x0b\x32\x14.clairvoyant.Segment\x12I\n\x0fsegment_sources\x18\x03 \x03(\x0b\x32\x30.clairvoyant.DownloadRequest.SegmentSourcesEntry\x12\x14\n\x0c\x61rrival_time\x18\x04 \x01(\x03\x12\x14\n\x0c\x63ontact_time\x18\x05 \x01(\x01\x12/\n\x0e\x63ontact_points\x18\x06 \x03(\x0b\x32\x17.clairvoyant.Coordinate\x1a\x35\n\x13SegmentSourcesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"K\n\rDownloadReply\x12\x10\n\x08token_id\x18\x01 \x01(\x03\x12\x13\n\x0bsegment_ids\x18\x02 \x03(\t\x12\x13\n\x0b\x65victed_ids\x18\x03 \x03(\t\"?\n\x17\x44ownloadCompleteRequest\x12\x13\n\x0bsegment_ids\x18\x01 \x03(\t\x12\x0f\n\x07node_id\x18\x02 \x01(\t\"\xd7\x01\n\tCVRequest\x12\x31\n\x0cvideorequest\x18\x01 \x01(\x0b\x32\x19.clairvoyant.VideoRequestH\x00\x12\x43\n\x15misseddeliveryrequest\x18\x02 \x01(\x0b\x32\".clairvoyant.MissedDeliveryRequestH\x00\x12G\n\x17\x64ownloadcompleterequest\x18\x03 \x01(\x0b\x32$.clairvoyant.DownloadCompleteRequestH\x00\x42\t\n\x07request\"m\n\x07\x43VReply\x12-\n\nvideoreply\x18\x01 \x01(\x0b\x32\x17.clairvoyant.VideoReplyH\x00\x12*\n\x06status\x18\x02 \x01(\x0b\x32\x18.clairvoyant.StatusReplyH\x00\x42\x07\n\x05reply\"\x8e\x01\n\x12ModelUpdateRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\t\x12\x39\n\x05model\x18\x02 \x03(\x0b\x32*.clairvoyant.ModelUpdateRequest.ModelEntry\x1a,\n\nModelEntry\x12\x0b\n\x03key\x18\x01 \x01(\x03\x12\r\n\x05value\x18\x02 \x01(\x01:\x02\x38\x01\"Q\n\rUpdateRequest\x12\x36\n\x0bmodelupdate\x18\x01 \x01(\x0b\x32\x1f.clairvoyant.ModelUpdateRequestH\x00\x42\x08\n\x06update\"&\n\x12\x43lockUpdateRequest\x12\x10\n\x08newClock\x18\x01 \x01(\x03\"$\n\x10\x43lockUpdateReply\x12\x10\n\x08oldClock\x18\x01 \x01(\x03\x32_\n\x10MonitoringServer\x12K\n\x13HandleUpdateRequest\x12\x1a.clairvoyant.UpdateRequest\x1a\x18.clairvoyant.StatusReply2K\n\x08\x43VServer\x12?\n\x0fHandleCVRequest\x12\x16.clairvoyant.CVRequest\x1a\x14.clairvoyant.CVReply2\xb4\x01\n\nEdgeServer\x12Q\n\x15HandleDownloadRequest\x12\x1c.clairvoyant.DownloadRequest\x1a\x1a.clairvoyant.DownloadReply\x12S\n\x11HandleUpdateClock\x12\x1f.clairvoyant.ClockUpdateRequest\x1a\x1d.clairvoyant.ClockUpdateReplyBAZ?github.gatech.edu/cs-epl/clairvoyant2/src/client_go/clairvoyantb\x06proto3')
 
 
 
-
-_NODEINFO = _descriptor.Descriptor(
-  name='NodeInfo',
-  full_name='clairvoyant.NodeInfo',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='node_id', full_name='clairvoyant.NodeInfo.node_id', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='node_ip', full_name='clairvoyant.NodeInfo.node_ip', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='arrival_time', full_name='clairvoyant.NodeInfo.arrival_time', index=2,
-      number=3, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='contact_time', full_name='clairvoyant.NodeInfo.contact_time', index=3,
-      number=4, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='contact_points', full_name='clairvoyant.NodeInfo.contact_points', index=4,
-      number=5, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=35,
-  serialized_end=172,
-)
-
-
-_SEGMENT = _descriptor.Descriptor(
-  name='Segment',
-  full_name='clairvoyant.Segment',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='segment_id', full_name='clairvoyant.Segment.segment_id', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='segment_size', full_name='clairvoyant.Segment.segment_size', index=1,
-      number=2, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='segment_name', full_name='clairvoyant.Segment.segment_name', index=2,
-      number=3, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=174,
-  serialized_end=247,
-)
-
-
-_SEGMENTOWNER = _descriptor.Descriptor(
-  name='SegmentOwner',
-  full_name='clairvoyant.SegmentOwner',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='segment', full_name='clairvoyant.SegmentOwner.segment', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='node_info', full_name='clairvoyant.SegmentOwner.node_info', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=249,
-  serialized_end=344,
-)
-
-
-_COORDINATE = _descriptor.Descriptor(
-  name='Coordinate',
-  full_name='clairvoyant.Coordinate',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='x', full_name='clairvoyant.Coordinate.x', index=0,
-      number=1, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='y', full_name='clairvoyant.Coordinate.y', index=1,
-      number=2, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='speed', full_name='clairvoyant.Coordinate.speed', index=2,
-      number=3, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='time', full_name='clairvoyant.Coordinate.time', index=3,
-      number=4, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='distance', full_name='clairvoyant.Coordinate.distance', index=4,
-      number=5, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=346,
-  serialized_end=427,
-)
-
-
-_ROUTE = _descriptor.Descriptor(
-  name='Route',
-  full_name='clairvoyant.Route',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='route_id', full_name='clairvoyant.Route.route_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='points', full_name='clairvoyant.Route.points', index=1,
-      number=2, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=429,
-  serialized_end=495,
-)
-
-
-_VIDEOREQUEST = _descriptor.Descriptor(
-  name='VideoRequest',
-  full_name='clairvoyant.VideoRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='video_id', full_name='clairvoyant.VideoRequest.video_id', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='route', full_name='clairvoyant.VideoRequest.route', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='timestamp', full_name='clairvoyant.VideoRequest.timestamp', index=2,
-      number=3, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=497,
-  serialized_end=583,
-)
-
-
-_VIDEOREPLY = _descriptor.Descriptor(
-  name='VideoReply',
-  full_name='clairvoyant.VideoReply',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='token_id', full_name='clairvoyant.VideoReply.token_id', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='urls', full_name='clairvoyant.VideoReply.urls', index=1,
-      number=2, type=9, cpp_type=9, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=585,
-  serialized_end=629,
-)
-
-
-_STATUSREPLY = _descriptor.Descriptor(
-  name='StatusReply',
-  full_name='clairvoyant.StatusReply',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='status', full_name='clairvoyant.StatusReply.status', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=631,
-  serialized_end=660,
-)
-
-
-_MISSEDDELIVERYREQUEST = _descriptor.Descriptor(
-  name='MissedDeliveryRequest',
-  full_name='clairvoyant.MissedDeliveryRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='token_id', full_name='clairvoyant.MissedDeliveryRequest.token_id', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='segments', full_name='clairvoyant.MissedDeliveryRequest.segments', index=1,
-      number=2, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='node_id', full_name='clairvoyant.MissedDeliveryRequest.node_id', index=2,
-      number=3, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='timestamp', full_name='clairvoyant.MissedDeliveryRequest.timestamp', index=3,
-      number=4, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=662,
-  serialized_end=779,
-)
-
-
-_DOWNLOADREQUEST_SEGMENTSOURCESENTRY = _descriptor.Descriptor(
-  name='SegmentSourcesEntry',
-  full_name='clairvoyant.DownloadRequest.SegmentSourcesEntry',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='key', full_name='clairvoyant.DownloadRequest.SegmentSourcesEntry.key', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='value', full_name='clairvoyant.DownloadRequest.SegmentSourcesEntry.value', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=b'8\001',
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1027,
-  serialized_end=1080,
-)
-
-_DOWNLOADREQUEST = _descriptor.Descriptor(
-  name='DownloadRequest',
-  full_name='clairvoyant.DownloadRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='token_id', full_name='clairvoyant.DownloadRequest.token_id', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='segments', full_name='clairvoyant.DownloadRequest.segments', index=1,
-      number=2, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='segment_sources', full_name='clairvoyant.DownloadRequest.segment_sources', index=2,
-      number=3, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='arrival_time', full_name='clairvoyant.DownloadRequest.arrival_time', index=3,
-      number=4, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='contact_time', full_name='clairvoyant.DownloadRequest.contact_time', index=4,
-      number=5, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='contact_points', full_name='clairvoyant.DownloadRequest.contact_points', index=5,
-      number=6, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[_DOWNLOADREQUEST_SEGMENTSOURCESENTRY, ],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=782,
-  serialized_end=1080,
-)
-
-
-_DOWNLOADREPLY = _descriptor.Descriptor(
-  name='DownloadReply',
-  full_name='clairvoyant.DownloadReply',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='token_id', full_name='clairvoyant.DownloadReply.token_id', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='segment_ids', full_name='clairvoyant.DownloadReply.segment_ids', index=1,
-      number=2, type=9, cpp_type=9, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='evicted_ids', full_name='clairvoyant.DownloadReply.evicted_ids', index=2,
-      number=3, type=9, cpp_type=9, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1082,
-  serialized_end=1157,
-)
-
-
-_DOWNLOADCOMPLETEREQUEST = _descriptor.Descriptor(
-  name='DownloadCompleteRequest',
-  full_name='clairvoyant.DownloadCompleteRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='segment_ids', full_name='clairvoyant.DownloadCompleteRequest.segment_ids', index=0,
-      number=1, type=9, cpp_type=9, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='node_id', full_name='clairvoyant.DownloadCompleteRequest.node_id', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1159,
-  serialized_end=1222,
-)
-
-
-_CVREQUEST = _descriptor.Descriptor(
-  name='CVRequest',
-  full_name='clairvoyant.CVRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='videorequest', full_name='clairvoyant.CVRequest.videorequest', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='misseddeliveryrequest', full_name='clairvoyant.CVRequest.misseddeliveryrequest', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='downloadcompleterequest', full_name='clairvoyant.CVRequest.downloadcompleterequest', index=2,
-      number=3, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-    _descriptor.OneofDescriptor(
-      name='request', full_name='clairvoyant.CVRequest.request',
-      index=0, containing_type=None,
-      create_key=_descriptor._internal_create_key,
-    fields=[]),
-  ],
-  serialized_start=1225,
-  serialized_end=1440,
-)
-
-
-_CVREPLY = _descriptor.Descriptor(
-  name='CVReply',
-  full_name='clairvoyant.CVReply',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='videoreply', full_name='clairvoyant.CVReply.videoreply', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='status', full_name='clairvoyant.CVReply.status', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-    _descriptor.OneofDescriptor(
-      name='reply', full_name='clairvoyant.CVReply.reply',
-      index=0, containing_type=None,
-      create_key=_descriptor._internal_create_key,
-    fields=[]),
-  ],
-  serialized_start=1442,
-  serialized_end=1551,
-)
-
-
-_MODELUPDATEREQUEST_MODELENTRY = _descriptor.Descriptor(
-  name='ModelEntry',
-  full_name='clairvoyant.ModelUpdateRequest.ModelEntry',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='key', full_name='clairvoyant.ModelUpdateRequest.ModelEntry.key', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='value', full_name='clairvoyant.ModelUpdateRequest.ModelEntry.value', index=1,
-      number=2, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=b'8\001',
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1652,
-  serialized_end=1696,
-)
-
-_MODELUPDATEREQUEST = _descriptor.Descriptor(
-  name='ModelUpdateRequest',
-  full_name='clairvoyant.ModelUpdateRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='node_id', full_name='clairvoyant.ModelUpdateRequest.node_id', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='model', full_name='clairvoyant.ModelUpdateRequest.model', index=1,
-      number=2, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[_MODELUPDATEREQUEST_MODELENTRY, ],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1554,
-  serialized_end=1696,
-)
-
-
-_UPDATEREQUEST = _descriptor.Descriptor(
-  name='UpdateRequest',
-  full_name='clairvoyant.UpdateRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='modelupdate', full_name='clairvoyant.UpdateRequest.modelupdate', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-    _descriptor.OneofDescriptor(
-      name='update', full_name='clairvoyant.UpdateRequest.update',
-      index=0, containing_type=None,
-      create_key=_descriptor._internal_create_key,
-    fields=[]),
-  ],
-  serialized_start=1698,
-  serialized_end=1779,
-)
-
-_NODEINFO.fields_by_name['contact_points'].message_type = _COORDINATE
-_SEGMENTOWNER.fields_by_name['segment'].message_type = _SEGMENT
-_SEGMENTOWNER.fields_by_name['node_info'].message_type = _NODEINFO
-_ROUTE.fields_by_name['points'].message_type = _COORDINATE
-_VIDEOREQUEST.fields_by_name['route'].message_type = _ROUTE
-_MISSEDDELIVERYREQUEST.fields_by_name['segments'].message_type = _SEGMENT
-_DOWNLOADREQUEST_SEGMENTSOURCESENTRY.containing_type = _DOWNLOADREQUEST
-_DOWNLOADREQUEST.fields_by_name['segments'].message_type = _SEGMENT
-_DOWNLOADREQUEST.fields_by_name['segment_sources'].message_type = _DOWNLOADREQUEST_SEGMENTSOURCESENTRY
-_DOWNLOADREQUEST.fields_by_name['contact_points'].message_type = _COORDINATE
-_CVREQUEST.fields_by_name['videorequest'].message_type = _VIDEOREQUEST
-_CVREQUEST.fields_by_name['misseddeliveryrequest'].message_type = _MISSEDDELIVERYREQUEST
-_CVREQUEST.fields_by_name['downloadcompleterequest'].message_type = _DOWNLOADCOMPLETEREQUEST
-_CVREQUEST.oneofs_by_name['request'].fields.append(
-  _CVREQUEST.fields_by_name['videorequest'])
-_CVREQUEST.fields_by_name['videorequest'].containing_oneof = _CVREQUEST.oneofs_by_name['request']
-_CVREQUEST.oneofs_by_name['request'].fields.append(
-  _CVREQUEST.fields_by_name['misseddeliveryrequest'])
-_CVREQUEST.fields_by_name['misseddeliveryrequest'].containing_oneof = _CVREQUEST.oneofs_by_name['request']
-_CVREQUEST.oneofs_by_name['request'].fields.append(
-  _CVREQUEST.fields_by_name['downloadcompleterequest'])
-_CVREQUEST.fields_by_name['downloadcompleterequest'].containing_oneof = _CVREQUEST.oneofs_by_name['request']
-_CVREPLY.fields_by_name['videoreply'].message_type = _VIDEOREPLY
-_CVREPLY.fields_by_name['status'].message_type = _STATUSREPLY
-_CVREPLY.oneofs_by_name['reply'].fields.append(
-  _CVREPLY.fields_by_name['videoreply'])
-_CVREPLY.fields_by_name['videoreply'].containing_oneof = _CVREPLY.oneofs_by_name['reply']
-_CVREPLY.oneofs_by_name['reply'].fields.append(
-  _CVREPLY.fields_by_name['status'])
-_CVREPLY.fields_by_name['status'].containing_oneof = _CVREPLY.oneofs_by_name['reply']
-_MODELUPDATEREQUEST_MODELENTRY.containing_type = _MODELUPDATEREQUEST
-_MODELUPDATEREQUEST.fields_by_name['model'].message_type = _MODELUPDATEREQUEST_MODELENTRY
-_UPDATEREQUEST.fields_by_name['modelupdate'].message_type = _MODELUPDATEREQUEST
-_UPDATEREQUEST.oneofs_by_name['update'].fields.append(
-  _UPDATEREQUEST.fields_by_name['modelupdate'])
-_UPDATEREQUEST.fields_by_name['modelupdate'].containing_oneof = _UPDATEREQUEST.oneofs_by_name['update']
-DESCRIPTOR.message_types_by_name['NodeInfo'] = _NODEINFO
-DESCRIPTOR.message_types_by_name['Segment'] = _SEGMENT
-DESCRIPTOR.message_types_by_name['SegmentOwner'] = _SEGMENTOWNER
-DESCRIPTOR.message_types_by_name['Coordinate'] = _COORDINATE
-DESCRIPTOR.message_types_by_name['Route'] = _ROUTE
-DESCRIPTOR.message_types_by_name['VideoRequest'] = _VIDEOREQUEST
-DESCRIPTOR.message_types_by_name['VideoReply'] = _VIDEOREPLY
-DESCRIPTOR.message_types_by_name['StatusReply'] = _STATUSREPLY
-DESCRIPTOR.message_types_by_name['MissedDeliveryRequest'] = _MISSEDDELIVERYREQUEST
-DESCRIPTOR.message_types_by_name['DownloadRequest'] = _DOWNLOADREQUEST
-DESCRIPTOR.message_types_by_name['DownloadReply'] = _DOWNLOADREPLY
-DESCRIPTOR.message_types_by_name['DownloadCompleteRequest'] = _DOWNLOADCOMPLETEREQUEST
-DESCRIPTOR.message_types_by_name['CVRequest'] = _CVREQUEST
-DESCRIPTOR.message_types_by_name['CVReply'] = _CVREPLY
-DESCRIPTOR.message_types_by_name['ModelUpdateRequest'] = _MODELUPDATEREQUEST
-DESCRIPTOR.message_types_by_name['UpdateRequest'] = _UPDATEREQUEST
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
-
+_NODEINFO = DESCRIPTOR.message_types_by_name['NodeInfo']
+_SEGMENT = DESCRIPTOR.message_types_by_name['Segment']
+_SEGMENTOWNER = DESCRIPTOR.message_types_by_name['SegmentOwner']
+_COORDINATE = DESCRIPTOR.message_types_by_name['Coordinate']
+_ROUTE = DESCRIPTOR.message_types_by_name['Route']
+_VIDEOREQUEST = DESCRIPTOR.message_types_by_name['VideoRequest']
+_VIDEOREPLY = DESCRIPTOR.message_types_by_name['VideoReply']
+_STATUSREPLY = DESCRIPTOR.message_types_by_name['StatusReply']
+_MISSEDDELIVERYREQUEST = DESCRIPTOR.message_types_by_name['MissedDeliveryRequest']
+_DOWNLOADREQUEST = DESCRIPTOR.message_types_by_name['DownloadRequest']
+_DOWNLOADREQUEST_SEGMENTSOURCESENTRY = _DOWNLOADREQUEST.nested_types_by_name['SegmentSourcesEntry']
+_DOWNLOADREPLY = DESCRIPTOR.message_types_by_name['DownloadReply']
+_DOWNLOADCOMPLETEREQUEST = DESCRIPTOR.message_types_by_name['DownloadCompleteRequest']
+_CVREQUEST = DESCRIPTOR.message_types_by_name['CVRequest']
+_CVREPLY = DESCRIPTOR.message_types_by_name['CVReply']
+_MODELUPDATEREQUEST = DESCRIPTOR.message_types_by_name['ModelUpdateRequest']
+_MODELUPDATEREQUEST_MODELENTRY = _MODELUPDATEREQUEST.nested_types_by_name['ModelEntry']
+_UPDATEREQUEST = DESCRIPTOR.message_types_by_name['UpdateRequest']
+_CLOCKUPDATEREQUEST = DESCRIPTOR.message_types_by_name['ClockUpdateRequest']
+_CLOCKUPDATEREPLY = DESCRIPTOR.message_types_by_name['ClockUpdateReply']
 NodeInfo = _reflection.GeneratedProtocolMessageType('NodeInfo', (_message.Message,), {
   'DESCRIPTOR' : _NODEINFO,
   '__module__' : 'clairvoyant_pb2'
@@ -1019,86 +166,75 @@ UpdateRequest = _reflection.GeneratedProtocolMessageType('UpdateRequest', (_mess
   })
 _sym_db.RegisterMessage(UpdateRequest)
 
+ClockUpdateRequest = _reflection.GeneratedProtocolMessageType('ClockUpdateRequest', (_message.Message,), {
+  'DESCRIPTOR' : _CLOCKUPDATEREQUEST,
+  '__module__' : 'clairvoyant_pb2'
+  # @@protoc_insertion_point(class_scope:clairvoyant.ClockUpdateRequest)
+  })
+_sym_db.RegisterMessage(ClockUpdateRequest)
 
-DESCRIPTOR._options = None
-_DOWNLOADREQUEST_SEGMENTSOURCESENTRY._options = None
-_MODELUPDATEREQUEST_MODELENTRY._options = None
+ClockUpdateReply = _reflection.GeneratedProtocolMessageType('ClockUpdateReply', (_message.Message,), {
+  'DESCRIPTOR' : _CLOCKUPDATEREPLY,
+  '__module__' : 'clairvoyant_pb2'
+  # @@protoc_insertion_point(class_scope:clairvoyant.ClockUpdateReply)
+  })
+_sym_db.RegisterMessage(ClockUpdateReply)
 
-_MONITORINGSERVER = _descriptor.ServiceDescriptor(
-  name='MonitoringServer',
-  full_name='clairvoyant.MonitoringServer',
-  file=DESCRIPTOR,
-  index=0,
-  serialized_options=None,
-  create_key=_descriptor._internal_create_key,
-  serialized_start=1781,
-  serialized_end=1876,
-  methods=[
-  _descriptor.MethodDescriptor(
-    name='HandleUpdateRequest',
-    full_name='clairvoyant.MonitoringServer.HandleUpdateRequest',
-    index=0,
-    containing_service=None,
-    input_type=_UPDATEREQUEST,
-    output_type=_STATUSREPLY,
-    serialized_options=None,
-    create_key=_descriptor._internal_create_key,
-  ),
-])
-_sym_db.RegisterServiceDescriptor(_MONITORINGSERVER)
+_MONITORINGSERVER = DESCRIPTOR.services_by_name['MonitoringServer']
+_CVSERVER = DESCRIPTOR.services_by_name['CVServer']
+_EDGESERVER = DESCRIPTOR.services_by_name['EdgeServer']
+if _descriptor._USE_C_DESCRIPTORS == False:
 
-DESCRIPTOR.services_by_name['MonitoringServer'] = _MONITORINGSERVER
-
-
-_CVSERVER = _descriptor.ServiceDescriptor(
-  name='CVServer',
-  full_name='clairvoyant.CVServer',
-  file=DESCRIPTOR,
-  index=1,
-  serialized_options=None,
-  create_key=_descriptor._internal_create_key,
-  serialized_start=1878,
-  serialized_end=1953,
-  methods=[
-  _descriptor.MethodDescriptor(
-    name='HandleCVRequest',
-    full_name='clairvoyant.CVServer.HandleCVRequest',
-    index=0,
-    containing_service=None,
-    input_type=_CVREQUEST,
-    output_type=_CVREPLY,
-    serialized_options=None,
-    create_key=_descriptor._internal_create_key,
-  ),
-])
-_sym_db.RegisterServiceDescriptor(_CVSERVER)
-
-DESCRIPTOR.services_by_name['CVServer'] = _CVSERVER
-
-
-_EDGESERVER = _descriptor.ServiceDescriptor(
-  name='EdgeServer',
-  full_name='clairvoyant.EdgeServer',
-  file=DESCRIPTOR,
-  index=2,
-  serialized_options=None,
-  create_key=_descriptor._internal_create_key,
-  serialized_start=1955,
-  serialized_end=2050,
-  methods=[
-  _descriptor.MethodDescriptor(
-    name='HandleDownloadRequest',
-    full_name='clairvoyant.EdgeServer.HandleDownloadRequest',
-    index=0,
-    containing_service=None,
-    input_type=_DOWNLOADREQUEST,
-    output_type=_DOWNLOADREPLY,
-    serialized_options=None,
-    create_key=_descriptor._internal_create_key,
-  ),
-])
-_sym_db.RegisterServiceDescriptor(_EDGESERVER)
-
-DESCRIPTOR.services_by_name['EdgeServer'] = _EDGESERVER
-
+  DESCRIPTOR._options = None
+  DESCRIPTOR._serialized_options = b'Z?github.gatech.edu/cs-epl/clairvoyant2/src/client_go/clairvoyant'
+  _DOWNLOADREQUEST_SEGMENTSOURCESENTRY._options = None
+  _DOWNLOADREQUEST_SEGMENTSOURCESENTRY._serialized_options = b'8\001'
+  _MODELUPDATEREQUEST_MODELENTRY._options = None
+  _MODELUPDATEREQUEST_MODELENTRY._serialized_options = b'8\001'
+  _NODEINFO._serialized_start=35
+  _NODEINFO._serialized_end=172
+  _SEGMENT._serialized_start=174
+  _SEGMENT._serialized_end=247
+  _SEGMENTOWNER._serialized_start=249
+  _SEGMENTOWNER._serialized_end=344
+  _COORDINATE._serialized_start=346
+  _COORDINATE._serialized_end=427
+  _ROUTE._serialized_start=429
+  _ROUTE._serialized_end=495
+  _VIDEOREQUEST._serialized_start=497
+  _VIDEOREQUEST._serialized_end=583
+  _VIDEOREPLY._serialized_start=585
+  _VIDEOREPLY._serialized_end=629
+  _STATUSREPLY._serialized_start=631
+  _STATUSREPLY._serialized_end=660
+  _MISSEDDELIVERYREQUEST._serialized_start=662
+  _MISSEDDELIVERYREQUEST._serialized_end=779
+  _DOWNLOADREQUEST._serialized_start=782
+  _DOWNLOADREQUEST._serialized_end=1080
+  _DOWNLOADREQUEST_SEGMENTSOURCESENTRY._serialized_start=1027
+  _DOWNLOADREQUEST_SEGMENTSOURCESENTRY._serialized_end=1080
+  _DOWNLOADREPLY._serialized_start=1082
+  _DOWNLOADREPLY._serialized_end=1157
+  _DOWNLOADCOMPLETEREQUEST._serialized_start=1159
+  _DOWNLOADCOMPLETEREQUEST._serialized_end=1222
+  _CVREQUEST._serialized_start=1225
+  _CVREQUEST._serialized_end=1440
+  _CVREPLY._serialized_start=1442
+  _CVREPLY._serialized_end=1551
+  _MODELUPDATEREQUEST._serialized_start=1554
+  _MODELUPDATEREQUEST._serialized_end=1696
+  _MODELUPDATEREQUEST_MODELENTRY._serialized_start=1652
+  _MODELUPDATEREQUEST_MODELENTRY._serialized_end=1696
+  _UPDATEREQUEST._serialized_start=1698
+  _UPDATEREQUEST._serialized_end=1779
+  _CLOCKUPDATEREQUEST._serialized_start=1781
+  _CLOCKUPDATEREQUEST._serialized_end=1819
+  _CLOCKUPDATEREPLY._serialized_start=1821
+  _CLOCKUPDATEREPLY._serialized_end=1857
+  _MONITORINGSERVER._serialized_start=1859
+  _MONITORINGSERVER._serialized_end=1954
+  _CVSERVER._serialized_start=1956
+  _CVSERVER._serialized_end=2031
+  _EDGESERVER._serialized_start=2034
+  _EDGESERVER._serialized_end=2214
 # @@protoc_insertion_point(module_scope)

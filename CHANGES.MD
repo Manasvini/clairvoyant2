@@ -64,3 +64,22 @@ Incorporating the velocity, we can calculate the next stop required?
 5. Request arrival modelling : Fixed
 6. Ratio between edge nodes to cloud, Number of edge nodes : Fixed
 7. Density of the edge nodes, Inter-location of edge nodes : Fixed
+
+### 11th March
+
+1. Get retention time + segments which are never accessed.
+2. Make improvements in the algorithm and show that these metrics are better.
+3. Popularity : no of accesses in the retention time period.
+   1. Retention time directly proportional to space.
+   2. We can procastinate on the highly popular, but that becomes a scheduling algorithm.
+   3. We do not want to change the global schedule, we just need to change the timings for the current schedule.
+   4. Popularity is somehwat dependent on the max interval. But both of them are nearly independent on the retention time.
+4. We track 3 metrics,  retention time, max interval and popularity.
+
+Now what to plot. We have for every segment, every node the above metrics.
+1. Cache size 
+2. Distribution of every metric per node.
+
+Need to finally show that we can finally have more requests.
+Lets start implementing by first implementing a simple cloud procastinator.
+It might be easier to implement the edge one first. Just say no at the negotiation from cloud.

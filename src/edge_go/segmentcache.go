@@ -48,7 +48,8 @@ type SegmentCache struct {
 	size int64
 	// size left
 	currentSize      int64
-	cachePolicy      string
+	evictableSize    int64
+    cachePolicy      string
 	mu               sync.Mutex
 	currentTimestamp int64
 	evictCount       int64
@@ -108,7 +109,7 @@ func (cache *SegmentCache) curRealTS() int64 {
 
 // remove a segment id from the evictable set if it exists in that set.
 // basically performs a "policy touch"
-func (cache *SegmentCache) updateEvictable(segmentId string) {
+func (cache *SegmentCache) updateEvictable(segmentId string) bool {
 	//idx := cache.segmentRouteMap[segmentId].evictListIdx
 	idx := -1
 	for i, v := range cache.evictable {
@@ -117,10 +118,13 @@ func (cache *SegmentCache) updateEvictable(segmentId string) {
 			break
 		}
 	}
+    glog.Infof("Segment %s found in evicatble at pos %d", segmentId, idx)
 	if idx != -1 {
 		cache.evictable = append(cache.evictable[:idx], cache.evictable[idx+1:]...)
-	}
-	cache.promoteCount += 1
+	    cache.promoteCount += 1
+        return true
+    }
+    return false
 }
 
 // cache pop based on policy. removes a complete segment
@@ -132,8 +136,9 @@ func (cache *SegmentCache) pop() (string, error) {
 	}
 	segId := cache.evictable[0]
 	cache.currentSize -= cache.segmentRouteMap[segId].segSize
-	cache.evictCount += 1
-	glog.Infof("deleting segment %s, total evictions = %d", segId, cache.evictCount)
+	cache.evictableSize -= cache.segmentRouteMap[segId].segSize
+    cache.evictCount += 1
+	glog.Infof("deleting segment %s, total evictions = %d currentsize=%d evictable size =%d", segId, cache.evictCount, cache.currentSize, cache.evictableSize)
 
 	delete(cache.segmentRouteMap, segId)
 	cache.evictable = cache.evictable[1:]
@@ -148,12 +153,8 @@ func (cache *SegmentCache) isSegmentCacheFull(excess int64) ([]string, bool) {
 		return nil, false
 	}
 
-	//check if evicted list size can support excess
-	var evictSize int64
-	for _, segId := range cache.evictable {
-		evictSize += cache.segmentRouteMap[segId].segSize
-	}
-	if (cache.currentSize - evictSize + excess) > cache.size {
+	// check if evicted list size can support excess
+	if (cache.currentSize - cache.evictableSize + excess) > cache.size {
 		return nil, true
 	}
 
@@ -172,17 +173,16 @@ func (cache *SegmentCache) isSegmentCacheFull(excess int64) ([]string, bool) {
 
 // array util to insert at random position
 func insert(a []string, index int, value string) []string {
-	if len(a) == index { // nil or empty slice or after last element
-		return append(a, value)
-	}
-	b := append(a[:index], value)
-	c := append(b, a[index+1:]...) // index < len(a)
-	c[index] = value
-	return c
+    if len(a) == index { // nil or empty slice or after last element
+        return append(a, value)
+    }
+    a = append(a[:index+1], a[index:]...) // index < len(a)
+    a[index] = value
+    return a
 }
 
 func (cache *SegmentCache) addEvent(segmentId string, routeId int64, eventType int) {
-	glog.Infof("[extended_utilites][cache_event][%s,%d,%d,%d]\n", segmentId, routeId, eventType, cache.curRealTS())
+	glog.Infof("[extended_utilites][cache_event][%s,%d,%d,%d,%d]\n", segmentId, routeId, eventType, cache.curRealTS(), cache.size - cache.GetAvailableFreeSpace())
 
 	cache.events = append(cache.events, Event{
 		segmentId: segmentId,
@@ -209,21 +209,22 @@ func (cache *SegmentCache) addToEvictable(curSeg *SegmentMetadata) {
 		curSeg.evictListIdx = idx
 		// simply do an insert
 		cache.evictable = insert(cache.evictable, idx, curSeg.segmentId)
-
+        cache.evictableSize += curSeg.segSize
 		cache.addEvent(curSeg.segmentId, -1, EvictableEvent)
 	case LFU:
 		var idx int
 		for i, segId := range cache.evictable {
 			if curSeg.popularity < cache.segmentRouteMap[segId].popularity {
 				idx = i
-				break
+                break
 			}
 		}
 		curSeg.evictListIdx = idx
 		cache.evictable = insert(cache.evictable, idx, curSeg.segmentId)
-
+        cache.evictableSize += curSeg.segSize
 		cache.addEvent(curSeg.segmentId, -1, EvictableEvent)
 	}
+    glog.Infof("current size=%d evictable size =%d", cache.currentSize, cache.evictableSize)
 }
 
 /*package external functions*/
@@ -264,7 +265,6 @@ func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]st
 	if evictedIds, isFull = cache.isSegmentCacheFull(int64(segment.SegmentSize)); isFull {
 		return nil, errors.New("SegmentCache is full")
 	}
-
 	// add to cache now
 	// first case when segment id is not present
 	if _, ok := cache.segmentRouteMap[segment.SegmentId]; !ok {
@@ -274,19 +274,23 @@ func (cache *SegmentCache) AddSegment(segment cvpb.Segment, routeId int64) ([]st
 			routeIdSet: map[int64]bool{routeId: true},
 			popularity: 0,
 		}
+        cache.currentSize += int64(segment.SegmentSize)
 		cache.addEvent(segment.SegmentId, routeId, PushEvent)
 		// segment id is present
 	} else {
 		cache.segmentRouteMap[segment.SegmentId].routeIdSet[routeId] = true
 		cache.segmentRouteMap[segment.SegmentId].popularity += 1
 		//remove from evictable if we need to
-		cache.updateEvictable(segment.SegmentId)
-
-		cache.addEvent(segment.SegmentId, routeId, TouchEvent)
+		promoted := cache.updateEvictable(segment.SegmentId)
+        if promoted {
+            glog.Infof("segement %s was in evictable list, now promoted", segment.SegmentId)
+            cache.evictableSize -= int64(segment.SegmentSize)
+		}
+        cache.addEvent(segment.SegmentId, routeId, TouchEvent)
 	}
 	// update the segment map with the "touched" timestamp
 	cache.segmentRouteMap[segment.SegmentId].timestamp = cache.curTS()
-
+    glog.Infof("cache current size = %d evictable=%d", cache.currentSize, cache.evictableSize)
 	for _, evictedId := range evictedIds {
 		cache.addEvent(evictedId, -1, PopEvent)
 	}
@@ -313,4 +317,12 @@ func (cache *SegmentCache) UpdateSegmentStatus(segmentId string, routeId int64) 
 		cache.addToEvictable(cache.segmentRouteMap[segmentId])
 	}
 
+}
+
+func (cache *SegmentCache) GetAvailableFreeSpace() int64{
+    //total size : cache.size
+    //occupied, unavailable: cache.currentSize
+    //occupied, available: cache.evictableSize
+    glog.Infof("current size=%d evictable=%d", cache.currentSize,cache.evictableSize)
+    return cache.size - cache.currentSize + cache.evictableSize
 }

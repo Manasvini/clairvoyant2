@@ -44,7 +44,7 @@ func (trajectory *Trajectory) Advance() bool {
 
 func (trajectory *Trajectory) LoadFromFile(filename string) {
 	f, err := os.Open(filename)
-
+    defer f.Close()
 	if err != nil {
 		fmt.Println(err)
 	}

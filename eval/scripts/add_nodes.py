@@ -15,13 +15,12 @@ def process_args():
     parser.add_option("-s", dest="start", type=int, help="ip start")
     parser.add_option("-i", dest="nodeid", type=int, help="id start")
     parser.add_option("-f", dest="filename", type=str, help="nodes file")
+    parser.add_option("--ipinfo", dest="ipInfo", type=str, help="file containing list of edge ips")
     (options, args) = parser.parse_args()
     return options
 
-def main():
-    args = process_args()
+def old_main(args):
     nodes_df = pd.read_csv(args.filename)
-    #'enode_positions/microbenchmark/' + str(args.n) + 'nodes.csv')
     print(nodes_df)
     for j in range(1000):
         ctr = args.start
@@ -43,6 +42,39 @@ def main():
         else:
             break
 
+def main(args):
+    nodes_df = pd.read_csv(args.filename)
+    ip_df = pd.read_csv(args.ipInfo)
+    nodeIps = {}
+    for i in range(len(ip_df)):
+        if 'node_' in ip_df.iloc[i]['id']:
+            nodeIps[ip_df.iloc[i]['id']] = ip_df.iloc[i]['ip']
+
+
+    print(nodeIps)
+    print(nodes_df)
+
+    for j in range(1000):
+        ctr = args.start
+        port = 50056
+        for i in range(len(nodes_df)):
+            lat = nodes_df.iloc[i]['y']
+            lon = nodes_df.iloc[i]['x']
+            rc.geoadd(f'nodes{j}', lon, lat, f'node_{i}')
+            if i > args.n:
+                break
+    for i in range(len(nodes_df)):
+        if i < args.n :
+            nodeIp = nodeIps[f"node_{i}"]
+            print(f"adding {nodeIp} address to node node_{i}")
+            rc.hset(f'node_{i}',None, None, {'address':f'{nodeIp}:50056'})
+        else:
+            break
+
 if __name__=='__main__':
-    main()
+    args = process_args()
+    if args.ipInfo:
+        main(args)
+    else:
+        old_main(args)
 
