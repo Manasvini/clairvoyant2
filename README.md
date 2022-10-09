@@ -1,3 +1,5 @@
+## Dependencies  
+Install github.com/Manasvini/clairvoyantedge-metadata. The parent directory should be common for this repo and clairvoyantedge-metadata.  
 ### Running the code
 
 > Check the configuration eval/conf/10node_conf.json
